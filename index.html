@@ -504,6 +504,17 @@ ul{list-style:none;}
     <div id="bigaccountList"></div>
   </section>
 
+  <!-- ===== 小号脚本 ===== -->
+  <section class="section" id="sec-smallaccount">
+    <div class="section-head">
+      <h2>小号脚本</h2>
+      <span class="sub" id="smallaccountCount"></span>
+    </div>
+    <div class="info-bar" id="smallaccountInfo"></div>
+    <div class="date-bar" id="smallaccountDate"></div>
+    <div id="smallaccountList"></div>
+  </section>
+
   <!-- ===== 拍摄方向库 ===== -->
   <section class="section" id="sec-directions">
     <div class="section-head">
@@ -669,6 +680,7 @@ const NAV_ITEMS = [
   {id:'library', name:'灵感库', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>'},
   {id:'script', name:'每日脚本', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="14" y2="17"/></svg>'},
   {id:'bigaccount', name:'大号脚本', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z"/></svg>'},
+  {id:'smallaccount', name:'小号脚本', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>'},
   {id:'directions', name:'方向库', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/><circle cx="6" cy="6" r="1" fill="currentColor"/><circle cx="6" cy="12" r="1" fill="currentColor"/><circle cx="6" cy="18" r="1" fill="currentColor"/></svg>'},
   {id:'settings', name:'设置', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>'}
 ];
@@ -700,6 +712,7 @@ function switchSection(id){
   if(id==='library') renderLibrary();
   if(id==='script') fillScriptSelect();
   if(id==='bigaccount') renderBigaccount();
+  if(id==='smallaccount') renderSmallaccount();
 }
 
 function toggleDrawer(open){
@@ -827,6 +840,7 @@ async function fetchGist(){
     renderInspire();
     renderRecreate();
     renderBigaccount();
+    renderSmallaccount();
     fillScriptSelect();
     updateDrawerInfo();
     showToast('✅ 已更新 '+ (content.date||''));
@@ -845,6 +859,7 @@ async function fetchGist(){
           renderInspire();
           renderRecreate();
           renderBigaccount();
+          renderSmallaccount();
           updateDrawerInfo();
           showToast('✅ 已更新 '+ (content.date||''));
           return;
@@ -892,6 +907,7 @@ function loadDemoData(){
   renderInspire();
   renderRecreate();
   renderBigaccount();
+  renderSmallaccount();
   updateDrawerInfo();
 }
 
@@ -2806,6 +2822,142 @@ function saveBigaccountToScripts(idx){
     id: newId,
     tag: (raw.tag||'大号') + '·大号',
     title: raw.title || '大号脚本',
+    created: new Date().toLocaleString('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}),
+    script: sc
+  });
+  Store.set('scripts', list);
+  showToast('✅ 已存入每日脚本');
+  setTimeout(()=>switchSection('script'), 800);
+}
+
+// ===== 小号脚本渲染 =====
+function renderSmallaccount(){
+  const data = Store.get('dailyData', null);
+  const info = document.getElementById('smallaccountInfo');
+  const list = document.getElementById('smallaccountList');
+  const dateEl = document.getElementById('smallaccountDate');
+  const countEl = document.getElementById('smallaccountCount');
+
+  if(!data){
+    info.innerHTML = '<span class="err">未获取到数据，点击右上角刷新</span>';
+    list.innerHTML = '<div class="empty"><p>暂无小号脚本</p></div>';
+    countEl.textContent = '';
+    return;
+  }
+
+  const items = data.smallaccount || [];
+  countEl.textContent = `共 ${items.length} 条`;
+  dateEl.textContent = '📅 '+ (data.date||'') + ' · 3类型轮换';
+  const lu = Store.get('lastUpdate','');
+  info.innerHTML = lu? `<span class="ok">数据更新于 ${lu}</span>` : '';
+
+  if(!items.length){
+    list.innerHTML = '<div class="empty"><p>今日暂无小号脚本，点击右上角刷新</p></div>';
+    return;
+  }
+
+  const productName = Store.get('productName','') || '颜小盼咖啡';
+
+  list.innerHTML = items.map((it,i)=>{
+    const sc = normalizeScript(JSON.parse(JSON.stringify(it)), productName);
+    const typeColor = {'减脂生活方式':'#27AE60','好物分享':'#E67E22','直播预热':'#E74C3C'}[sc.type] || '#8CA63E';
+    return `
+    <div class="card">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+        <div style="flex:1;min-width:200px;">
+          <span style="font-size:11px;background:${typeColor};color:#fff;padding:3px 9px;border-radius:8px;font-weight:600;">${esc(sc.type||'小号')}</span>
+          ${sc.form?`<span style="font-size:11px;background:#FFF3E0;color:var(--orange);padding:2px 8px;border-radius:8px;font-weight:500;margin-left:4px;">${esc(sc.form)}</span>`:''}
+          ${sc.difficulty?`<span style="font-size:11px;color:var(--text-sub);margin-left:4px;">${esc(sc.difficulty)}</span>`:''}
+          <div style="font-size:15px;font-weight:600;margin-top:8px;color:var(--text);">${i+1}. ${esc(it.title||'')}</div>
+        </div>
+        <span style="font-size:11px;color:var(--text-mute);flex-shrink:0;">⏱${esc(sc.duration||'')}</span>
+      </div>
+      ${sc.location?`<div style="font-size:12px;color:var(--text-sub);margin-bottom:6px;">📍 场地：${esc(sc.location)}</div>`:''}
+      ${sc.actors?`<div style="font-size:12px;color:var(--text-sub);margin-bottom:6px;">👥 出镜：${esc(sc.actors)}</div>`:''}
+      ${sc.props && sc.props.length?`<div style="font-size:12px;color:var(--text-sub);margin-bottom:6px;">🎒 道具：${sc.props.map(p=>esc(p)).join('、')}</div>`:''}
+      ${sc.hook_logic?`<div style="background:linear-gradient(135deg,#FFF8E8,#FFFEF5);padding:10px;border-radius:8px;margin-bottom:10px;border-left:3px solid var(--gold);"><div style="font-size:11px;font-weight:700;color:var(--gold);margin-bottom:4px;">🎯 推流逻辑</div><div style="font-size:12px;color:var(--text);line-height:1.5;">${esc(sc.hook_logic)}</div></div>`:''}
+      ${sc.scenes && sc.scenes.length?`<div style="font-size:13px;font-weight:700;color:var(--olive-dark);margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid var(--olive-pale);">📋 分镜头脚本（${sc.scenes.length}个镜头）</div>
+        ${sc.scenes.map((shot,si)=>`<div style="background:var(--olive-tint);border-radius:10px;padding:12px;margin-bottom:10px;border-left:3px solid var(--olive-light);">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
+            <span style="background:var(--olive);color:#fff;font-size:11px;padding:2px 8px;border-radius:6px;font-weight:600;">镜头${si+1}</span>
+            <span style="font-size:12px;color:var(--olive);font-weight:600;">${esc(shot.time||'')}</span>
+            <span style="font-size:11px;color:var(--text-sub);background:#fff;padding:2px 8px;border-radius:6px;">${esc(shot.framing||'')}</span>
+            <span style="font-size:11px;color:var(--text-sub);background:#fff;padding:2px 8px;border-radius:6px;">${esc(shot.camera||'')}</span>
+          </div>
+          ${shot.visual?`<div style="margin-bottom:5px;"><span style="font-size:11px;color:var(--text-sub);font-weight:600;">🎬 画面：</span><span style="font-size:12px;color:var(--text);">${esc(shot.visual)}</span></div>`:''}
+          ${shot.expression?`<div style="margin-bottom:5px;"><span style="font-size:11px;color:#E91E63;font-weight:600;">😊 表情：</span><span style="font-size:12px;color:var(--text);">${esc(shot.expression)}</span></div>`:''}
+          ${shot.action?`<div style="margin-bottom:5px;"><span style="font-size:11px;color:var(--text-sub);font-weight:600;">✋ 动作：</span><span style="font-size:12px;color:var(--text);">${esc(shot.action)}</span></div>`:''}
+          ${shot.line && shot.line!=='无'?`<div style="margin-bottom:5px;background:#fff;padding:6px 10px;border-radius:6px;border-left:2px solid var(--olive);"><span style="font-size:11px;color:var(--olive-dark);font-weight:600;">🗣 台词：</span><span style="font-size:13px;color:var(--text);font-weight:500;">${esc(shot.line)}</span></div>`:''}
+          ${shot.subtitle && shot.subtitle!=='无'?`<div style="margin-bottom:5px;"><span style="font-size:11px;color:#3498DB;font-weight:600;">📝 字幕：</span><span style="font-size:12px;color:var(--text-sub);">${esc(shot.subtitle)}</span></div>`:''}
+          ${shot.bgm?`<div style="margin-bottom:5px;"><span style="font-size:11px;color:var(--text-sub);font-weight:600;">🎵 BGM：</span><span style="font-size:12px;color:var(--text-sub);">${esc(shot.bgm)}</span></div>`:''}
+          ${shot.tip?`<div style="background:#FFF8E8;padding:8px 10px;border-radius:6px;margin-top:6px;border-left:2px solid var(--gold);"><span style="font-size:11px;color:var(--gold);font-weight:600;">💡 要点：</span><span style="font-size:12px;color:var(--text);">${esc(shot.tip)}</span></div>`:''}
+        </div>`).join('')}`:''}
+      ${sc.ending_hook?`<div style="background:#F0F4E8;padding:10px;border-radius:8px;margin-bottom:8px;border-left:3px solid var(--olive);"><div style="font-size:11px;font-weight:600;color:var(--olive-dark);margin-bottom:4px;">🎬 结尾钩子</div><div style="font-size:12px;color:var(--text);line-height:1.5;">${esc(sc.ending_hook)}</div></div>`:''}
+      ${sc.publish_config?`<div style="background:#fff;padding:10px;border-radius:8px;margin-bottom:8px;border:1px solid var(--line);">
+        <div style="font-size:11px;font-weight:600;color:var(--olive-dark);margin-bottom:6px;">📤 发布配置</div>
+        ${sc.publish_config.best_time?`<div style="font-size:12px;color:var(--text-sub);margin-bottom:3px;">⏰ ${esc(sc.publish_config.best_time)}</div>`:''}
+        ${sc.publish_config.caption?`<div style="font-size:12px;color:var(--text);margin-bottom:3px;">📝 ${esc(sc.publish_config.caption)}</div>`:''}
+        ${sc.publish_config.cover_text?`<div style="font-size:12px;color:var(--orange);margin-bottom:3px;">🏷 封面：${esc(sc.publish_config.cover_text)}</div>`:''}
+        ${sc.publish_config.pinned_comment?`<div style="font-size:12px;color:var(--text-sub);">📌 置顶：${esc(sc.publish_config.pinned_comment)}</div>`:''}
+      </div>`:''}
+      ${sc.compliance_check?`<div style="background:#E8F5E9;padding:8px 10px;border-radius:8px;margin-bottom:8px;"><span style="font-size:11px;color:#27AE60;font-weight:600;">✅ 合规：</span><span style="font-size:11px;color:var(--text-sub);">${esc(sc.compliance_check)}</span></div>`:''}
+      ${sc.shoot_checklist && sc.shoot_checklist.length?`<div style="background:#FFF3E0;padding:10px;border-radius:8px;margin-bottom:10px;"><div style="font-size:11px;font-weight:600;color:var(--orange);margin-bottom:6px;">✅ 拍摄清单</div><ul style="font-size:12px;color:var(--text);padding-left:16px;line-height:1.6;">${sc.shoot_checklist.map(c=>`<li style="margin-bottom:2px;">${esc(c)}</li>`).join('')}</ul></div>`:''}
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-cancel" style="flex:1;font-size:12px;padding:8px;" onclick="copySmallaccount(${i})">复制完整脚本</button>
+        <button class="btn btn-primary" style="flex:1;font-size:12px;padding:8px;" onclick="saveSmallaccountToScripts(${i})">存入每日脚本</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function copySmallaccount(idx){
+  const data = Store.get('dailyData', null);
+  if(!data || !data.smallaccount || !data.smallaccount[idx]) return;
+  const productName = Store.get('productName','') || '颜小盼咖啡';
+  const sc = normalizeScript(JSON.parse(JSON.stringify(data.smallaccount[idx])), productName);
+  let txt = `【小号脚本】${data.smallaccount[idx].title||''}\n`;
+  txt += `类型：${sc.type||''} | 形式：${sc.form||''} | 时长：${sc.duration||''}\n`;
+  if(sc.location) txt += `场地：${sc.location}\n`;
+  if(sc.actors) txt += `出镜：${sc.actors}\n`;
+  if(sc.props && sc.props.length) txt += `道具：${sc.props.join('、')}\n`;
+  if(sc.hook_logic) txt += `\n🎯 推流逻辑\n${sc.hook_logic}\n`;
+  if(sc.scenes && sc.scenes.length){
+    txt += `\n📋 分镜头脚本（${sc.scenes.length}个镜头）\n`;
+    sc.scenes.forEach((s,i)=>{
+      txt += `\n[镜头${i+1}] ${s.time||''} ${s.framing||''} ${s.camera||''}\n`;
+      if(s.visual) txt += `画面：${s.visual}\n`;
+      if(s.expression) txt += `表情：${s.expression}\n`;
+      if(s.action) txt += `动作：${s.action}\n`;
+      if(s.line && s.line!=='无') txt += `台词：${s.line}\n`;
+      if(s.subtitle && s.subtitle!=='无') txt += `字幕：${s.subtitle}\n`;
+      if(s.bgm) txt += `BGM：${s.bgm}\n`;
+      if(s.tip) txt += `要点：${s.tip}\n`;
+    });
+  }
+  if(sc.ending_hook) txt += `\n🎬 结尾钩子\n${sc.ending_hook}\n`;
+  if(sc.publish_config){
+    txt += `\n📤 发布配置\n`;
+    if(sc.publish_config.best_time) txt += `时间：${sc.publish_config.best_time}\n`;
+    if(sc.publish_config.caption) txt += `文案：${sc.publish_config.caption}\n`;
+    if(sc.publish_config.cover_text) txt += `封面：${sc.publish_config.cover_text}\n`;
+    if(sc.publish_config.pinned_comment) txt += `置顶：${sc.publish_config.pinned_comment}\n`;
+  }
+  if(sc.shoot_checklist && sc.shoot_checklist.length) txt += `\n✅ 拍摄清单\n${sc.shoot_checklist.map(c=>'· '+c).join('\n')}\n`;
+  copyText(txt);
+}
+
+function saveSmallaccountToScripts(idx){
+  const data = Store.get('dailyData', null);
+  if(!data || !data.smallaccount || !data.smallaccount[idx]) return;
+  const productName = Store.get('productName','') || '颜小盼咖啡';
+  const raw = data.smallaccount[idx];
+  const sc = normalizeScript(JSON.parse(JSON.stringify(raw)), productName);
+  const list = Store.get('scripts', []);
+  const newId = list.length? Math.max(...list.map(x=>x.id||0))+1 : 1;
+  list.unshift({
+    id: newId,
+    tag: (raw.type||'小号') + '·小号',
+    title: raw.title || '小号脚本',
     created: new Date().toLocaleString('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}),
     script: sc
   });
