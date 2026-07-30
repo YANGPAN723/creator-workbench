@@ -241,6 +241,7 @@ ul{list-style:none;}
 .lib-card .lc-section b{color:var(--olive-dark);}
 .lib-card .lc-section .lbl{display:inline-block;background:var(--olive-pale);color:var(--olive-dark);font-size:11px;padding:1px 7px;border-radius:5px;margin-right:6px;font-weight:600;}
 .lib-card .lc-foot{display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--text-mute);padding-top:8px;border-top:1px dashed var(--line);}
+.lib-card .lc-foot .lc-action{color:var(--olive);padding:4px 8px;background:var(--olive-pale);border-radius:6px;}
 .lib-card .lc-foot .lc-del{color:var(--red);padding:4px 8px;}
 .lib-add-btn{
   position:fixed;right:18px;bottom:calc(78px + var(--safe-bottom));width:52px;height:52px;
@@ -329,6 +330,11 @@ ul{list-style:none;}
 .filter-tab.active{background:var(--olive);color:#fff;font-weight:600;}
 
 </style>
+<link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoi5Yqo5Yqb5oqA5ben5bC65Z2WIiwic2hvcnRfbmFtZSI6IuWKqOWKm+iMgOWBnuWktCIsInN0YXJ0X3VybCI6Ii4iLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsImJhY2tncm91bmRfY29sb3IiOiIjRkZGRkZGIiwidGhlbWVfY29sb3IiOiIjOENBNjNFIiwiaWNvbnMiOlt7InNyYyI6ImRhdGE6aW1hZ2Uvc3ZnK3htbDtiYXNlNjQsUEhOMlp5QjNhV1IwSUQwaWFIUjBjRG92TDJkcGJtVm1ZWEl1WTI5dEwyVjJaVzUwY3k4eE1EQXdJaUI0Yld4dWN6MGlhSFIwY0RvdkwyZHBibVZtWVhJdVkyOXRMMlYyWlc1MGN5OHhNREF3SWo0S1BITjJaeUIzYVdSMElEMGlhSFIwY0RvdkwyZHBibVZtWVhJdVkyOXRMMlYyWlc1MGN5OHhNREF3SWlCNGRXRnVibUZ0WlQwaWFIUjBjRG92TDJkcGJtVm1ZWEl1WTI5dEwyVjJaVzUwY3k4eE1EQXdJaUI0Yld4dWN6MGlhSFIwY0RvdkwyZHBibVZtWVhJdVkyOXRMMlYyWlc1MGN5OHhNREF3SWo0S1BITjJaeUIzYVdSMElEMGlhSFIwY0RvdkwyZHBibVZtWVhJdVkyOXRMMlYyWlc1MGN5OHhNREF3SWlCNGRXRnVibUZ0WlQwaWFIUjBjRG92TDJkcGJtVm1ZWEl1WTI5dEwyVjJaVzUwY3k4eE1EQXdJajQ9Iiwic2l6ZXMiOiIxOTJ4MTkyIn1dfQ==">
+<meta name="theme-color" content="#8CA63E">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="盼盼工作台">
 </head>
 <body>
 
@@ -487,6 +493,17 @@ ul{list-style:none;}
     <div id="scriptList"></div>
   </section>
 
+  <!-- ===== 大号脚本（盼盼两口子大号专用） ===== -->
+  <section class="section" id="sec-bigaccount">
+    <div class="section-head">
+      <h2>大号脚本</h2>
+      <span class="sub" id="bigaccountCount"></span>
+    </div>
+    <div class="info-bar" id="bigaccountInfo"></div>
+    <div class="date-bar" id="bigaccountDate"></div>
+    <div id="bigaccountList"></div>
+  </section>
+
   <!-- ===== 拍摄方向库 ===== -->
   <section class="section" id="sec-directions">
     <div class="section-head">
@@ -516,7 +533,7 @@ ul{list-style:none;}
       <div style="font-size:14px;font-weight:600;color:var(--red);margin-bottom:8px;">⚠️ 抖音违规避雷（必须遵守）</div>
       <div style="font-size:12px;color:var(--text);line-height:1.7;">
         <div>❌ 禁用词：减肥/瘦身/溶脂/排毒/清肠/治疗/治愈/药物/包瘦/保证瘦/见效快/神效/奇迹/秘方/独家/唯一/加微信/私聊/下单/买</div>
-        <div>✅ 替换：减肥→减脂/身材管理，瘦身→变好看，产品功效→"我每天喝的/我选择的"</div>
+        <div>✅ 替换：减肥→减脂/身材管理，瘦身→变好看，产品功效→"我减脂那段时间喝的/我用过的"（强调现在不喝了，避免粉丝跟买）</div>
         <div>❌ 不承诺效果：不说"X天瘦X斤"，只说"这段时间的变化"</div>
         <div>❌ 不说价格：视频里绝不出现268等价格</div>
         <div>❌ 不违规引流：不说"加微信"，只说"来找我/评论区见"</div>
@@ -544,6 +561,15 @@ ul{list-style:none;}
       <div class="form-group">
         <label style="font-size:13px;color:var(--text-sub);margin-bottom:6px;display:block;">赛道关键词</label>
         <input type="text" id="setTrack" placeholder="例如：农村生活/三农" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--olive-tint);">
+      </div>
+      <div class="form-group">
+        <label style="font-size:13px;color:var(--text-sub);margin-bottom:6px;display:block;">产品名（脚本里自动替换）</label>
+        <input type="text" id="setProductName" placeholder="默认：颜小盼咖啡" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--olive-tint);">
+      </div>
+      <div class="form-group">
+        <label style="font-size:13px;color:var(--text-sub);margin-bottom:6px;display:block;">AI 密钥（用于灵感库 AI 整理）</label>
+        <input type="password" id="setAIKey" placeholder="sk-...（留空则灵感库无法使用 AI 整理）" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--olive-tint);">
+        <div style="font-size:11px;color:var(--text-mute);margin-top:4px;">密钥仅存在手机本地，不会上传。公开仓库中请勿硬编码。</div>
       </div>
       <button class="btn btn-primary" onclick="saveSettings()" style="width:100%;margin-top:6px;">保存设置</button>
     </div>
@@ -595,7 +621,8 @@ ul{list-style:none;}
     </div>
     <div class="modal-actions">
       <button class="btn btn-cancel" onclick="closeModal('inspireModal')">取消</button>
-      <button class="btn btn-primary" onclick="saveInspire()">保存</button>
+      <button class="btn btn-primary" onclick="saveInspire(true)">保存并AI整理</button>
+      <button class="btn btn-primary" onclick="saveInspire()" style="background:var(--olive-light);">仅保存</button>
     </div>
   </div>
 </div>
@@ -641,6 +668,7 @@ const NAV_ITEMS = [
   {id:'memo', name:'备忘录', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg>'},
   {id:'library', name:'灵感库', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>'},
   {id:'script', name:'每日脚本', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="14" y2="17"/></svg>'},
+  {id:'bigaccount', name:'大号脚本', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z"/></svg>'},
   {id:'directions', name:'方向库', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/><circle cx="6" cy="6" r="1" fill="currentColor"/><circle cx="6" cy="12" r="1" fill="currentColor"/><circle cx="6" cy="18" r="1" fill="currentColor"/></svg>'},
   {id:'settings', name:'设置', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>'}
 ];
@@ -671,6 +699,7 @@ function switchSection(id){
   if(id==='recreate') renderRecreate();
   if(id==='library') renderLibrary();
   if(id==='script') fillScriptSelect();
+  if(id==='bigaccount') renderBigaccount();
 }
 
 function toggleDrawer(open){
@@ -797,6 +826,7 @@ async function fetchGist(){
     document.getElementById('refreshBtn').classList.remove('has-new');
     renderInspire();
     renderRecreate();
+    renderBigaccount();
     fillScriptSelect();
     updateDrawerInfo();
     showToast('✅ 已更新 '+ (content.date||''));
@@ -814,6 +844,7 @@ async function fetchGist(){
           Store.set('lastUpdate', new Date().toLocaleString('zh-CN'));
           renderInspire();
           renderRecreate();
+          renderBigaccount();
           updateDrawerInfo();
           showToast('✅ 已更新 '+ (content.date||''));
           return;
@@ -860,6 +891,7 @@ function loadDemoData(){
   Store.set('lastUpdate', new Date().toLocaleString('zh-CN'));
   renderInspire();
   renderRecreate();
+  renderBigaccount();
   updateDrawerInfo();
 }
 
@@ -947,6 +979,63 @@ function renderRecreate(){
    二创脚本生成（基于热点改编，可直接落地拍摄）
    与选题脚本的区别：二创必须先引用原热点，再过渡到盼盼的改编拍摄
 =================================================== */
+
+// 模板变量替换：把 {HOT} {PRODUCT} {TITLE} 等占位符替换成实际内容
+function replaceVars(str, vars){
+  if(typeof str !== 'string') return str;
+  return str.replace(/\{(\w+)\}/g, (m, k) => vars[k] !== undefined ? vars[k] : m);
+}
+
+// 脚本后处理：智能产品名替换 + 植入频率控制
+// 策略：台词里念生活化说法（避免广告感），动作/策略里用真实产品名（方便拍摄认道具）
+function normalizeScript(result, productName){
+  const pn = productName || '颜小盼咖啡';
+  // 台词里念的——强调"我当时喝的咖啡"，不说现在还喝
+  const casual = '我当时喝的咖啡';
+  // 动作/策略/要点里——用真实产品名，方便拍摄时认出道具
+  const replaceAction = (str) => {
+    if(typeof str !== 'string') return str;
+    return str.replace(/\{PRODUCT\}/g, pn)
+              .replace(/产品/g, pn)
+              .replace(/饮品/g, pn)
+              .replace(/我喝的这杯/g, pn);
+  };
+  // 台词里——把产品名替换为生活化说法（避免广告感）
+  const replaceLine = (str) => {
+    if(typeof str !== 'string') return str;
+    return str.replace(/\{PRODUCT\}/g, casual)
+              .replace(/产品/g, casual)
+              .replace(/饮品/g, casual)
+              .replace(new RegExp(pn, 'g'), casual);  // 把已经被replaceVars替换成的产品名再换回生活化
+  };
+  // 策略说明里——用真实产品名
+  const replaceStrategy = (str) => {
+    if(typeof str !== 'string') return str;
+    return str.replace(/\{PRODUCT\}/g, pn)
+              .replace(/产品/g, pn)
+              .replace(/饮品/g, pn)
+              .replace(/我喝的这杯/g, pn);
+  };
+
+  result.hook = replaceAction(result.hook);
+  result.logic = replaceAction(result.logic);
+  result.emotion = replaceAction(result.emotion);
+  result.interact = replaceLine(result.interact);  // 互动引导也是台词
+  result.product = replaceStrategy(result.product);
+  if(result.tips) result.tips = result.tips.map(replaceAction);
+  if(result.scenes){
+    result.scenes = result.scenes.map(s => ({
+      time: s.time,
+      shot: replaceAction(s.shot),
+      action: replaceAction(s.action),      // 动作描述：用真实产品名
+      line: replaceLine(s.line),            // 台词：生活化说法
+      bgm: s.bgm,
+      note: replaceAction(s.note)
+    }));
+  }
+  return result;
+}
+
 function generateRecreateScript(i){
   const data = Store.get('dailyData', null);
   if(!data || !data.recreate || !data.recreate[i]){
@@ -1007,277 +1096,277 @@ function buildRecreateScript(item){
     // 居家场景类
     '居家跟拍版_standard': {
       form:'标准视频', duration:'30秒',
-      hook:'热点画面截图开场→切到盼盼家里：「这事我也遇到过」',
+      hook:'热点画面截图开场→切到盼盼家里：「{HOT} 这事我也遇到过」',
       emotion:'好奇→共鸣→会心一笑',
       logic:'先用热点话题抓眼球，3秒内切到自己家里的真实场景，用夫妻日常降维解读热点，避免硬蹭。',
       scenes:[
-        {time:'0-3秒', shot:'手机录屏/截图', action:'热点视频截图或录屏画面，配大字标题「这个热点火了」', line:'（字幕）最近这个话题火了', bgm:'轻快', note:'【黄金3秒】用热点本身吸睛，不要自己说话'},
-        {time:'3-6秒', shot:'中景', action:'硬切到盼盼家客厅，盼盼正抱娃/做减脂餐，抬头看镜头', line:'盼盼：这事我也遇到过', bgm:'转折', note:'【过渡钩子】硬切制造反差，3秒内进入自己的场景'},
-        {time:'6-15秒', shot:'中景/近景交替', action:'盼盼边做手头的事边聊，老公从背后路过插一句嘴', line:'盼盼：其实吧……（结合热点聊自己的看法）\n老公：你就是……（吐槽）', bgm:'生活感', note:'【夫妻日常】老公插嘴要自然，不要演，展现真实互动'},
-        {time:'15-22秒', shot:'近景', action:'盼盼拿起桌上的产品自然喝一口/展示，继续说', line:'盼盼：我现在就是……（自然带出减脂生活方式）', bgm:'保持', note:'【产品软植入】产品当道具自然出现，不介绍功效'},
-        {time:'22-27秒', shot:'中景', action:'老公又补一刀/孩子跑过来抢镜', line:'老公/孩子：（画外音互动）', bgm:'轻松', note:'【完播钩子】中段加意外元素留住观众'},
-        {time:'27-30秒', shot:'近景', action:'盼盼对着镜头抛问题', line:'盼盼：你们家也这样吗？评论区聊聊', bgm:'收', note:'【互动触发】抛开放性问题'}
+        {time:'0-3秒', shot:'手机录屏/截图', action:'{HOT}视频截图或录屏画面，配大字标题「{HOT}」', line:'（字幕）{HOT}', bgm:'轻快', note:'【黄金3秒】用热点本身吸睛，不要自己说话'},
+        {time:'3-6秒', shot:'中景', action:'硬切到盼盼家客厅，盼盼正抱娃/做减脂餐，抬头看镜头', line:'盼盼：{HOT}，这事我也遇到过。', bgm:'转折', note:'【过渡钩子】硬切制造反差，3秒内进入自己的场景'},
+        {time:'6-15秒', shot:'中景/近景交替', action:'盼盼边做手头的事边聊，老公从背后路过插一句嘴', line:'盼盼：好多姐妹光看别人热闹，但我是从117斤到98斤的宝妈，我知道这里面最累的不是热点本身，是我们每天的日子。\n老公：你又开始讲道理了。', bgm:'生活感', note:'【夫妻日常】老公插嘴要自然，不要演，展现真实互动'},
+        {time:'15-22秒', shot:'近景', action:'盼盼拿起{PRODUCT}展示一下，继续说', line:'盼盼：我现在状态能稳住，不是因为我还在喝什么，是因为减脂那段时间养成的习惯没丢。当时就是靠{PRODUCT}这种辅助过来的。', bgm:'保持', note:'【产品软植入】产品作为"我当时用过的辅助"出现，不强调现在还喝'},
+        {time:'22-27秒', shot:'中景', action:'老公又补一刀/孩子跑过来抢镜', line:'老公：你现在不喝了 我才奇怪。\n孩子：妈妈！', bgm:'轻松', note:'【完播钩子】中段加意外元素留住观众，呼应"现在不喝了"的人设'},
+        {time:'27-30秒', shot:'近景', action:'盼盼对着镜头抛问题', line:'盼盼：{HOT}你们也刷到了吗？评论区聊聊。', bgm:'收', note:'【互动触发】抛开放性问题'}
       ],
-      interact:'「你们家也这样吗？评论区告诉我」+ 置顶一条自己的真实经历',
-      product:'产品当生活道具出现（喝水/泡饮品），只展示不讲解',
+      interact:'「{HOT}你们也刷到了吗？评论区聊聊」+ 置顶一条自己的真实经历',
+      product:'{PRODUCT}当生活道具出现（喝水/泡饮品），只展示不讲解',
       tips:['热点截图要用当天的，超过2天就过气','硬切转场比淡入更抓人','老公插话要真实，别背台词']
     },
     '厨房场景版_standard': {
       form:'标准视频', duration:'35秒',
-      hook:'锅里滋滋声+盼盼边炒边说热点',
+      hook:'锅里滋滋声+盼盼边炒边说{HOT}',
       emotion:'好奇→专注→信任',
       logic:'用做饭的ASMR感开场抓人，边做边聊热点，产品作为食材/饮品天然植入，生活感最强。',
       scenes:[
-        {time:'0-3秒', shot:'特写', action:'锅里食材特写，滋滋声，盼盼手入画翻炒', line:'（字幕）边做减脂餐 边聊个热点', bgm:'保留环境音', note:'【黄金3秒】ASMR感开场，食物特写最抓人'},
-        {time:'3-8秒', shot:'中景', action:'盼盼围裙造型，边翻炒边对镜头聊热点', line:'盼盼：今天看到个热点……（简述热点）', bgm:'轻柔', note:'边做边说，动作要持续不停'},
-        {time:'8-18秒', shot:'近景/特写交替', action:'盼盼往锅里加调料/盛出装盘，同时发表自己的看法', line:'盼盼：我觉得吧……（减脂视角解读）\n（字幕同步）', bgm:'保持', note:'【情绪转折】从复述热点→输出观点'},
-        {time:'18-25秒', shot:'中景', action:'盼盼把做好的减脂餐端上桌，顺手拿起产品搭配', line:'盼盼：配这个 我每天喝的（自然拿起产品）', bgm:'温暖', note:'【产品软植入】产品作为餐桌搭配出现'},
+        {time:'0-3秒', shot:'特写', action:'锅里食材特写，滋滋声，盼盼手入画翻炒', line:'（字幕）边做减脂餐 边聊{HOT}', bgm:'保留环境音', note:'【黄金3秒】ASMR感开场，食物特写最抓人'},
+        {time:'3-8秒', shot:'中景', action:'盼盼围裙造型，边翻炒边对镜头聊热点', line:'盼盼：今天刷到{HOT}了，我一边做早饭一边跟你们唠两句。', bgm:'轻柔', note:'边做边说，动作要持续不停'},
+        {time:'8-18秒', shot:'近景/特写交替', action:'盼盼往锅里加调料/盛出装盘，同时发表自己的看法', line:'盼盼：我看很多人只看热闹，但作为从117到98的宝妈，我想说一句，身材管理不是跟风，是把自己每一天的小习惯过好。\n（字幕同步）', bgm:'保持', note:'【情绪转折】从复述热点→输出观点'},
+        {time:'18-25秒', shot:'中景', action:'盼盼把做好的减脂餐端上桌，顺手拿起{PRODUCT}展示', line:'盼盼：减脂那段时间，配我的减脂餐，我每天都会喝{PRODUCT}。', bgm:'温暖', note:'【产品软植入】产品作为回忆场景出现，不说现在还喝'},
         {time:'25-30秒', shot:'近景', action:'盼盼尝一口，表情满足，老公从背后伸手偷吃', line:'盼盼：嗯~\n老公：我尝尝（偷吃）', bgm:'轻松', note:'【夫妻日常+完播钩子】老公偷吃是经典梗'},
-        {time:'30-35秒', shot:'中景', action:'盼盼笑着赶老公，对镜头', line:'盼盼：你们家谁偷吃？评论区举手', bgm:'收', note:'【互动触发】'}
+        {time:'30-35秒', shot:'中景', action:'盼盼笑着赶老公，对镜头', line:'盼盼：你们家做饭谁偷吃？评论区举手', bgm:'收', note:'【互动触发】'}
       ],
       interact:'「你们家做饭谁偷吃？评论区举手🙋」',
-      product:'产品作为减脂餐的饮品搭配自然出现桌面上',
+      product:'{PRODUCT}作为减脂餐的饮品搭配自然出现桌面上',
       tips:['做饭画面要真实有油烟感','产品不要特写介绍，当背景道具','老公偷吃要即兴不要彩排']
     },
 
     // 情感共鸣类
     '走心独白版_long': {
       form:'长视频', duration:'90秒',
-      hook:'热点截图+盼盼安静坐着：「这个热点 我想说点不一样的」',
+      hook:'{HOT}截图+盼盼安静坐着：「这个热点 我想说点不一样的」',
       emotion:'好奇→代入→共鸣→治愈',
-      logic:'长视频走心款，用热点做引子但不急着评价，先讲自己的故事，最后回到热点升华。金句要慢说配字幕。',
+      logic:'长视频走心款，用{HOT}做引子但不急着评价，先讲自己的故事，最后回到热点升华。金句要慢说配字幕。',
       scenes:[
-        {time:'0-5秒', shot:'近景', action:'盼盼安静坐在窗边/床边，光线柔和，手里拿着手机看热点', line:'（字幕）这个热点 我想说点不一样的', bgm:'钢琴轻柔', note:'【黄金3秒】安静氛围+反常规表态制造悬念'},
-        {time:'5-15秒', shot:'近景', action:'盼盼放下手机，看向镜头，开始讲', line:'盼盼：大家都在说……（复述热点主流观点）\n但我想讲讲我自己', bgm:'保持', note:'【过渡】先认同再转折'},
-        {time:'15-35秒', shot:'中景/近景', action:'盼盼讲述自己从117到98的经历，穿插旧照片', line:'盼盼：我从117到98……（真实经历，讲过程不讲结果）\n（字幕同步关键词）', bgm:'渐入', note:'【故事主体】讲挣扎不讲成功，越真实越共鸣'},
-        {time:'35-55秒', shot:'近景', action:'盼盼说到动情处，眼眶微红', line:'盼盼：最难的不是少吃……是……（讲心理挣扎）', bgm:'情绪推高', note:'【情绪转折】这里要慢，留白，别急着说下一句'},
-        {time:'55-75秒', shot:'中景', action:'盼盼站起来/换个姿势，语气转坚定', line:'盼盼：后来我明白了……（输出价值观）\n（字幕）「坚持的记录 比奇迹更真实」', bgm:'高潮', note:'【截图传播点】金句字幕放大，停留3秒，配BGM高潮'},
-        {time:'75-85秒', shot:'近景', action:'盼盼拿起产品自然喝一口，平静说', line:'盼盼：我现在每天这样（喝产品）……不为别的，为自己', bgm:'收', note:'【产品软植入】产品融入生活方式，不卖货'},
-        {time:'85-90秒', shot:'近景', action:'盼盼看着镜头，微笑', line:'盼盼：你呢？正在经历什么？评论区说说话', bgm:'收尾', note:'【互动触发】温柔收尾'}
+        {time:'0-5秒', shot:'近景', action:'{HOT}截图飘过，盼盼安静坐在窗边/床边，光线柔和，手里拿着手机', line:'（字幕）{HOT}\n我想说点不一样的', bgm:'钢琴轻柔', note:'【黄金3秒】安静氛围+反常规表态制造悬念'},
+        {time:'5-15秒', shot:'近景', action:'盼盼放下手机，看向镜头，开始讲', line:'盼盼：{HOT}大家都在讨论，有人笑，有人骂。但我是从117斤到98斤的宝妈，我看到的不一样。', bgm:'保持', note:'【过渡】先认同再转折'},
+        {time:'15-35秒', shot:'中景/近景', action:'盼盼讲述自己从117到98的经历，穿插旧照片', line:'盼盼：3年前我117斤的时候，每天最累的不是身体，是心里。我那时候照镜子，会下意识把衣服往下拉，不想让别人看到我腰上的肉。\n（字幕同步关键词）', bgm:'渐入', note:'【故事主体】讲挣扎不讲成功，越真实越共鸣'},
+        {time:'35-55秒', shot:'近景', action:'盼盼说到动情处，眼眶微红', line:'盼盼：最难的不是少吃，是我一直觉得自己不配穿好看的衣服。后来我每天做一件小事，坚持到今天，98斤了，但我最想说的不是体重。', bgm:'情绪推高', note:'【情绪转折】这里要慢，留白，别急着说下一句'},
+        {time:'55-75秒', shot:'中景', action:'盼盼站起来/换个姿势，语气转坚定，拿起{PRODUCT}展示', line:'盼盼：我减脂那段时间，每天早上起来先喝{PRODUCT}，不是为了瘦，是告诉自己，我今天也会认真对待自己。\n（字幕）「坚持的记录 比奇迹更真实」', bgm:'高潮', note:'【截图传播点】金句字幕放大，停留3秒，配BGM高潮'},
+        {time:'75-85秒', shot:'近景', action:'盼盼放下{PRODUCT}，平静说', line:'盼盼：所以{HOT}说什么不重要，重要的是你今天有没有对自己好一点。', bgm:'收', note:'【产品软植入】产品作为回忆道具，不强调现在还喝'},
+        {time:'85-90秒', shot:'近景', action:'盼盼看着镜头，微笑', line:'盼盼：你呢？正在经历什么？评论区说说话，我都在。', bgm:'收尾', note:'【互动触发】温柔收尾'}
       ],
       interact:'「你正在经历什么？评论区说说话，我都在」+ 置顶自己的金句截图',
-      product:'产品作为"我现在的生活方式"出现，喝一口带过，不介绍',
+      product:'{PRODUCT}作为"我现在的生活方式"出现，喝一口带过，不介绍',
       tips:['长视频必须光线好看，窗边自然光最好','讲经历要具体到某一天某件事，别泛泛而谈','金句字幕一定要大，停留够久让人截图','BGM情绪曲线要和讲述节奏匹配']
     },
     '私信回复版_long': {
       form:'长视频', duration:'75秒',
-      hook:'手机私信截图放大：「有个粉丝问我这个热点」',
+      hook:'手机私信截图放大：「有个粉丝问我{HOT}」',
       emotion:'好奇→信任→共鸣',
       logic:'用粉丝私信做钩子，比直接聊热点更有真实感。回复私信的过程中自然讲自己的故事。',
       scenes:[
-        {time:'0-5秒', shot:'手机屏特写', action:'粉丝私信截图，文字放大「盼盼姐 这个热点你怎么看？」', line:'（字幕）有个粉丝问我这个热点', bgm:'轻柔', note:'【黄金3秒】私信截图比热点本身更有代入感'},
-        {time:'5-12秒', shot:'中景', action:'盼盼拿着手机，抬头看镜头，笑一下', line:'盼盼：这个问题问得好，我跟你说说', bgm:'保持', note:'【过渡钩子】像和朋友聊天一样开口'},
-        {time:'12-30秒', shot:'近景', action:'盼盼边看手机边讲，穿插热点画面', line:'盼盼：这个热点说的是……（简述）\n我看到第一反应是……', bgm:'保持', note:'先复述再表态，别一上来就喷'},
-        {time:'30-50秒', shot:'中景', action:'盼盼放下手机，讲自己类似经历', line:'盼盼：因为我之前也……（讲自己的故事）\n（字幕关键词）', bgm:'渐入', note:'【情绪转折】从评价热点→讲自己'},
-        {time:'50-65秒', shot:'近景', action:'盼盼拿起桌上的产品，边喝边说', line:'盼盼：所以我现在……（自然带出生活方式）\n这才是我想告诉你的', bgm:'温暖', note:'【产品软植入】产品作为"我的答案"出现'},
-        {time:'65-75秒', shot:'近景', action:'盼盼对着镜头，真诚', line:'盼盼：你也有类似的困惑吗？私信我 或评论区聊', bgm:'收', note:'【互动触发】引导私信增加粘性'}
+        {time:'0-5秒', shot:'手机屏特写', action:'粉丝私信截图，文字放大「盼盼姐 {HOT}你怎么看？」', line:'（字幕）有个粉丝问我{HOT}', bgm:'轻柔', note:'【黄金3秒】私信截图比热点本身更有代入感'},
+        {time:'5-12秒', shot:'中景', action:'盼盼拿着手机，抬头看镜头，笑一下', line:'盼盼：这个问题问得好，我跟你说说。', bgm:'保持', note:'【过渡钩子】像和朋友聊天一样开口'},
+        {time:'12-30秒', shot:'近景', action:'盼盼边看手机边讲，穿插{HOT}画面', line:'盼盼：{HOT}说的是大家都在关注的那件事。我第一反应不是站队，是想到我以前。', bgm:'保持', note:'先复述再表态，别一上来就喷'},
+        {time:'30-50秒', shot:'中景', action:'盼盼放下手机，讲自己类似经历', line:'盼盼：我117斤的时候，也特别在意别人怎么看我。那时候不是不想变好，是不知道从哪里开始。后来我就每天只做一件小事，比如早起先喝{PRODUCT}，提醒自己今天别敷衍。', bgm:'渐入', note:'【情绪转折】从评价热点→讲自己（"早起喝"是减脂期的回忆，不是现在）'},
+        {time:'50-65秒', shot:'近景', action:'盼盼拿起桌上的{PRODUCT}展示一下，继续说', line:'盼盼：所以我现在不追热点，只追自己每天的状态。这就是我那时候的答案。', bgm:'温暖', note:'【产品软植入】产品作为"我当时的答案"出现，不强调现在还喝'},
+        {time:'65-75秒', shot:'近景', action:'盼盼对着镜头，真诚', line:'盼盼：你也有类似的困惑吗？私信我，或者评论区聊，我都在。', bgm:'收', note:'【互动触发】引导私信增加粘性'}
       ],
       interact:'「你也有类似困惑？私信我 或评论区聊」+ 回复前3条评论',
-      product:'产品作为"我的生活方式答案"自然出现',
+      product:'{PRODUCT}作为"我的生活方式答案"自然出现',
       tips:['私信截图要打码保护粉丝隐私','语气要像闺蜜聊天，不要像说教','回复评论要快，前3条必回']
     },
 
     // 对比反差类
     '前后对比版_long': {
       form:'长视频', duration:'60秒',
-      hook:'热点截图→盼盼旧照：「这个热点 我有发言权」',
+      hook:'{HOT}截图→盼盼旧照：「这个热点 我有发言权」',
       emotion:'好奇→震撼→激励',
-      logic:'用热点话题做引子，但核心是展示自己的117→98对比，热点只是入场券，自己的变化才是主角。',
+      logic:'用{HOT}做引子，但核心是展示自己的117→98对比，热点只是入场券，自己的变化才是主角。',
       scenes:[
-        {time:'0-4秒', shot:'手机截图', action:'热点视频截图，配大字「这个热点 我有发言权」', line:'（字幕）这个热点 我有发言权', bgm:'悬疑', note:'【黄金3秒】用"发言权"制造好奇'},
-        {time:'4-8秒', shot:'近景', action:'盼盼对着镜头，拿出一张旧照片', line:'盼盼：因为我经历过', bgm:'转折', note:'【过渡钩子】掏旧照片的动作有仪式感'},
-        {time:'8-25秒', shot:'特写/中景', action:'盼盼举着117斤旧照，旁边是自己现在的脸，对比', line:'盼盼：这是117斤的我……（讲当时状态）\n（字幕）117斤', bgm:'低沉', note:'【对比主体】讲旧照时的痛苦，不要美化'},
-        {time:'25-35秒', shot:'中景', action:'盼盼转身/换装，镜头转场到现在的状态', line:'（字幕）98斤 现在\n盼盼：这是现在的我', bgm:'高潮卡点', note:'【情绪转折】音乐卡点转场，反差最大化'},
-        {time:'35-50秒', shot:'近景', action:'盼盼展示现在状态，拿起产品', line:'盼盼：怎么做到的？……（讲方法，自然带产品）\n（字幕）我的记录 不是奇迹', bgm:'保持', note:'【产品软植入】产品作为方法之一出现'},
-        {time:'50-60秒', shot:'中景', action:'盼盼看着镜头，眼神坚定', line:'盼盼：这个热点说什么不重要\n重要的是你开始了吗？', bgm:'收', note:'【互动触发】把热点拉回观众自己'}
+        {time:'0-4秒', shot:'手机截图', action:'{HOT}视频截图，配大字「这个热点 我有发言权」', line:'（字幕）{HOT}\n我有发言权', bgm:'悬疑', note:'【黄金3秒】用"发言权"制造好奇'},
+        {time:'4-8秒', shot:'近景', action:'盼盼对着镜头，拿出一张旧照片', line:'盼盼：{HOT}很多人看个热闹，但我经历过。', bgm:'转折', note:'【过渡钩子】掏旧照片的动作有仪式感'},
+        {time:'8-25秒', shot:'特写/中景', action:'盼盼举着117斤旧照，旁边是自己现在的脸，对比', line:'盼盼：这是117斤的我。那时候我每天最累的不是身体，是心。穿衣服只敢穿黑色，拍照永远站在最后。\n（字幕）117斤', bgm:'低沉', note:'【对比主体】讲旧照时的痛苦，不要美化'},
+        {time:'25-35秒', shot:'中景', action:'盼盼转身/换装，镜头转场到现在的状态', line:'（字幕）98斤 现在\n盼盼：这是现在的我。', bgm:'高潮卡点', note:'【情绪转折】音乐卡点转场，反差最大化'},
+        {time:'35-50秒', shot:'近景', action:'盼盼展示现在状态，拿起{PRODUCT}', line:'盼盼：怎么做到的？不是靠少吃，是每天把小事做好。早起一杯{PRODUCT}，按时吃饭，早点睡觉。这些听起来普通，但我做了3年。', bgm:'保持', note:'【产品软植入】产品作为方法之一出现'},
+        {time:'50-60秒', shot:'中景', action:'盼盼看着镜头，眼神坚定', line:'盼盼：{HOT}说什么不重要，重要的是你开始了吗？', bgm:'收', note:'【互动触发】把热点拉回观众自己'}
       ],
       interact:'「你现在的状态 几斤了？评论区打卡」+ 置顶自己的对比照',
-      product:'产品作为"我用的方法"自然出现，不强调功效',
+      product:'{PRODUCT}作为"我用的方法"自然出现，不强调功效',
       tips:['旧照一定要真实，不要P过','转场用遮挡镜头或音乐卡点，反差才够大','说"我的记录"不说"你也能瘦"']
     },
     '别人vs我版_short': {
       form:'极短视频', duration:'15秒',
-      hook:'分屏：别人怎么对这个热点 vs 盼盼怎么对',
+      hook:'分屏：别人怎么对{HOT} vs 盼盼怎么对',
       emotion:'好奇→会心一笑',
-      logic:'极短款，分屏对比制造笑点，用减脂人的视角反差解读热点，3秒一个反转。',
+      logic:'极短款，分屏对比制造笑点，用减脂人的视角反差解读{HOT}，3秒一个反转。',
       scenes:[
-        {time:'0-3秒', shot:'分屏', action:'左屏：热点视频截图（别人）；右屏：盼盼（黑屏待出现）', line:'（字幕）别人 vs 减脂人', bgm:'轻快', note:'【黄金3秒】分屏本身就抓眼球'},
-        {time:'3-7秒', shot:'分屏', action:'左屏：别人怎么反应（复述热点行为）；右屏：盼盼同样场景但反应完全不同', line:'（左字幕）别人：……\n（右字幕）减脂人：……', bgm:'卡点', note:'【对比主体】反差要大，越荒诞越好笑'},
-        {time:'7-11秒', shot:'分屏', action:'左屏继续；右屏盼盼拿起产品淡定喝一口', line:'（右字幕）我：先喝口再说', bgm:'卡点', note:'【产品软植入】产品作为"减脂人标配"出现'},
+        {time:'0-3秒', shot:'分屏', action:'左屏：{HOT}截图（别人）；右屏：盼盼（黑屏待出现）', line:'（字幕）别人 vs 减脂人', bgm:'轻快', note:'【黄金3秒】分屏本身就抓眼球'},
+        {time:'3-7秒', shot:'分屏', action:'左屏：别人怎么反应（复述{HOT}行为）；右屏：盼盼同样场景但反应完全不同', line:'（左字幕）别人：{HOT}好火，跟一下！\n（右字幕）减脂人：火不火，{PRODUCT}照喝。', bgm:'卡点', note:'【对比主体】反差要大，越荒诞越好笑'},
+        {time:'7-11秒', shot:'分屏', action:'左屏继续；右屏盼盼拿起{PRODUCT}淡定喝一口', line:'（右字幕）我：先喝口{PRODUCT}再说。', bgm:'卡点', note:'【产品软植入】产品作为"减脂人标配"出现'},
         {time:'11-15秒', shot:'近景', action:'盼盼对镜头挑眉', line:'盼盼：减脂人懂的都懂\n（字幕）懂的都懂', bgm:'收', note:'【互动触发】圈层暗号'}
       ],
       interact:'「减脂人懂的都懂 评论区举手🙋」',
-      product:'产品作为"减脂人标配道具"出现',
+      product:'{PRODUCT}作为"减脂人标配道具"出现',
       tips:['分屏用剪映模板，3分钟搞定','反差要夸张但合理，别硬凹','15秒别说话太多，字幕为主']
     },
 
     // 夫妻互动类
     '夫妻reaction版_standard': {
       form:'标准视频', duration:'35秒',
-      hook:'盼盼和老公挤一起看手机：「快看这个热点」',
+      hook:'盼盼和老公挤一起看手机：「快看{HOT}」',
       emotion:'好奇→搞笑→甜蜜',
       logic:'夫妻reaction类，真实反应是核心。不要提前剧透，让老公第一反应真实呈现，笑点在互动不在内容。',
       scenes:[
-        {time:'0-3秒', shot:'中景', action:'盼盼和老公头挨头看手机，盼盼指着屏幕', line:'盼盼：快看这个！火了！', bgm:'轻快', note:'【黄金3秒】夫妻同框+看手机的画面就有代入感'},
-        {time:'3-10秒', shot:'近景', action:'手机里放热点视频（画中画），两人表情变化', line:'（热点原声）\n老公：卧槽……？\n盼盼：哈哈哈', bgm:'保持', note:'【真实反应】老公第一反应要真实，不要彩排'},
-        {time:'10-18秒', shot:'中景', action:'老公开始吐槽/发表看法，盼盼接话', line:'老公：我觉得……\n盼盼：你这思路绝了', bgm:'保持', note:'【夫妻日常】观点碰撞，别都同意'},
-        {time:'18-25秒', shot:'近景', action:'盼盼借机聊到自己的减脂日常，拿起产品', line:'盼盼：说到这个 我现在……（喝产品）', bgm:'温暖', note:'【产品软植入】自然过渡到自己的生活'},
-        {time:'25-32秒', shot:'中景', action:'老公补刀/两人拌嘴，孩子乱入', line:'老公：你就是……\n孩子：妈妈！', bgm:'轻松', note:'【完播钩子】孩子乱入是最强留人元素'},
-        {time:'32-35秒', shot:'近景', action:'盼盼笑着看镜头', line:'盼盼：你们家也这样吗？', bgm:'收', note:'【互动触发】'}
+        {time:'0-3秒', shot:'中景', action:'盼盼和老公头挨头看手机，盼盼指着屏幕', line:'盼盼：快看这个！{HOT}火了！', bgm:'轻快', note:'【黄金3秒】夫妻同框+看手机的画面就有代入感'},
+        {time:'3-10秒', shot:'近景', action:'手机里放{HOT}视频（画中画），两人表情变化', line:'（热点原声）\n老公：卧槽……？\n盼盼：哈哈哈', bgm:'保持', note:'【真实反应】老公第一反应要真实，不要彩排'},
+        {time:'10-18秒', shot:'中景', action:'老公开始吐槽/发表看法，盼盼接话', line:'老公：这都能火？网友是真闲。\n盼盼：你不懂，这背后有东西的。', bgm:'保持', note:'【夫妻日常】观点碰撞，别都同意'},
+        {time:'18-25秒', shot:'近景', action:'盼盼借机聊到自己的减脂经历，拿起{PRODUCT}展示', line:'盼盼：说到这个，我减脂那段时间{PRODUCT}是每天喝的，饭照吃，就是不再瞎跟风了。', bgm:'温暖', note:'【产品软植入】产品作为减脂期回忆出现，不说现在还喝'},
+        {time:'25-32秒', shot:'中景', action:'老公补刀/两人拌嘴，孩子乱入', line:'老公：你跟风的时候还少？\n孩子：妈妈！', bgm:'轻松', note:'【完播钩子】孩子乱入是最强留人元素'},
+        {time:'32-35秒', shot:'近景', action:'盼盼笑着看镜头', line:'盼盼：你们家看{HOT}会吵起来吗？', bgm:'收', note:'【互动触发】'}
       ],
-      interact:'「你们家看热点会讨论吗？评论区聊聊」',
-      product:'产品作为"盼盼日常"自然出现',
+      interact:'「你们家看{HOT}会讨论吗？评论区聊聊」',
+      product:'{PRODUCT}作为"盼盼日常"自然出现',
       tips:['reaction一定要第一次看，真实反应才好笑','老公不要背台词，想到啥说啥','孩子乱入别剪掉，那是完播神器']
     },
     '老公采访版_standard': {
       form:'标准视频', duration:'30秒',
-      hook:'盼盼举手机对老公：「老公 这个热点你怎么看」',
+      hook:'盼盼举手机对老公：「老公 {HOT}你怎么看」',
       emotion:'好奇→搞笑→甜',
       logic:'采访形式，核心是老公的真实回答。盼盼负责提问和引导，笑点在老公的直男回答和盼盼的反应。',
       scenes:[
-        {time:'0-3秒', shot:'主观镜头', action:'盼盼举手机对准老公，老公正在忙别的', line:'盼盼：老公！这个热点你怎么看？', bgm:'轻快', note:'【黄金3秒】突袭采访感最真实'},
-        {time:'3-10秒', shot:'主观镜头', action:'老公抬头一脸懵，开始回答', line:'老公：啊？这个啊……我觉得……', bgm:'保持', note:'【真实反应】老公懵的瞬间最好笑'},
-        {time:'10-18秒', shot:'主观镜头', action:'老公越说越离谱/越说越甜，盼盼画外音反应', line:'老公：……\n盼盼：（画外）你这什么脑回路！', bgm:'保持', note:'【夫妻日常】老公的回答要出人意料'},
-        {time:'18-24秒', shot:'主观镜头', action:'盼盼把产品塞给老公「喝这个」老公喝', line:'盼盼：别说了 喝这个\n老公：嗯？这啥', bgm:'轻松', note:'【产品软植入】产品作为"堵嘴道具"出现，最自然'},
-        {time:'24-30秒', shot:'主观镜头', action:'老公喝完继续说，盼盼笑场', line:'老公：好喝 再来一口\n盼盼：哈哈哈', bgm:'收', note:'【完播钩子+互动】笑场收尾'}
+        {time:'0-3秒', shot:'主观镜头', action:'盼盼举手机对准老公，老公正在忙别的', line:'盼盼：老公！{HOT}你怎么看？', bgm:'轻快', note:'【黄金3秒】突袭采访感最真实'},
+        {time:'3-10秒', shot:'主观镜头', action:'老公抬头一脸懵，开始回答', line:'老公：啊？{HOT}啊？我咋看，我看网友就是太闲了。', bgm:'保持', note:'【真实反应】老公懵的瞬间最好笑'},
+        {time:'10-18秒', shot:'主观镜头', action:'老公越说越离谱/越说越甜，盼盼画外音反应', line:'老公：要我说，能把自己日子过好的才最厉害。\n盼盼：（画外）你这脑回路今天开光了？', bgm:'保持', note:'【夫妻日常】老公的回答要出人意料'},
+        {time:'18-24秒', shot:'主观镜头', action:'盼盼把{PRODUCT}塞给老公「看这个」老公看', line:'盼盼：别说了，看这个。\n老公：嗯？这啥？\n盼盼：我减脂时候喝的，现在不喝了。', bgm:'轻松', note:'【产品软植入】产品作为"我当时用的"出现，强调现在不喝了'},
+        {time:'24-30秒', shot:'主观镜头', action:'老公喝完继续说，盼盼笑场', line:'老公：好喝，再来一口。\n盼盼：哈哈哈，你够了。', bgm:'收', note:'【完播钩子+互动】笑场收尾'}
       ],
       interact:'「你家老公会怎么回答？@他来试试」',
-      product:'产品作为"给老公的饮料"自然出现',
+      product:'{PRODUCT}作为"给老公的饮料"自然出现',
       tips:['一定要突袭采访，提前说了就不真实','老公回答不要纠正，越离谱越好','笑场别剪，真实感最强']
     },
 
     // 干货解读类
     '减脂视角解读版_short': {
       form:'极短视频', duration:'18秒',
-      hook:'热点截图+盼盼竖屏：「减脂人看这个热点 角度不一样」',
+      hook:'{HOT}截图+盼盼竖屏：「减脂人看{HOT} 角度不一样」',
       emotion:'好奇→恍然大悟',
       logic:'极短干货款，3秒抓人，10秒输出观点，5秒收尾。字幕要大，语速要快，信息密度高。',
       scenes:[
-        {time:'0-3秒', shot:'近景', action:'盼盼竖屏，旁边热点截图飘过', line:'盼盼：这个热点\n减脂人看的角度不一样', bgm:'紧凑', note:'【黄金3秒】"角度不一样"制造好奇'},
-        {time:'3-10秒', shot:'近景', action:'盼盼快速输出观点，字幕大字同步', line:'盼盼：大家都在说……\n但减脂人看到的是……（专业解读）\n（字幕大字）', bgm:'保持', note:'【干货主体】语速快，字幕大，信息密度高'},
-        {time:'10-15秒', shot:'近景', action:'盼盼拿起产品，边喝边收尾', line:'盼盼：所以 我选择……（喝产品）\n这才是关键', bgm:'保持', note:'【产品软植入】产品作为"专业选择"出现'},
+        {time:'0-3秒', shot:'近景', action:'盼盼竖屏，旁边{HOT}截图飘过', line:'盼盼：{HOT}\n减脂人看的角度不一样', bgm:'紧凑', note:'【黄金3秒】"角度不一样"制造好奇'},
+        {time:'3-10秒', shot:'近景', action:'盼盼快速输出观点，字幕大字同步', line:'盼盼：网友都在看热闹，减脂人看到的是：不要被带节奏，先把每天三件小事做好——吃对、睡好、找到自己能坚持的辅助，比如我那段时间喝的{PRODUCT}。\n（字幕大字）', bgm:'保持', note:'【干货主体】语速快，字幕大，信息密度高'},
+        {time:'10-15秒', shot:'近景', action:'盼盼拿起{PRODUCT}，边喝边收尾', line:'盼盼：所以我选择每天{PRODUCT}，不是因为火，是因为这是我生活方式的一部分。', bgm:'保持', note:'【产品软植入】产品作为"专业选择"出现'},
         {time:'15-18秒', shot:'近景', action:'盼盼指镜头', line:'盼盼：减脂人 评论区集合', bgm:'收', note:'【互动触发】圈层召唤'}
       ],
       interact:'「减脂人评论区集合🙋」+ 置顶观点金句',
-      product:'产品作为"专业选择"自然出现',
+      product:'{PRODUCT}作为"专业选择"自然出现',
       tips:['18秒必须快节奏，字幕要大','观点要犀利，别和稀泥','减脂视角要专业但不说教']
     },
     '避坑指南版_short': {
       form:'极短视频', duration:'20秒',
-      hook:'热点截图+大字「这个热点 别跟着学」',
+      hook:'{HOT}截图+大字「{HOT} 别跟着学」',
       emotion:'好奇→紧张→松口气',
-      logic:'避坑款，用热点做反面教材，输出减脂避坑干货。制造紧张感→给出解决方案→软植入产品。',
+      logic:'避坑款，用{HOT}做反面教材，输出减脂避坑干货。制造紧张感→给出解决方案→软植入产品。',
       scenes:[
-        {time:'0-3秒', shot:'近景', action:'热点截图+红色大字警告', line:'（字幕）这个热点 别跟着学！', bgm:'紧张', note:'【黄金3秒】警告式钩子最强'},
-        {time:'3-10秒', shot:'近景', action:'盼盼严肃脸，指出热点里的问题', line:'盼盼：这个方法看着有效\n但有3个坑……（列举）\n（字幕同步）', bgm:'保持紧张', note:'【干货主体】讲坑不讲卖点'},
-        {time:'10-16秒', shot:'近景', action:'盼盼语气转柔和，给正确做法', line:'盼盼：正确做法是……\n（字幕）我这样做了3个月', bgm:'转温暖', note:'【情绪转折】从紧张→安心'},
-        {time:'16-20秒', shot:'近景', action:'盼盼拿起产品', line:'盼盼：比如 我每天这样（喝产品）\n别走弯路', bgm:'收', note:'【产品软植入】产品作为"正确做法之一"'}
+        {time:'0-3秒', shot:'近景', action:'{HOT}截图+红色大字警告', line:'（字幕）{HOT} 别跟着学！', bgm:'紧张', note:'【黄金3秒】警告式钩子最强'},
+        {time:'3-10秒', shot:'近景', action:'盼盼严肃脸，指出{HOT}里的问题', line:'盼盼：{HOT}这个方法看着有效，但对普通人有3个坑：第一太折腾，第二难坚持，第三容易反弹。', bgm:'保持紧张', note:'【干货主体】讲坑不讲卖点'},
+        {time:'10-16秒', shot:'近景', action:'盼盼语气转柔和，给正确做法', line:'盼盼：正确做法很简单，饭吃好，觉睡好，找到能坚持的辅助——我那段时间喝的{PRODUCT}配合过来的，不追求快，只追求稳。', bgm:'转温暖', note:'【情绪转折】从紧张→安心，强调"那段时间"'},
+        {time:'16-20秒', shot:'近景', action:'盼盼拿起{PRODUCT}', line:'盼盼：别走弯路，先把每天的小事做好。', bgm:'收', note:'【产品软植入】产品作为"正确做法之一"'}
       ],
       interact:'「你踩过这些坑吗？评论区说说我帮你避」',
-      product:'产品作为"正确做法"出现',
+      product:'{PRODUCT}作为"正确做法"出现',
       tips:['警告式开头要够狠，但别恐慌营销','讲坑要具体，别空泛','产品是解决方案之一，不是全部']
     },
 
     // 生活记录类
     'vlog日常版_visual': {
       form:'画面配音乐', duration:'35秒',
-      hook:'一天碎片画面+字幕：「减脂人的一天 怎么过这个热点」',
+      hook:'一天碎片画面+字幕：「减脂人的一天 怎么看待{HOT}」',
       emotion:'平静→温暖→向往',
-      logic:'画面配音乐款，全程不说话，靠字幕推进。把热点融入一天的碎片，展现减脂人的生活方式。',
+      logic:'画面配音乐款，全程不说话，靠字幕推进。把{HOT}融入一天的碎片，展现减脂人的生活方式。',
       scenes:[
-        {time:'0-5秒', shot:'空镜', action:'早晨光线，盼盼起床/拉开窗帘', line:'（字幕）减脂人的一天\n怎么看待这个热点', bgm:'轻柔钢琴', note:'【黄金3秒】空镜+字幕开场，氛围感'},
-        {time:'5-12秒', shot:'中景', action:'盼盼做早餐/泡产品，慢动作', line:'（字幕）早上6点\n我的仪式感', bgm:'保持', note:'【产品软植入】产品作为早晨仪式出现'},
-        {time:'12-20秒', shot:'近景/中景', action:'盼盼带孩子/做家务的碎片画面', line:'（字幕）这个热点火了\n但我更在意这些小事', bgm:'渐温暖', note:'【情绪转折】从热点→日常，价值观输出'},
+        {time:'0-5秒', shot:'空镜', action:'早晨光线，盼盼起床/拉开窗帘', line:'（字幕）减脂人的一天\n怎么看待{HOT}', bgm:'轻柔钢琴', note:'【黄金3秒】空镜+字幕开场，氛围感'},
+        {time:'5-12秒', shot:'中景', action:'盼盼做早餐/泡{PRODUCT}，慢动作', line:'（字幕）早上6点\n我的仪式感', bgm:'保持', note:'【产品软植入】产品作为早晨仪式出现'},
+        {time:'12-20秒', shot:'近景/中景', action:'盼���带孩子/做家务的碎片画面', line:'（字幕）{HOT}火了\n但我更在意这些小事', bgm:'渐温暖', note:'【情绪转折】从热点→日常，价值观输出'},
         {time:'20-28秒', shot:'近景', action:'盼盼和老公吃饭/散步，自然互动', line:'（字幕）30岁 两娃 98斤\n坚持的记录 比奇迹真实', bgm:'高潮', note:'【截图传播点】金句字幕放大停留'},
         {time:'28-35秒', shot:'空镜', action:'夜晚盼盼关灯/睡前画面', line:'（字幕）明天继续\n你也可以', bgm:'收尾', note:'【互动触发】温柔收尾留余味'}
       ],
       interact:'「你的一天是怎么过的？评论区聊聊」',
-      product:'产品作为"早晨仪式感"自然出现，不说话不介绍',
+      product:'{PRODUCT}作为"早晨仪式感"自然出现，不说话不介绍',
       tips:['全程不说话，字幕推动叙事','画面要精致，慢动作+好光线','BGM情绪曲线是灵魂，要选对','金句字幕要大要慢，适合截图']
     },
     '带娃日常版_visual': {
       form:'画面配音乐', duration:'30秒',
-      hook:'孩子闹腾画面+字幕：「带娃的时候 这个热点」',
+      hook:'孩子闹腾画面+字幕：「带娃的时候 {HOT}」',
       emotion:'共鸣→温暖→会心一笑',
-      logic:'宝妈人设强化款，画面配音乐。用带娃的真实碎片呼应热点，强化"30岁宝妈好状态"人设。',
+      logic:'宝妈人设强化款，画面配音乐。用带娃的真实碎片呼应{HOT}，强化"30岁宝妈好状态"人设。',
       scenes:[
-        {time:'0-4秒', shot:'中景', action:'孩子在闹/跑，盼盼手忙脚乱', line:'（字幕）带娃的时候\n看到这个热点', bgm:'轻快', note:'【黄金3秒】带娃混乱画面宝妈最有共鸣'},
-        {time:'4-12秒', shot:'近景', action:'盼盼哄娃/喂娃，穿插热点截图一闪而过', line:'（字幕）别人在讨论\n我在……（带娃画面）', bgm:'保持', note:'【情绪转折】热点vs现实的反差'},
-        {time:'12-20秒', shot:'中景', action:'盼盼趁娃安静，赶紧喝口产品/做自己的事', line:'（字幕）娃终于睡了\n属于我的5分钟', bgm:'温暖', note:'【产品软植入】产品作为"宝妈喘息时刻"出现'},
+        {time:'0-4秒', shot:'中景', action:'孩子在闹/跑，盼盼手忙脚乱', line:'（字幕）带娃的时候\n刷到{HOT}', bgm:'轻快', note:'【黄金3秒】带娃混乱画面宝妈最有共鸣'},
+        {time:'4-12秒', shot:'近景', action:'盼盼哄娃/喂娃，穿插{HOT}截图一闪而过', line:'（字幕）别人在讨论{HOT}\n我在……带娃', bgm:'保持', note:'【情绪转折】热点vs现实的反差'},
+        {time:'12-20秒', shot:'中景', action:'盼盼趁娃安静，赶紧喝口{PRODUCT}/做自己的事', line:'（字幕）娃终于睡了\n属于我的5分钟', bgm:'温暖', note:'【产品软植入】产品作为"宝妈喘息时刻"出现'},
         {time:'20-26秒', shot:'近景', action:'盼盼看着睡着的娃，微笑', line:'（字幕）30岁 两娃 98斤\n不是奇迹 是选择', bgm:'高潮', note:'【截图传播点】金句字幕'},
         {time:'26-30秒', shot:'空镜', action:'盼盼关灯/夜晚安静画面', line:'（字幕）你也辛苦了\n晚安', bgm:'收', note:'【互动触发】共情收尾'}
       ],
       interact:'「带娃的你 也辛苦了 评论区抱抱」',
-      product:'产品作为"宝妈喘息时刻的陪伴"出现',
+      product:'{PRODUCT}作为"宝妈喘息时刻的陪伴"出现',
       tips:['带娃画面要真实混乱，别摆拍','产品出现要自然，像顺手拿的','金句字幕"不是奇迹 是选择"要大']
     },
 
     // 励志蜕变类
     '蜕变叙事版_long': {
       form:'长视频', duration:'90秒',
-      hook:'热点截图→盼盼旧照缓缓出现：「这个热点 让我想起3年前的自己」',
+      hook:'{HOT}截图→盼盼旧照缓缓出现：「{HOT} 让我想起3年前的自己」',
       emotion:'好奇→代入→震撼→激励',
-      logic:'完整蜕变叙事款，热点只是引子，核心是117→98的完整故事。要有挣扎、转折、方法、金句，适合置顶作品。',
+      logic:'完整蜕变叙事款，{HOT}只是引子，核心是117→98的完整故事。要有挣扎、转折、方法、金句，适合置顶作品。',
       scenes:[
-        {time:'0-5秒', shot:'近景', action:'热点截图飘过，盼盼旧照缓缓淡入', line:'（字幕）这个热点\n让我想起3年前的自己', bgm:'低沉钢琴', note:'【黄金3秒】热点+旧照双钩子'},
-        {time:'5-20秒', shot:'特写', action:'盼盼117斤旧照特写，配旁白', line:'盼盼（旁白）：那时候的我……\n（字幕）117斤 3年前\n每天很累 很丧', bgm:'低沉', note:'【故事开端】讲痛苦要具体'},
-        {time:'20-40秒', shot:'中景', action:'盼盼讲转折点，眼神有光', line:'盼盼：直到有一天……（讲具体转折事件）\n我决定改变', bgm:'渐入', note:'【情绪转折】转折点要真实具体'},
-        {time:'40-60秒', shot:'近景/中景', action:'盼盼讲过程，穿插现在的日常画面', line:'盼盼：我开始……（讲方法，自然带产品）\n一天一天 这样', bgm:'推高', note:'【产品软植入】产品作为方法之一出现'},
-        {time:'60-78秒', shot:'中景', action:'盼盼展示现在状态，对比旧照', line:'盼盼：现在 98斤\n（字幕）30岁 两娃 98斤\n不是奇迹 是3年的记录', bgm:'高潮', note:'【截图传播点】金句字幕停留5秒'},
-        {time:'78-90秒', shot:'近景', action:'盼盼看着镜头，平静坚定', line:'盼盼：这个热点说什么不重要\n你开始了吗？', bgm:'收', note:'【互动触发】把球踢给观众'}
+        {time:'0-5秒', shot:'近景', action:'{HOT}截图飘过，盼盼旧照缓缓淡入', line:'（字幕）{HOT}\n让我想起3年前的自己', bgm:'低沉钢琴', note:'【黄金3秒】热点+旧照双钩子'},
+        {time:'5-20秒', shot:'特写', action:'盼盼117斤旧照特写，配旁白', line:'盼盼（旁白）：3年前我117斤的时候，每天最累的不是身体，是心里。\n（字幕）117斤 3年前\n每天很累 很丧', bgm:'低沉', note:'【故事开端】讲痛苦要具体'},
+        {time:'20-40秒', shot:'中景', action:'盼盼讲转折点，眼神有光', line:'盼盼：直到有一天，我镜子里的自己让我害怕。我决定不再敷衍自己。从那天起，我每天早起先喝{PRODUCT}，不是为了瘦，是告诉自己今天要认真过。', bgm:'渐入', note:'【情绪转折】"早起先喝"是减脂那段时间的事，不是现在'},
+        {time:'40-60秒', shot:'近景/中景', action:'盼盼讲过程，穿插现在的日常画面', line:'盼盼：有人问我怎么坚持的。我说没有坚持，就是习惯了。吃饭、睡觉、陪孩子，减脂那段时间{PRODUCT}每天喝，一天一天，做了3年。', bgm:'推高', note:'【产品软植入】产品作为"那段时间的辅助"出现，不强调现在还喝'},
+        {time:'60-78秒', shot:'中景', action:'盼盼展示现在状态，对比旧照', line:'盼盼：现在98斤。\n（字幕）30岁 两娃 98斤\n不是奇迹 是3年的记录', bgm:'高潮', note:'【截图传播点】金句字幕停留5秒'},
+        {time:'78-90秒', shot:'近景', action:'盼盼看着镜头，平静坚定', line:'盼盼：{HOT}说什么不重要，你开始了吗？', bgm:'收', note:'【互动触发】把球踢给观众'}
       ],
       interact:'「你 准备开始了吗？评论区立flag」+ 置顶对比照',
-      product:'产品作为"我用的方法之一"自然出现，不强调功效',
+      product:'{PRODUCT}作为"我用的方法之一"自然出现，不强调功效',
       tips:['旧照一定要真实，越丑越好','转折点要讲具体事件，别空泛','金句字幕"不是奇迹 是记录"要大要慢','适合做置顶作品，长尾流量']
     },
     '励志金句版_music': {
       form:'音乐转场', duration:'20秒',
-      hook:'热点截图→鼓点转场→盼盼状态展示',
+      hook:'{HOT}截图→鼓点转场→盼盼状态展示',
       emotion:'好奇→震撼→燃',
-      logic:'音乐卡点款，热点做引子，核心是金句+状态展示。靠音乐卡点制造燃点，字幕精简有力。',
+      logic:'音乐卡点款，{HOT}做引子，核心是金句+状态展示。靠音乐卡点制造燃点，字幕精简有力。',
       scenes:[
-        {time:'0-3秒', shot:'手机截图', action:'热点截图，黑白处理', line:'（字幕）这个热点', bgm:'前奏低沉', note:'【黄金3秒】黑白处理制造严肃感'},
+        {time:'0-3秒', shot:'手机截图', action:'{HOT}截图，黑白处理', line:'（字幕）{HOT}', bgm:'前奏低沉', note:'【黄金3秒】黑白处理制造严肃感'},
         {time:'3-6秒', shot:'中景', action:'鼓点！硬切到盼盼117旧照', line:'（字幕）以前 117斤', bgm:'鼓点！', note:'【转场卡点】鼓点硬切，反差开始'},
         {time:'6-10秒', shot:'中景', action:'鼓点！切到现在盼盼状态', line:'（字幕）现在 98斤', bgm:'连续鼓点', note:'【情绪转折】反差最大化'},
         {time:'10-15秒', shot:'近景/特写', action:'连续卡点展示多个状态画面', line:'（字幕）30岁 两娃\n不是奇迹 是选择', bgm:'高潮卡点', note:'【截图传播点】金句字幕卡点出现'},
-        {time:'15-18秒', shot:'近景', action:'盼盼拿起产品，自信状态', line:'（字幕）我每天的选择', bgm:'保持', note:'【产品软植入】产品作为"选择"出现'},
+        {time:'15-18秒', shot:'近景', action:'盼盼拿起{PRODUCT}，自信状态', line:'（字幕）{PRODUCT}\n我减脂期的选择', bgm:'保持', note:'【产品软植入】产品作为"减脂期的选择"出现，不说现在还喝'},
         {time:'18-20秒', shot:'近景', action:'盼盼对镜头', line:'（字幕）你呢？', bgm:'收', note:'【互动触发】'}
       ],
       interact:'「你 的选择是什么？评论区立flag」',
-      product:'产品作为"我每天的选择"出现',
+      product:'{PRODUCT}作为"我减脂期的选择"出现',
       tips:['音乐卡点一定要准，用剪映自动卡点','黑白→彩色转场反差最大','字幕要短，一个画面一句话','金句"不是奇迹 是选择"适合截图']
     },
 
     // 趣味改编类
     '减脂版改编_short': {
       form:'极短视频', duration:'15秒',
-      hook:'热点原画面→盼盼翻拍版：「减脂版来了」',
+      hook:'{HOT}原画面→盼盼翻拍版：「减脂版来了」',
       emotion:'好奇→爆笑',
-      logic:'把热点内容翻拍成减脂版本，搞笑又涨知识。核心是"反差翻拍"，原版多正经减脂版就多离谱。',
+      logic:'把{HOT}内容翻拍成减脂版本，搞笑又涨知识。核心是"反差翻拍"，原版多正经减脂版就多离谱。',
       scenes:[
-        {time:'0-3秒', shot:'分屏', action:'上屏：热点原版画面；下屏：盼盼准备翻拍', line:'（字幕）原版 vs 减脂版', bgm:'轻快', note:'【黄金3秒】分屏+翻拍预告'},
-        {time:'3-9秒', shot:'中景', action:'盼盼翻拍热点内容，但全换成减脂场景/台词', line:'盼盼：（翻拍 减脂版台词）\n（字幕同步）', bgm:'卡点', note:'【翻拍主体】越离谱越好笑'},
-        {time:'9-12秒', shot:'近景', action:'盼盼掏出产品当道具', line:'盼盼：减脂人必备（拿产品）', bgm:'保持', note:'【产品软植入】产品当搞笑道具'},
+        {time:'0-3秒', shot:'分屏', action:'上屏：{HOT}原版画面；下屏：盼盼准备翻拍', line:'（字幕）原版 vs 减脂版', bgm:'轻快', note:'【黄金3秒】分屏+翻拍预告'},
+        {time:'3-9秒', shot:'中景', action:'盼盼翻拍{HOT}内容，但全换成减脂场景/台词', line:'盼盼：别人关心{HOT}，减脂人只关心今天{PRODUCT}喝没喝。', bgm:'卡点', note:'【翻拍主体】越离谱越好笑'},
+        {time:'9-12秒', shot:'近景', action:'盼盼掏出{PRODUCT}当道具', line:'盼盼：减脂人必备，{PRODUCT}拿好。', bgm:'保持', note:'【产品软植入】产品当搞笑道具'},
         {time:'12-15秒', shot:'近景', action:'盼盼破功笑场/老公画外吐槽', line:'盼盼/老公：哈哈哈\n（字幕）减脂人懂的都懂', bgm:'收', note:'【完播钩子】笑场收尾最真实'}
       ],
-      interact:'「减脂版还有什么 改编？评论区出题」',
-      product:'产品作为"减脂人道具"搞笑出现',
+      interact:'「减脂版{HOT}还有什么改编？评论区出题」',
+      product:'{PRODUCT}作为"减脂人道具"搞笑出现',
       tips:['翻拍要抓住原版精髓再魔改','越离谱越好笑，但别低俗','笑场别剪，真实感最强']
     },
     '角色扮演版_standard': {
       form:'标准视频', duration:'30秒',
-      hook:'盼盼和老公换装：「热点翻拍 我俩来演」',
+      hook:'盼盼和老公换装：「{HOT} 我俩来演」',
       emotion:'好奇→搞笑→甜',
-      logic:'和老公/姐姐角色扮演热点场景，趣味性最强。核心是"演反差"，盼盼和老公互换角色或夸张演绎。',
+      logic:'和老公/姐姐角色扮演{HOT}场景，趣味性最强。核心是"演反差"，盼盼和老公互换角色或夸张演绎。',
       scenes:[
-        {time:'0-3秒', shot:'中景', action:'盼盼和老公换装/拿道具，准备开演', line:'盼盼：热点翻拍 我俩来演！', bgm:'轻快', note:'【黄金3秒】预告+换装画面就抓人'},
-        {time:'3-12秒', shot:'中景', action:'两人扮演热点里的场景，夸张演绎', line:'盼盼（演角色A）：……\n老公（演角色B）：……', bgm:'保持', note:'【翻拍主体】演技浮夸一点更好笑'},
-        {time:'12-20秒', shot:'中景', action:'演着演着跑偏了，两人开始即兴互动', line:'盼盼：你怎么不按剧本\n老公：我即兴的', bgm:'轻松', note:'【情绪转折】跑偏的即兴最好笑'},
-        {time:'20-26秒', shot:'近景', action:'盼盼笑着拿起产品「演累了」', line:'盼盼：演累了 喝口（拿产品）\n老公：给我也来点', bgm:'保持', note:'【产品软植入】产品作为"演累了"的道具'},
-        {time:'26-30秒', shot:'中景', action:'两人碰杯/对视，笑场', line:'（字幕）减脂人 夫妻日常\n你俩也试试？', bgm:'收', note:'【互动触发】'}
+        {time:'0-3秒', shot:'中景', action:'盼盼和老公换装/拿道具，准备开演', line:'盼盼：{HOT}翻拍，我俩来演！', bgm:'轻快', note:'【黄金3秒】预告+换装画面就抓人'},
+        {time:'3-12秒', shot:'中景', action:'两人扮演{HOT}里的场景，夸张演绎', line:'盼盼（演角色A）：{HOT}的主角应该这样做！\n老公（演角色B）：不对，要这样！', bgm:'保持', note:'【翻拍主体】演技浮夸一点更好笑'},
+        {time:'12-20秒', shot:'中景', action:'演着演着跑偏了，两人开始即兴互动', line:'盼盼：你怎么不按剧本？\n老公：我即兴的，{HOT}本来就离谱。', bgm:'轻松', note:'【情绪转折】跑偏的即兴最好笑'},
+        {time:'20-26秒', shot:'近景', action:'盼盼笑着拿起{PRODUCT}「演累了」', line:'盼盼：演累了，喝口{PRODUCT}。\n老公：给我也来点。', bgm:'保持', note:'【产品软植入】产品作为"演累了"的道具'},
+        {time:'26-30秒', shot:'中景', action:'两人碰杯/对视，笑场', line:'（字幕）减脂人 夫妻日常\n你们也试试？', bgm:'收', note:'【互动触发】'}
       ],
-      interact:'「@你家那位 一起来翻拍」',
-      product:'产品作为"演累了喝口"的道具出现',
+      interact:'「@你家那位 一起来翻拍{HOT}」',
+      product:'{PRODUCT}作为"演累了喝口"的道具出现',
       tips:['角色互换反差最大','即兴跑偏别剪，最好笑','道具越简陋越有喜感']
     }
   };
@@ -1298,22 +1387,22 @@ function buildRecreateScript(item){
     }
   }
   if(!selected){
-    // 还是找不到，用通用二创模板
+    // 还是找不到，用通用二创模板（全部使用具体台词，可直接念）
     selected = {
       form:'标准视频', duration:'30秒',
-      hook:'热点截图→盼盼：「这个我来翻拍」',
+      hook:'热点截图→盼盼：直接开口聊这个热点',
       emotion:'好奇→共鸣→互动',
-      logic:'通用二创款，用热点做钩子，过渡到盼盼的视角和故事，结尾留钩子。',
+      logic:'通用二创款，用热点画面做钩子，盼盼直接开口复述热点+结合自身经历+给出观点，最后自然带出产品和互动。',
       scenes:[
-        {time:'0-3秒', shot:'手机截图', action:'热点视频截图，配大字标题', line:'（字幕）这个热点', bgm:'轻快', note:'【黄金3秒】用热点本身吸睛'},
-        {time:'3-8秒', shot:'中景', action:'硬切到盼盼，开始聊', line:'盼盼：这个我得说说……', bgm:'转折', note:'【过渡钩子】硬切反差'},
-        {time:'8-18秒', shot:'近景', action:'盼盼结合热点讲自己的看法/故事', line:'盼盼：我觉得……（观点+经历）\n（字幕同步）', bgm:'保持', note:'【主体内容】'},
-        {time:'18-25秒', shot:'近景', action:'盼盼拿起产品，自然过渡', line:'盼盼：所以 我现在……（喝产品）', bgm:'温暖', note:'【产品软植入】'},
-        {time:'25-30秒', shot:'近景', action:'盼盼对镜头', line:'盼盼：你怎么看？评论区聊', bgm:'收', note:'【互动触发】'}
+        {time:'0-3秒', shot:'手机截图', action:'热点视频截图或录屏，配大字标题「{HOT}」', line:'（字幕）{HOT}', bgm:'轻快', note:'【黄金3秒】用热点本身吸睛，不要自己说话'},
+        {time:'3-8秒', shot:'中景', action:'硬切到盼盼，盼盼正坐着或站着，面向镜头', line:'盼盼：刚刷到{HOT}，我想跟姐妹们说几句心里话。', bgm:'转折', note:'【过渡钩子】硬切反差，3秒内开口'},
+        {time:'8-18秒', shot:'近景', action:'盼盼认真看镜头讲，语速中等，配合手势', line:'盼盼：这个话题之所以火，是因为太多人只看热闹。但我是从117斤到98斤的宝妈，我看到的不一样。', bgm:'保持', note:'【主体内容】建立身份+观点'},
+        {time:'18-25秒', shot:'近景', action:'盼盼拿起{PRODUCT}展示一下，继续讲', line:'盼盼：我现在的状态，不是因为我少吃几顿，是因为减脂那段时间养成的习惯还在。比如{PRODUCT}，我那时候每天早上都会先喝。', bgm:'温暖', note:'【产品软植入】产品作为"那段时间用的"出现，不强调现在还喝'},
+        {time:'25-30秒', shot:'近景', action:'盼盼放下产品，对镜头微笑', line:'盼盼：你们看完{HOT}是什么感觉？评论区聊聊，我想听。', bgm:'收', note:'【互动触发】开放式提问'}
       ],
-      interact:'「你怎么看？评论区聊聊」',
-      product:'产品自然出现，不介绍',
-      tips:['热点要用当天的','硬切比淡入抓人','产品当道具不当广告']
+      interact:'「你们看完{HOT}是什么感觉？评论区聊聊」',
+      product:'{PRODUCT}自然出现，作为"我每天做的小事"之一，不介绍功效',
+      tips:['热点要用当天或近2天的','硬切转场比淡入更抓人','{PRODUCT}只展示，不当广告讲','语速放慢，字幕放大']
     };
   }
 
@@ -1323,10 +1412,39 @@ function buildRecreateScript(item){
   result.tag = '二创';
   result.hotRef = hot;  // 记录原热点
   result.angleRef = angleDesc || angleType;  // 记录改编角度
+
+  // 变量填充：把模板里的占位符替换为真实内容
+  const hotText = hot.replace(/^热点[：:]/, '').trim();
+  const productName = Store.get('productName','') || '颜小盼咖啡';
+  const vars = {
+    HOT: hotText,
+    ANGLE: angleDesc || angleType,
+    TITLE: title,
+    PRODUCT: productName,
+    AGE: '30',
+    KIDS: '两娃',
+    FROM: '117',
+    TO: '98'
+  };
+  result.hook = replaceVars(result.hook, vars);
+  result.logic = replaceVars(result.logic, vars);
+  result.emotion = replaceVars(result.emotion, vars);
+  result.interact = replaceVars(result.interact, vars);
+  result.product = replaceVars(result.product, vars);
+  result.tips = (result.tips || []).map(t => replaceVars(t, vars));
+  result.scenes = (result.scenes || []).map(s => ({
+    time: s.time,
+    shot: replaceVars(s.shot, vars),
+    action: replaceVars(s.action, vars),
+    line: replaceVars(s.line, vars),
+    bgm: s.bgm,
+    note: replaceVars(s.note, vars)
+  }));
+
   result.safeWords = [
     '用"身材管理"代替"减肥"',
     '用"变好看/状态好"代替"瘦了"',
-    '用"我选择的/我每天喝的"代替产品功效',
+    '用"我减脂那段时间喝的/我用过的"代替产品功效（强调现在不喝了，避免粉丝跟买）',
     '不出现具体价格',
     '不承诺效果，只说"我的记录"',
     '二创热点要用当天的，超过2天就过气',
@@ -1340,7 +1458,7 @@ function buildRecreateScript(item){
     '金句要慢说，字幕放大，适合截图'
   ]);
 
-  return result;
+  return normalizeScript(result, productName);
 }
 
 /* ===================================================
@@ -1498,6 +1616,107 @@ function delMemo(i){
 }
 
 /* ===================================================
+   AI 调用（灵感库整理）
+=================================================== */
+async function callAI(prompt, model){
+  const key = Store.get('aiKey','');
+  if(!key){
+    showToast('❌ 请先在设置里填写 AI 密钥');
+    switchSection('settings');
+    return null;
+  }
+  const m = model || 'deepseek-ai/DeepSeek-V3';
+  try{
+    const res = await fetch('https://api.siliconflow.cn/v1/chat/completions', {
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'Authorization':'Bearer ' + key
+      },
+      body: JSON.stringify({
+        model: m,
+        messages:[
+          {role:'system', content:'你是抖音减脂赛道短视频创作助手，熟悉30岁宝妈从117斤到98斤的人设，擅长把灵感和链接改写成可直接落地拍摄的分镜头脚本。'},
+          {role:'user', content: prompt}
+        ],
+        temperature: 0.7,
+        max_tokens: 2500
+      })
+    });
+    if(!res.ok){
+      const txt = await res.text();
+      showToast('AI请求失败: ' + res.status);
+      console.error('AI error', txt);
+      return null;
+    }
+    const data = await res.json();
+    return data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content || '';
+  }catch(e){
+    showToast('AI请求出错: ' + e.message);
+    return null;
+  }
+}
+
+function parseAIResult(text){
+  // 尝试提取 JSON
+  let json = null;
+  // 先找 ```json ... ```
+  const m1 = text.match(/```json\s*([\s\S]+?)\s*```/);
+  if(m1){
+    try{ json = JSON.parse(m1[1]); }catch(e){}
+  }
+  if(!json){
+    // 找 {...}
+    const m2 = text.match(/\{[\s\S]*"hook"[\s\S]*\}/);
+    if(m2){
+      try{ json = JSON.parse(m2[0]); }catch(e){}
+    }
+  }
+  if(!json){
+    // 兜底：把文本当拍法返回
+    return { hook: text.slice(0,80)+'...', shoot: text, script: null };
+  }
+  // 兼容只返回 hook/shoot 的旧格式，也返回完整 script
+  return {
+    hook: json.hook || json.title || '',
+    form: json.form || '',
+    duration: json.duration || '',
+    emotion: json.emotion || '',
+    logic: json.logic || '',
+    scenes: Array.isArray(json.scenes) ? json.scenes : [],
+    interact: json.interact || '',
+    product: json.product || '',
+    tips: Array.isArray(json.tips) ? json.tips : [],
+    rawText: text
+  };
+}
+
+function buildLibPrompt(item){
+  const productName = Store.get('productName','') || '颜小盼咖啡';
+  const lines = [];
+  lines.push('请为以下灵感/翻拍内容，写一条可直接落地拍摄的抖音短视频脚本。');
+  lines.push('');
+  lines.push('目标人设：30岁宝妈，两个儿子，从117斤到98斤，做减脂/身材管理赛道。');
+  lines.push('产品名：' + productName + '（软植入，台词里说"我减脂那段时间喝的/我用过的"，强调现在已不喝了，避免粉丝跟买；动作描述里可用产品名作为回忆道具出现）。');
+  lines.push('');
+  lines.push('类型：' + (item.type==='翻拍'?'翻拍别人的爆款视频':'突发灵感扩展'));
+  lines.push('标题：' + item.title);
+  lines.push('原始内容：' + (item.raw || '无'));
+  lines.push('');
+  lines.push('要求：');
+  lines.push('1. 黄金3秒钩子：具体、可直接拍，能留住人。');
+  lines.push('2. 视频形式：从极短视频/标准视频/长视频/音乐转场/画面配音乐中选一种最适合的。');
+  lines.push('3. 分镜头脚本：5-7个镜头，每个镜头包含：time（时间）、shot（景别）、action（画面/动作）、line（台词/字幕，要直接能念）、bgm（BGM）、note（拍摄要点）。');
+  lines.push('4. 情绪节奏曲线、拍摄逻辑、互动引导、产品软植入策略。');
+  lines.push('5. 违规避雷：禁用"减肥/瘦身/溶脂/排毒/治疗/保证/秘方"等词，用"减脂/身材管理/变好看/我的记录"替代。');
+  lines.push('6. 总时长控制在15-40秒（长视频可60-90秒）。');
+  lines.push('');
+  lines.push('输出必须是严格可解析的JSON格式，不要加 markdown 代码块标记，直接输出 JSON：');
+  lines.push('{"form":"...","duration":"...","hook":"...","emotion":"...","logic":"...","scenes":[{"time":"...","shot":"...","action":"...","line":"...","bgm":"...","note":"..."}],"interact":"...","product":"...","tips":["..."]}');
+  return lines.join('\n');
+}
+
+/* ===================================================
    自我灵感库
 =================================================== */
 let libFilter = 'all';
@@ -1531,11 +1750,17 @@ function renderLibrary(){
       </div>
       <div class="lc-title">${esc(it.title)}</div>
       ${it.raw?`<div class="lc-section"><span class="lbl">原始</span>${esc(it.raw)}</div>`:''}
-      ${it.ai?`<div class="lc-section"><span class="lbl">爆点</span>${esc(it.ai.hook||'')}</div>
-              <div class="lc-section"><span class="lbl">拍法</span>${esc(it.ai.shoot||'')}</div>`:''}
+      ${it.ai?`<div class="lc-section"><span class="lbl">形式</span>${esc(it.ai.form||'')} · ${esc(it.ai.duration||'')}</div>
+              <div class="lc-section"><span class="lbl">钩子</span>${esc(it.ai.hook||'')}</div>
+              <div class="lc-section"><span class="lbl">拍法</span>${esc(it.ai.logic||'')}</div>
+              ${it.ai.scenes && it.ai.scenes.length?`<div class="lc-section"><span class="lbl">镜头</span>共 ${it.ai.scenes.length} 个镜头<br>${it.ai.scenes.map((s,i)=>`<div style="margin:6px 0;padding:6px 8px;background:#fff;border-radius:6px;"><b>镜头${i+1}</b> ${esc(s.time)} ${esc(s.shot)}<br>${esc(s.line)}</div>`).join('')}</div>`:''}`:''}
       <div class="lc-foot">
-        <span>${it.ai?'✅ 已整理':'⏳ 待AI整理'}</span>
-        <span class="lc-del" onclick="delLib(${it.id})">删除</span>
+        <span style="${it.ai?'color:var(--olive);':'color:var(--text-mute);'}">${it.ai?'✅ 已整理':'⏳ 待AI整理'}</span>
+        <div style="display:flex;gap:10px;align-items:center;">
+          ${it.ai?`<span class="lc-action" onclick="generateLibScript(${it.id}, event)">🎬 生成脚本</span>`:''}
+          <span class="lc-action" onclick="aiOrganizeLib(${it.id}, event)">${it.ai?'重新整理':'AI整理'}</span>
+          <span class="lc-del" onclick="delLib(${it.id}, event)">删除</span>
+        </div>
       </div>
     </div>
   `).join('');
@@ -1551,7 +1776,7 @@ function openInspireModal(){
 }
 function closeModal(id){ document.getElementById(id).classList.remove('open'); }
 
-function saveInspire(){
+async function saveInspire(autoOrganize){
   const title = document.getElementById('imTitle').value.trim();
   if(!title){ showToast('请填写标题'); return; }
   const item = {
@@ -1567,7 +1792,12 @@ function saveInspire(){
   Store.set('library', list);
   closeModal('inspireModal');
   renderLibrary();
-  showToast('✅ 灵感已保存'+(item.type==='翻拍'?'，等待AI整理':''));
+  if(autoOrganize){
+    showToast('✅ 灵感已保存，开始AI整理...');
+    await aiOrganizeLib(item.id);
+  }else{
+    showToast('✅ 灵感已保存'+(item.type==='翻拍'?'，可点AI整理生成脚本':''));
+  }
 }
 
 function saveToLibrary(title, desc){
@@ -1585,7 +1815,70 @@ function saveToLibrary(title, desc){
   showToast('✅ 已存入灵感库');
 }
 
-function delLib(id){
+async function aiOrganizeLib(id, e){
+  if(e) e.stopPropagation();
+  const list = getLibrary();
+  const item = list.find(x=>x.id===id);
+  if(!item) return;
+  const key = Store.get('aiKey','');
+  if(!key){
+    showToast('❌ 请先在设置里填写 AI 密钥');
+    switchSection('settings');
+    return;
+  }
+  showToast('🤖 正在 AI 整理，请稍候...');
+  const prompt = buildLibPrompt(item);
+  const text = await callAI(prompt);
+  if(!text) return;
+  item.ai = parseAIResult(text);
+  Store.set('library', list);
+  renderLibrary();
+  showToast('✅ AI 整理完成');
+}
+
+function generateLibScript(id, e){
+  if(e) e.stopPropagation();
+  const list = getLibrary();
+  const item = list.find(x=>x.id===id);
+  if(!item || !item.ai){
+    showToast('请先 AI 整理');
+    return;
+  }
+  const ai = item.ai;
+  // 构建和 buildScript 输出一致的 script 对象
+  const script = {
+    form: ai.form || '标准视频',
+    duration: ai.duration || '30秒',
+    hook: ai.hook || '',
+    emotion: ai.emotion || '',
+    logic: ai.logic || '',
+    scenes: ai.scenes && ai.scenes.length ? ai.scenes : [{
+      time:'0-30秒', shot:'近景', action:'按AI整理结果拍摄',
+      line: ai.shoot || '参考上方整理结果',
+      bgm:'轻快', note:ai.hook || ''
+    }],
+    interact: ai.interact || '评论区聊聊',
+    product: ai.product || '自然出镜',
+    tips: Array.isArray(ai.tips) ? ai.tips : ['参考AI整理结果拍摄']
+  };
+  const rec = {
+    id: Date.now(),
+    title: '灵感：' + item.title,
+    tag: '灵感库',
+    desc: item.raw || '',
+    script,
+    created: new Date().toLocaleString('zh-CN').slice(5,16)
+  };
+  const scripts = Store.get('scripts', []);
+  scripts.unshift(rec);
+  Store.set('scripts', scripts);
+  switchSection('script');
+  renderScript();
+  showToast('✅ 已生成到每日脚本');
+}
+
+function delLib(id, e){
+  if(e) e.stopPropagation();
   if(!confirm('删除这条灵感？')) return;
   const list = getLibrary().filter(x=>x.id!==id);
   Store.set('library', list);
@@ -1697,11 +1990,11 @@ function buildScript(topic){
           {time:'2-4秒', shot:'中景', action:'第一个鼓点——转场，换上现在的装扮，自信站姿。', line:'（字幕）98斤', bgm:'鼓点1', note:'转场要干脆，用衣服遮挡镜头切换。'},
           {time:'4-8秒', shot:'近景/特写', action:'连续3个卡点，展示腰线、锁骨、全身。', line:'（字幕）30岁 两个孩子', bgm:'连续鼓点', note:'每个鼓点换一个角度，动作要利落。'},
           {time:'8-14秒', shot:'中景', action:'盼盼对着镜头自信走过来，或转身秀全身。', line:'（字幕）坚持的记录，不是奇迹', bgm:'音乐高潮', note:'这6秒是核心展示时间。'},
-          {time:'14-18秒', shot:'近景', action:'盼盼微笑，手里自然拿着自己每天喝的饮品。', line:'（字幕）我的选择 评论区见', bgm:'音乐收尾', note:'产品自然出镜，不强调。'},
+          {time:'14-18秒', shot:'近景', action:'盼盼微笑，手里拿着当时减脂喝的饮品展示一下。', line:'（字幕）我的记录 评论区见', bgm:'音乐收尾', note:'产品作为"我当时的辅助"出镜，不说现在还喝。'},
           {time:'18-20秒', shot:'字幕收尾', action:'黑屏字幕。', line:'（字幕）你也可以', bgm:'收', note:'留白1秒。'}
         ],
         interact:'评论区：你最想看哪件衣服对比？',
-        product:'软植入：结尾手持饮品，字幕写"我的选择"。',
+        product:'软植入：结尾手持当时喝的饮品，字幕写"我的记录"，不强调现在还喝。',
         tips:['卡点必须准，用剪映的"踩点"功能','每个转场用衣服遮挡镜头，最简单有效','音乐选节奏强的，不要选慢歌']
       },
       short: {
@@ -1744,7 +2037,7 @@ function buildScript(topic){
         emotion:'搞笑→甜蜜→羡慕。让粉丝觉得"这老公真宠"。',
         logic:'夫妻互动类的核心是真实，不要演。让老公做"陪衬"，盼盼做"主角"，最后落到"变好真好"。',
         scenes:[
-          {time:'0-3秒', shot:'近景', action:'盼盼发现老公又在偷吃她的健康餐/咖啡，假装生气走过去。', line:'你又偷吃我的！这可是我每天喝的。', bgm:'轻快、俏皮', note:'镜头提前架好，拍真实反应。'},
+          {time:'0-3秒', shot:'近景', action:'盼盼发现老公又在偷吃她的健康餐，或翻看她减脂时喝的咖啡，假装生气走过去。', line:'你又偷吃我的！这可是我减脂那时候喝的。', bgm:'轻快、俏皮', note:'镜头提前架好，拍真实反应。产品作为"减脂时的回忆"出现。'},
           {time:'3-7秒', shot:'中景', action:'老公被抓包，笑着狡辩，盼盼假装要打他。', line:'老公：我就尝尝... 盼盼：尝尝？你都要喝完了！', bgm:'保持俏皮', note:'让老公自由发挥，越自然越好。'},
           {time:'7-11秒', shot:'近景', action:'【完播钩子】盼盼突然转向镜头，表情变化。', line:'不过你们先别笑，听到他后面说什么我直接愣了。', bgm:'节奏停顿', note:'这里是完播钩子，制造悬念留人。'},
           {time:'11-18秒', shot:'中景', action:'老公从背后抱住盼盼或帮她整理头发，说了一句暖心话。', line:'老公：你变好看了，我更紧张了。', bgm:'稍微温柔', note:'【情绪转折】从搞笑转到甜蜜。'},
@@ -1752,7 +2045,7 @@ function buildScript(topic){
           {time:'24-30秒', shot:'中景', action:'两人甜蜜互动，盼盼笑着挥手。', line:'（字幕）你们老公也这样吗？评论区告诉我。', bgm:'温暖收尾', note:'引导互动。'}
         ],
         interact:'评论区：你们老公/男朋友也偷吃你们的吗？',
-        product:'软植入：把"每天喝的"作为夫妻互动道具。',
+        product:'软植入：把"减脂时喝的咖啡"作为夫妻互动道具，不强调现在还喝。',
         tips:['不要提前排练，越自然流量越好','第7秒的完播钩子是关键','第18秒的金句要慢慢说']
       },
       short: {
@@ -1784,13 +2077,13 @@ function buildScript(topic){
           {time:'15-25秒', shot:'近景', action:'盼盼坐在沙发上，认真讲。', line:'最难受的一次，是带孩子去幼儿园，别的妈妈穿得漂漂亮亮，我穿着最大码的家居服。有个家长问我是不是保姆。', bgm:'稍微低沉', note:'【痛点共鸣】这里要慢，让粉丝代入。'},
           {time:'25-35秒', shot:'中景', action:'盼盼站起来，语气变化。', line:'【完播钩子】但真正让我改变的，不是那件事，是后面发生的一件事。', bgm:'节奏停顿', note:'完播钩子，制造悬念。'},
           {time:'35-60秒', shot:'近景/穿插', action:'盼盼讲述转折事件，可以穿插相关画面。', line:'有一天晚上，老大跟我说：妈妈你是不是不开心。我突然意识到，我的状态在影响孩子。那天晚上我决定，要改变。', bgm:'逐渐温暖', note:'【情绪转折】从低沉到希望。'},
-          {time:'60-90秒', shot:'中景/混剪', action:'展示改变过程：早起、运动、调整饮食、记录。', line:'（画外音）不是一下子变的。每天早起半小时，孩子没醒的时候是我的时间。开始调整饮食，每天喝的、吃的都注意。坚持记录，看着自己一点一点变化。', bgm:'轻快、有节奏', note:'过程混剪，展示"坚持"。'},
+          {time:'60-90秒', shot:'中景/混剪', action:'展示改变过程：早起、运动、调整饮食、记录。', line:'（画外音）不是一下子变的。每天早起半小时，孩子没醒的时候是我的时间。开始调整饮食，减脂那段时间每天喝的、吃的都注意。坚持记录，看着自己一点一点变化。', bgm:'轻快、有节奏', note:'过程混剪，展示"坚持"。"每天喝"是减脂期的事。'},
           {time:'90-110秒', shot:'近景', action:'盼盼看着镜头，【截图传播点】金句。', line:'减了19斤，但最大的变化不是数字。是我照镜子的时候，终于喜欢自己了。', bgm:'温暖有力', note:'金句字幕放大，适合截图。'},
           {time:'110-120秒', shot:'中景', action:'盼盼展示现在的状态，带娃、工作、生活。', line:'（画外音）30岁，两个孩子，98斤。我的人生才刚开始。', bgm:'高潮', note:'展示成果，但不炫耀。'},
           {time:'120秒', shot:'近景', action:'盼盼微笑，字幕引导。', line:'（字幕）你也想开始？评论区告诉我。我陪你。', bgm:'收尾', note:'引导互动，落到"陪伴"。'}
         ],
         interact:'评论区：你最难的时候是什么时候？我们一起聊聊。',
-        product:'软植入：混剪画面里自然出现每天喝的饮品，不强调。',
+        product:'软植入：混剪画面里自然出现减脂时喝的饮品，不强调现在还喝。',
         tips:['2分钟必须有3个情绪转折','第25秒的完播钩子是关键','第90秒的金句是截图传播点','长视频不要流水账，要有故事弧线']
       },
       music: {
@@ -2005,7 +2298,7 @@ function buildScript(topic){
           {time:'5-20秒', shot:'中景/穿插', action:'穿插旧照片。', line:'因为我自己经历过。从117到98，我知道那种想改变又不敢开始的感觉。踩过很多坑，也试过很多方法。', bgm:'保持', note:'真实故事。'},
           {time:'20-35秒', shot:'近景', action:'盼盼认真说。', line:'最难受的时候，不是没效果，是不知道该信谁。市面太多乱七八糟的东西，我踩过坑，不想让你们再踩。', bgm:'稍微低沉', note:'建立信任。'},
           {time:'35-50秒', shot:'近景', action:'【完播钩子】', line:'后来我想明白了一件事，这也是我做这件事的核心理念。', bgm:'节奏停顿', note:'留人。'},
-          {time:'50-80秒', shot:'中景', action:'盼盼在店里整理产品。', line:'简单、能坚持，比什么都重要。不是追求快，是追求能长期做下去。我自己每天喝的，才敢给你们。', bgm:'温暖', note:'理念输出。'},
+          {time:'50-80秒', shot:'中景', action:'盼盼在店里整理产品。', line:'简单、能坚持，比什么都重要。不是追求快，是追求能长期做下去。我自己减脂那段时间喝的，才敢给你们。', bgm:'温暖', note:'理念输出。"每天喝"改成"那段时间喝"。'},
           {time:'80-100秒', shot:'近景', action:'【截图传播点】金句。', line:'我不想做一锤子买卖。我想做的是，你跟着我，一步一步变好，我们成为长期的朋友。', bgm:'温暖有力', note:'金句放大。'},
           {time:'100-120秒', shot:'中景', action:'盼盼打包发货或服务顾客。', line:'（画外音）每天做一点，剩下的交给时间。我负责选好的，你负责相信我。', bgm:'收尾', note:'展示工作。'}
         ],
@@ -2042,12 +2335,12 @@ function buildScript(topic){
         emotion:'好奇→放心→信任。',
         logic:'工厂溯源类要展示严谨，但不要硬广。',
         scenes:[
-          {time:'0-5秒', shot:'中景/工厂', action:'盼盼在工厂门口。', line:'今天带你们看看，我每天喝的，是怎么做出来的。', bgm:'轻快', note:'开场。'},
+          {time:'0-5秒', shot:'中景/工厂', action:'盼盼在工厂门口。', line:'今天带你们看看，我减脂那段时间喝的，是怎么做出来的。', bgm:'轻快', note:'开场。"每天喝"改成"那段时间喝"。'},
           {time:'5-25秒', shot:'近景/特写', action:'展示原料、生产线。', line:'（画外音）从源头开始，每一关我都要自己看过。原料从哪来，每一步怎么把关，我都要问清楚。', bgm:'保持', note:'展示专业。'},
-          {time:'25-40秒', shot:'中景', action:'盼盼和工作人员交流。', line:'不只是看，我要确认。这个环节我特别在意，因为我自己每天喝。', bgm:'保持', note:'增加真实感。'},
+          {time:'25-40秒', shot:'中景', action:'盼盼和工作人员交流。', line:'不只是看，我要确认。这个环节我特别在意，因为我自己减脂那段时间也喝。', bgm:'保持', note:'增加真实感。"每天喝"改成"那段时间喝"。'},
           {time:'40-55秒', shot:'近景', action:'【完播钩子】', line:'很多人问我为什么选这家工厂，其实有个原因。', bgm:'节奏停顿', note:'留人。'},
           {time:'55-75秒', shot:'中景/穿插', action:'展示工厂资质或检测报告。', line:'因为他们是xx认证的，每批都有检测报告。我自己看过，才放心。', bgm:'温暖', note:'展示严谨。'},
-          {time:'75-90秒', shot:'近景', action:'盼盼拿起产品。', line:'所以我才敢每天喝，才敢推荐给你们。', bgm:'温暖', note:'不说功效，说"我的选择"。'},
+          {time:'75-90秒', shot:'近景', action:'盼盼拿起产品。', line:'所以我才敢推荐给你们，因为我自己也喝过。', bgm:'温暖', note:'不说功效，说"我喝过"（不说"我每天喝"）。'},
           {time:'90秒', shot:'近景', action:'盼盼微笑。', line:'（字幕）我负责选 你负责相信我', bgm:'收尾', note:'引导信任。'}
         ],
         interact:'评论区：你们还想看哪个环节？',
@@ -2250,83 +2543,83 @@ function buildScript(topic){
     const generic = {
       short: {
         form:'极短视频', duration:'12秒',
-        hook:'直接上画面，一句话开场。',
+        hook:'直接上画面，一句话开场：关于{TITLE}，我只说一句。',
         emotion:'好奇→共鸣。',
-        logic:'极短视频只讲一个点。',
+        logic:'极短视频只讲一个点，用{TITLE}做引子，直接给结论。',
         scenes:[
-          {time:'0-2秒', shot:'近景', action:'直接展示选题相关画面。', line:title.slice(0,20), bgm:'轻快', note:'不铺垫。'},
-          {time:'2-6秒', shot:'中景', action:'展示具体场景。', line:'我自己经历过，所以知道。', bgm:'保持', note:'真实感。'},
-          {time:'6-10秒', shot:'近景', action:'金句输出。', line:'一步一步来，比急功近利有用。', bgm:'温暖', note:'金句。'},
-          {time:'10-12秒', shot:'近景', action:'字幕引导。', line:'（字幕）你怎么看？', bgm:'收', note:'互动。'}
+          {time:'0-2秒', shot:'近景', action:'盼盼对着镜头，表情认真', line:'盼盼：关于{TITLE}，我只说一句。', bgm:'轻快', note:'不铺垫。'},
+          {time:'2-6秒', shot:'中景', action:'盼盼侧身展示状态或相关画面', line:'盼盼：我是从117到98的宝妈，这条路我走过。', bgm:'保持', note:'真实感。'},
+          {time:'6-10秒', shot:'近景', action:'盼盼拿起{PRODUCT}，自然喝一口', line:'盼盼：不是少吃几顿，是每天把小事做好。', bgm:'温暖', note:'金句+产品自然出镜。'},
+          {time:'10-12秒', shot:'近景', action:'盼盼对镜头', line:'盼盼：你认同吗？', bgm:'收', note:'互动。'}
         ],
-        interact:'评论区：你怎么看？',
-        product:'软植入：自然出镜。',
+        interact:'评论区：你认同吗？',
+        product:'{PRODUCT}自然出镜，作为"我每天做的小事"之一',
         tips:['12秒只讲一个点','字幕要大','不铺垫']
       },
       standard: {
         form:'标准视频', duration:'30秒',
-        hook:'用具体画面开场。',
+        hook:'用具体画面开场：关于{TITLE}，这条告诉你答案。',
         emotion:'好奇→共鸣→温暖。',
-        logic:'标准视频有起承转合。',
+        logic:'标准视频有起承转合，围绕{TITLE}展开，讲自己的经历和观点。',
         scenes:[
-          {time:'0-3秒', shot:'近景', action:'直接展示选题画面。', line:title.slice(0,25)+'，这条告诉你答案。', bgm:'轻快前奏', note:'直接开场。'},
-          {time:'3-10秒', shot:'中景', action:'展开具体场景。', line:'我自己是经历过，所以才知道这中间的难。', bgm:'保持', note:'真实故事。'},
-          {time:'10-18秒', shot:'近景', action:'【完播钩子】', line:'但很多人不知道的是，关键不在快慢。', bgm:'节奏停顿', note:'留人。'},
-          {time:'18-25秒', shot:'近景', action:'【截图传播点】金句。', line:'关键是你有没有认真对待自己。', bgm:'温暖', note:'金句放大。'},
-          {time:'25-30秒', shot:'近景', action:'字幕引导。', line:'（字幕）你也在路上吗？评论区见。', bgm:'收尾', note:'互动。'}
+          {time:'0-3秒', shot:'近景', action:'盼盼对着镜头，背景干净', line:'盼盼：{TITLE}，这条告诉你答案。', bgm:'轻快前奏', note:'直接开场。'},
+          {time:'3-10秒', shot:'中景', action:'盼盼展示相关场景或旧照', line:'盼盼：我自己经历过，所以才知道这中间的难。117斤的时候，我也以为只要少吃就行。', bgm:'保持', note:'真实故事。'},
+          {time:'10-18秒', shot:'近景', action:'【完播钩子】盼盼语气放慢，制造悬念', line:'盼盼：但很多人不知道的是，关键不在快慢。', bgm:'节奏停顿', note:'留人。'},
+          {time:'18-25秒', shot:'近景', action:'【截图传播点】金句，盼盼拿起{PRODUCT}展示', line:'盼盼：关键是你有没有认真对待自己。我减脂那段时间{PRODUCT}每天喝，饭照吃，现在不喝了，但习惯养成了。', bgm:'温暖', note:'金句放大。强调"那段时间喝，现在不喝了"。'},
+          {time:'25-30秒', shot:'近景', action:'盼盼微笑', line:'盼盼：你也在路上吗？评论区见。', bgm:'收尾', note:'互动。'}
         ],
-        interact:'评论区：你怎么看？',
-        product:'软植入：自然出镜。',
+        interact:'评论区：你也在路上吗？',
+        product:'{PRODUCT}作为"我认真对待自己的方式"自然出镜',
         tips:['第10秒完播钩子留人','第18秒金句是核心','字幕要大']
       },
       long: {
         form:'长视频', duration:'1.5分钟',
-        hook:'用故事开场。',
+        hook:'用故事开场：{TITLE}，我想好好跟你们聊聊。',
         emotion:'好奇→共鸣→思考→希望。',
-        logic:'长视频要有完整故事弧线。',
+        logic:'长视频要有完整故事弧线，围绕{TITLE}讲自己的经历。',
         scenes:[
-          {time:'0-5秒', shot:'近景', action:'盼盼对着镜头。', line:title.slice(0,25)+'，我想好好跟你们聊聊。', bgm:'舒缓', note:'慢开场。'},
-          {time:'5-20秒', shot:'中景', action:'讲述背景。', line:'很多人看到的是现在的我，但你们不知道我经历过什么。', bgm:'保持', note:'铺垫。'},
-          {time:'20-35秒', shot:'近景', action:'【痛点共鸣】', line:'最难受的时候，不是身体累，是心累。是觉得自己来不及了。', bgm:'稍微低沉', note:'痛点。'},
-          {time:'35-50秒', shot:'近景', action:'【完播钩子】', line:'但后来发生了一件事，让我彻底改变。', bgm:'节奏停顿', note:'留人。'},
-          {time:'50-70秒', shot:'中景/混剪', action:'展示改变过程。', line:'（画外音）我开始每天给自己留时间，运动、调整饮食、记录变化。', bgm:'逐渐温暖', note:'过程。'},
-          {time:'70-80秒', shot:'近景', action:'【截图传播点】金句。', line:'变好不是为了别人，是为了照镜子的时候，更喜欢自己。', bgm:'温暖有力', note:'金句。'},
-          {time:'80-90秒', shot:'近景', action:'微笑。', line:'（字幕）你也想开始？评论区告诉我。', bgm:'收尾', note:'互动。'}
+          {time:'0-5秒', shot:'近景', action:'盼盼对着镜头，光线柔和', line:'盼盼：{TITLE}，我想好好跟你们聊聊。', bgm:'舒缓', note:'慢开场。'},
+          {time:'5-20秒', shot:'中景', action:'盼盼讲述背景，穿插旧照', line:'盼盼：很多人看到的是现在的我，但你们不知道我经历过什么。117斤的时候，我连拍照都不敢站前面。', bgm:'保持', note:'铺垫。'},
+          {time:'20-35秒', shot:'近景', action:'【痛点共鸣】', line:'盼盼：最难受的时候，不是身体累，是心累。是觉得自己来不及了。', bgm:'稍微低沉', note:'痛点。'},
+          {time:'35-50秒', shot:'近景', action:'【完播钩子】', line:'盼盼：但后来发生了一件事，让我彻底改变。', bgm:'节奏停顿', note:'留人。'},
+          {time:'50-70秒', shot:'中景/混剪', action:'展示改变过程，盼盼减脂期喝{PRODUCT}、运动、记录', line:'盼盼（画外音）：我开始每天给自己留时间，运动、调整饮食、记录变化，{PRODUCT}那段时间也坚持每天喝。', bgm:'逐渐温暖', note:'过程。强调"那段时间喝"。'},
+          {time:'70-80秒', shot:'近景', action:'【截图传播点】金句。', line:'盼盼：变好不是为了别人，是为了照镜子的时候，更喜欢自己。', bgm:'温暖有力', note:'金句。'},
+          {time:'80-90秒', shot:'近景', action:'微笑。', line:'盼盼：你也想开始？评论区告诉我。', bgm:'收尾', note:'互动。'}
         ],
-        interact:'评论区：你怎么看？',
-        product:'软植入：混剪自然出现。',
+        interact:'评论区：你也想开始吗？',
+        product:'{PRODUCT}在混剪中自然出现，作为日常记录的一部分',
         tips:['长视频要有3个情绪转折','第35秒完播钩子','第70秒金句']
       },
       music: {
         form:'音乐转场', duration:'20秒',
-        hook:'用卡点做反差。',
+        hook:'用卡点做反差：{TITLE}的答案，就在我的变化里。',
         emotion:'惊讶→羡慕。',
-        logic:'音乐转场类靠画面+卡点。',
+        logic:'音乐转场类靠画面+卡点，用{TITLE}做标题，展示变化。',
         scenes:[
-          {time:'0-3秒', shot:'中景', action:'开始状态。', line:'（字幕）以前', bgm:'前奏', note:'开始。'},
-          {time:'3-6秒', shot:'中景', action:'鼓点转场。', line:'（字幕）现在', bgm:'鼓点', note:'转场。'},
-          {time:'6-14秒', shot:'近景/特写', action:'连续卡点展示。', line:'（字幕）坚持的记录', bgm:'连续鼓点', note:'展示。'},
-          {time:'14-18秒', shot:'中景', action:'自信展示。', line:'（字幕）30岁 两娃 98斤', bgm:'高潮', note:'核心。'},
+          {time:'0-3秒', shot:'中景', action:'盼盼穿旧衣服，{TITLE}字幕出现', line:'（字幕）{TITLE}', bgm:'前奏', note:'开始。'},
+          {time:'3-6秒', shot:'中景', action:'鼓点转场', line:'（字幕）以前 117斤', bgm:'鼓点', note:'转场。'},
+          {time:'6-14秒', shot:'近景/特写', action:'连续卡点展示现在状态', line:'（字幕）现在 98斤', bgm:'连续鼓点', note:'展示。'},
+          {time:'14-18秒', shot:'中景', action:'自信展示，拿起{PRODUCT}', line:'（字幕）{PRODUCT} 减脂期的选择', bgm:'高潮', note:'核心。不说"每天的选择"，改成"减脂期的选择"。'},
           {time:'18-20秒', shot:'近景', action:'微笑。', line:'（字幕）你也可以', bgm:'收', note:'留白。'}
         ],
-        interact:'评论区：你怎么看？',
-        product:'软植入：自然出镜。',
+        interact:'评论区：你也在改变吗？',
+        product:'{PRODUCT}作为"减脂期的选择"自然出镜',
         tips:['卡点要准','转场用遮挡镜头','字幕精简']
       },
       visual: {
         form:'画面配音乐', duration:'30秒',
-        hook:'纯画面+字幕。',
+        hook:'纯画面+字幕：关于{TITLE}，我用画面回答。',
         emotion:'共鸣→思考→希望。',
-        logic:'画面配音乐类不说话，靠字幕推进。',
+        logic:'画面配音乐类不说话，靠字幕推进，围绕{TITLE}展现生活。',
         scenes:[
-          {time:'0-5秒', shot:'空镜', action:'相关场景空镜。', line:'（字幕）'+title.slice(0,15), bgm:'轻柔', note:'空镜开场。'},
+          {time:'0-5秒', shot:'空镜', action:'相关场景空镜，{TITLE}字幕', line:'（字幕）{TITLE}', bgm:'轻柔', note:'空镜开场。'},
           {time:'5-12秒', shot:'中景', action:'盼盼日常画面。', line:'（字幕）很多人不知道的是', bgm:'保持', note:'铺垫。'},
-          {time:'12-20秒', shot:'近景', action:'盼盼展示状态。', line:'（字幕）我也是一步一步过来的', bgm:'逐渐温暖', note:'转折。'},
+          {time:'12-20秒', shot:'近景', action:'盼盼展示状态，喝{PRODUCT}。', line:'（字幕）我也是一步一步过来的', bgm:'逐渐温暖', note:'转折。'},
           {time:'20-26秒', shot:'近景', action:'金句字幕。', line:'（字幕）坚持的记录 比奇迹更真实', bgm:'高潮', note:'【截图传播点】。'},
           {time:'26-30秒', shot:'空镜', action:'留白。', line:'（字幕）你也可以', bgm:'收尾', note:'结束。'}
         ],
         interact:'评论区：你怎么看？',
-        product:'软植入：自然出现。',
+        product:'{PRODUCT}自然出现，不说话不介绍',
         tips:['全程不说话','画面要精致','BGM情绪曲线']
       }
     };
@@ -2337,10 +2630,38 @@ function buildScript(topic){
   const result = Object.assign({}, selected);
   result.title = title;
   result.tag = topic.tag || '选题';
+
+  // 变量填充：把选题标题、产品名等占位符替换为真实内容
+  const productName = Store.get('productName','') || '颜小盼咖啡';
+  const vars = {
+    TITLE: title,
+    DESC: desc,
+    DESC1: desc.split(/[。！？\n]/)[0] || '',
+    PRODUCT: productName,
+    AGE: '30',
+    KIDS: '两娃',
+    FROM: '117',
+    TO: '98'
+  };
+  result.hook = replaceVars(result.hook, vars);
+  result.logic = replaceVars(result.logic, vars);
+  result.emotion = replaceVars(result.emotion, vars);
+  result.interact = replaceVars(result.interact, vars);
+  result.product = replaceVars(result.product, vars);
+  result.tips = (result.tips || []).map(t => replaceVars(t, vars));
+  result.scenes = (result.scenes || []).map(s => ({
+    time: s.time,
+    shot: replaceVars(s.shot, vars),
+    action: replaceVars(s.action, vars),
+    line: replaceVars(s.line, vars),
+    bgm: s.bgm,
+    note: replaceVars(s.note, vars)
+  }));
+
   result.safeWords = [
     '用"身材管理"代替"减肥"',
     '用"变好看/状态好"代替"瘦了"',
-    '用"我选择的/我每天喝的"代替产品功效',
+    '用"我减脂那段时间喝的/我用过的"代替产品功效（强调现在不喝了，避免粉丝跟买）',
     '不出现具体价格',
     '不承诺效果，只说"我的记录"'
   ];
@@ -2352,9 +2673,147 @@ function buildScript(topic){
     '完播钩子要在视频中段设置',
     '金句要慢说，字幕放大，适合截图'
   ]);
-  
-  return result;
+
+  return normalizeScript(result, productName);
 }
+/* ===================================================
+   大号脚本（盼盼两口子大号专用）
+=================================================== */
+function renderBigaccount(){
+  const data = Store.get('dailyData', null);
+  const info = document.getElementById('bigaccountInfo');
+  const list = document.getElementById('bigaccountList');
+  const dateEl = document.getElementById('bigaccountDate');
+  const countEl = document.getElementById('bigaccountCount');
+
+  if(!data){
+    info.innerHTML = '<span class="err">未获取到数据，点击右上角刷新</span>';
+    list.innerHTML = '<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg><p>暂无大号脚本</p></div>';
+    countEl.textContent = '';
+    return;
+  }
+
+  const items = data.bigaccount || [];
+  countEl.textContent = `共 ${items.length} 条`;
+  dateEl.textContent = '📅 '+ (data.date||'') + ' · 6支柱轮换';
+  const lu = Store.get('lastUpdate','');
+  info.innerHTML = lu? `<span class="ok">数据更新于 ${lu}</span>` : '';
+
+  if(!items.length){
+    list.innerHTML = '<div class="empty"><p>今日暂无大号脚本，点击右上角刷新</p></div>';
+    return;
+  }
+
+  const productName = Store.get('productName','') || '颜小盼咖啡';
+
+  list.innerHTML = items.map((it,i)=>{
+    const sc = normalizeScript(JSON.parse(JSON.stringify(it)), productName);
+    const pillarColor = {'故事回忆':'#E74C3C','独处白描':'#3498DB','夫妻白描':'#E91E63','婆媳白描':'#9B59B6','职场妈妈':'#F39C12','自我对话':'#1ABC9C'}[sc.pillar] || '#8CA63E';
+    return `
+    <div class="card">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+        <div style="flex:1;min-width:200px;">
+          <span style="font-size:11px;background:${pillarColor};color:#fff;padding:3px 9px;border-radius:8px;font-weight:600;">${esc(sc.pillar||'大号')}</span>
+          ${sc.form?`<span style="font-size:11px;background:#FFF3E0;color:var(--orange);padding:2px 8px;border-radius:8px;font-weight:500;margin-left:4px;">${esc(sc.form)}</span>`:''}
+          ${sc.difficulty?`<span style="font-size:11px;color:var(--text-sub);margin-left:4px;">${esc(sc.difficulty)}</span>`:''}
+          <div style="font-size:15px;font-weight:600;margin-top:8px;color:var(--text);">${i+1}. ${esc(it.title||'')}</div>
+        </div>
+        <span style="font-size:11px;color:var(--text-mute);flex-shrink:0;">⏱${esc(sc.duration||'')}</span>
+      </div>
+      ${sc.location?`<div style="font-size:12px;color:var(--text-sub);margin-bottom:6px;">📍 场地：${esc(sc.location)}</div>`:''}
+      ${sc.actors?`<div style="font-size:12px;color:var(--text-sub);margin-bottom:6px;">👥 出镜：${esc(sc.actors)}</div>`:''}
+      ${sc.props && sc.props.length?`<div style="font-size:12px;color:var(--text-sub);margin-bottom:6px;">🎒 道具：${sc.props.map(p=>esc(p)).join('、')}</div>`:''}
+      ${sc.hook_logic?`<div style="background:linear-gradient(135deg,#FFF8E8,#FFFEF5);padding:10px;border-radius:8px;margin-bottom:10px;border-left:3px solid var(--gold);"><div style="font-size:11px;font-weight:700;color:var(--gold);margin-bottom:4px;">🎯 推流逻辑</div><div style="font-size:12px;color:var(--text);line-height:1.5;">${esc(sc.hook_logic)}</div></div>`:''}
+      ${sc.scenes && sc.scenes.length?`<div style="font-size:13px;font-weight:700;color:var(--olive-dark);margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid var(--olive-pale);">📋 分镜头脚本（${sc.scenes.length}个镜头）</div>
+        ${sc.scenes.map((shot,si)=>`<div style="background:var(--olive-tint);border-radius:10px;padding:12px;margin-bottom:10px;border-left:3px solid var(--olive-light);">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
+            <span style="background:var(--olive);color:#fff;font-size:11px;padding:2px 8px;border-radius:6px;font-weight:600;">镜头${si+1}</span>
+            <span style="font-size:12px;color:var(--olive);font-weight:600;">${esc(shot.time||'')}</span>
+            <span style="font-size:11px;color:var(--text-sub);background:#fff;padding:2px 8px;border-radius:6px;">${esc(shot.framing||'')}</span>
+            <span style="font-size:11px;color:var(--text-sub);background:#fff;padding:2px 8px;border-radius:6px;">${esc(shot.camera||'')}</span>
+          </div>
+          ${shot.visual?`<div style="margin-bottom:5px;"><span style="font-size:11px;color:var(--text-sub);font-weight:600;">🎬 画面：</span><span style="font-size:12px;color:var(--text);">${esc(shot.visual)}</span></div>`:''}
+          ${shot.expression?`<div style="margin-bottom:5px;"><span style="font-size:11px;color:#E91E63;font-weight:600;">😊 表情：</span><span style="font-size:12px;color:var(--text);">${esc(shot.expression)}</span></div>`:''}
+          ${shot.action?`<div style="margin-bottom:5px;"><span style="font-size:11px;color:var(--text-sub);font-weight:600;">✋ 动作：</span><span style="font-size:12px;color:var(--text);">${esc(shot.action)}</span></div>`:''}
+          ${shot.line && shot.line!=='无'?`<div style="margin-bottom:5px;background:#fff;padding:6px 10px;border-radius:6px;border-left:2px solid var(--olive);"><span style="font-size:11px;color:var(--olive-dark);font-weight:600;">🗣 台词：</span><span style="font-size:13px;color:var(--text);font-weight:500;">${esc(shot.line)}</span></div>`:''}
+          ${shot.subtitle && shot.subtitle!=='无'?`<div style="margin-bottom:5px;"><span style="font-size:11px;color:#3498DB;font-weight:600;">📝 字幕：</span><span style="font-size:12px;color:var(--text-sub);">${esc(shot.subtitle)}</span></div>`:''}
+          ${shot.bgm?`<div style="margin-bottom:5px;"><span style="font-size:11px;color:var(--text-sub);font-weight:600;">🎵 BGM：</span><span style="font-size:12px;color:var(--text-sub);">${esc(shot.bgm)}</span></div>`:''}
+          ${shot.tip?`<div style="background:#FFF8E8;padding:8px 10px;border-radius:6px;margin-top:6px;border-left:2px solid var(--gold);"><span style="font-size:11px;color:var(--gold);font-weight:600;">💡 要点：</span><span style="font-size:12px;color:var(--text);">${esc(shot.tip)}</span></div>`:''}
+        </div>`).join('')}`:''}
+      ${sc.ending_hook?`<div style="background:#F0F4E8;padding:10px;border-radius:8px;margin-bottom:8px;border-left:3px solid var(--olive);"><div style="font-size:11px;font-weight:600;color:var(--olive-dark);margin-bottom:4px;">🎬 结尾钩子</div><div style="font-size:12px;color:var(--text);line-height:1.5;">${esc(sc.ending_hook)}</div></div>`:''}
+      ${sc.publish_config?`<div style="background:#fff;padding:10px;border-radius:8px;margin-bottom:8px;border:1px solid var(--line);">
+        <div style="font-size:11px;font-weight:600;color:var(--olive-dark);margin-bottom:6px;">📤 发布配置</div>
+        ${sc.publish_config.best_time?`<div style="font-size:12px;color:var(--text-sub);margin-bottom:3px;">⏰ ${esc(sc.publish_config.best_time)}</div>`:''}
+        ${sc.publish_config.caption?`<div style="font-size:12px;color:var(--text);margin-bottom:3px;">📝 ${esc(sc.publish_config.caption)}</div>`:''}
+        ${sc.publish_config.cover_text?`<div style="font-size:12px;color:var(--orange);margin-bottom:3px;">🏷 封面：${esc(sc.publish_config.cover_text)}</div>`:''}
+        ${sc.publish_config.pinned_comment?`<div style="font-size:12px;color:var(--text-sub);">📌 置顶：${esc(sc.publish_config.pinned_comment)}</div>`:''}
+      </div>`:''}
+      ${sc.compliance_check?`<div style="background:#E8F5E9;padding:8px 10px;border-radius:8px;margin-bottom:8px;"><span style="font-size:11px;color:#27AE60;font-weight:600;">✅ 合规：</span><span style="font-size:11px;color:var(--text-sub);">${esc(sc.compliance_check)}</span></div>`:''}
+      ${sc.shoot_checklist && sc.shoot_checklist.length?`<div style="background:#FFF3E0;padding:10px;border-radius:8px;margin-bottom:10px;"><div style="font-size:11px;font-weight:600;color:var(--orange);margin-bottom:6px;">✅ 拍摄清单</div><ul style="font-size:12px;color:var(--text);padding-left:16px;line-height:1.6;">${sc.shoot_checklist.map(c=>`<li style="margin-bottom:2px;">${esc(c)}</li>`).join('')}</ul></div>`:''}
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-cancel" style="flex:1;font-size:12px;padding:8px;" onclick="copyBigaccount(${i})">复制完整脚本</button>
+        <button class="btn btn-primary" style="flex:1;font-size:12px;padding:8px;" onclick="saveBigaccountToScripts(${i})">存入每日脚本</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function copyBigaccount(idx){
+  const data = Store.get('dailyData', null);
+  if(!data || !data.bigaccount || !data.bigaccount[idx]) return;
+  const productName = Store.get('productName','') || '颜小盼咖啡';
+  const sc = normalizeScript(JSON.parse(JSON.stringify(data.bigaccount[idx])), productName);
+  let txt = `【大号脚本】${data.bigaccount[idx].title||''}\n`;
+  txt += `支柱：${sc.pillar||''} | 形式：${sc.form||''} | 时长：${sc.duration||''}\n`;
+  if(sc.location) txt += `场地：${sc.location}\n`;
+  if(sc.actors) txt += `出镜：${sc.actors}\n`;
+  if(sc.props && sc.props.length) txt += `道具：${sc.props.join('、')}\n`;
+  if(sc.hook_logic) txt += `\n🎯 推流逻辑\n${sc.hook_logic}\n`;
+  if(sc.scenes && sc.scenes.length){
+    txt += `\n📋 分镜头脚本（${sc.scenes.length}个镜头）\n`;
+    sc.scenes.forEach((s,i)=>{
+      txt += `\n[镜头${i+1}] ${s.time||''} ${s.framing||''} ${s.camera||''}\n`;
+      if(s.visual) txt += `画面：${s.visual}\n`;
+      if(s.expression) txt += `表情：${s.expression}\n`;
+      if(s.action) txt += `动作：${s.action}\n`;
+      if(s.line && s.line!=='无') txt += `台词：${s.line}\n`;
+      if(s.subtitle && s.subtitle!=='无') txt += `字幕：${s.subtitle}\n`;
+      if(s.bgm) txt += `BGM：${s.bgm}\n`;
+      if(s.tip) txt += `要点：${s.tip}\n`;
+    });
+  }
+  if(sc.ending_hook) txt += `\n🎬 结尾钩子\n${sc.ending_hook}\n`;
+  if(sc.publish_config){
+    txt += `\n📤 发布配置\n`;
+    if(sc.publish_config.best_time) txt += `时间：${sc.publish_config.best_time}\n`;
+    if(sc.publish_config.caption) txt += `文案：${sc.publish_config.caption}\n`;
+    if(sc.publish_config.cover_text) txt += `封面：${sc.publish_config.cover_text}\n`;
+    if(sc.publish_config.pinned_comment) txt += `置顶：${sc.publish_config.pinned_comment}\n`;
+  }
+  if(sc.shoot_checklist && sc.shoot_checklist.length) txt += `\n✅ 拍摄清单\n${sc.shoot_checklist.map(c=>'· '+c).join('\n')}\n`;
+  copyText(txt);
+}
+
+function saveBigaccountToScripts(idx){
+  const data = Store.get('dailyData', null);
+  if(!data || !data.bigaccount || !data.bigaccount[idx]) return;
+  const productName = Store.get('productName','') || '颜小盼咖啡';
+  const raw = data.bigaccount[idx];
+  const sc = normalizeScript(JSON.parse(JSON.stringify(raw)), productName);
+  const list = Store.get('scripts', []);
+  const newId = list.length? Math.max(...list.map(x=>x.id||0))+1 : 1;
+  list.unshift({
+    id: newId,
+    tag: (raw.tag||'大号') + '·大号',
+    title: raw.title || '大号脚本',
+    created: new Date().toLocaleString('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}),
+    script: sc
+  });
+  Store.set('scripts', list);
+  showToast('✅ 已存入每日脚本');
+  setTimeout(()=>switchSection('script'), 800);
+}
+
 function renderScript(){
   const list = Store.get('scripts', []);
   document.getElementById('scriptCount').textContent = `共 ${list.length} 条`;
@@ -2435,10 +2894,14 @@ function delScript(id){
 function loadSettings(){
   document.getElementById('setGistId').value = Store.get('gistId','');
   document.getElementById('setTrack').value = Store.get('track', CONFIG.DEFAULT_TRACK);
+  document.getElementById('setProductName').value = Store.get('productName','');
+  document.getElementById('setAIKey').value = Store.get('aiKey','');
 }
 function saveSettings(){
   Store.set('gistId', document.getElementById('setGistId').value.trim());
   Store.set('track', document.getElementById('setTrack').value.trim());
+  Store.set('productName', document.getElementById('setProductName').value.trim() || '颜小盼咖啡');
+  Store.set('aiKey', document.getElementById('setAIKey').value.trim());
   showToast('✅ 设置已保存');
 }
 
@@ -2693,6 +3156,12 @@ document.addEventListener('touchend',e=>{
   if(now-lastTouch<300) e.preventDefault();
   lastTouch=now;
 },{passive:false});
+</script>
+<script>
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('data:application/javascript;base64,'+
+  btoa(unescape(encodeURIComponent(`self.addEventListener('install',e=>{self.skipWaiting();e.waitUntil(caches.open('cw-v1').then(c=>c.addAll(['./'])));});self.addEventListener('activate',e=>{e.waitUntil(self.clients.claim());});self.addEventListener('fetch',e=>{e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).then(resp=>{let copy=resp.clone();caches.open('cw-v1').then(c=>c.put(e.request,copy));return resp;})).catch(()=>caches.match('./')));}`))).catch(()=>{});
+}
 </script>
 </body>
 </html>
