@@ -2694,6 +2694,7 @@ function buildScript(topic){
 }
 /* ===================================================
    大号脚本（盼盼两口子大号专用）
+   样式对齐示例脚本：逐字段详细展示
 =================================================== */
 function renderBigaccount(){
   const data = Store.get('dailyData', null);
@@ -2704,7 +2705,7 @@ function renderBigaccount(){
 
   if(!data){
     info.innerHTML = '<span class="err">未获取到数据，点击右上角刷新</span>';
-    list.innerHTML = '<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg><p>暂无大号脚本</p></div>';
+    list.innerHTML = '<div class="empty"><p>暂无大号脚本</p></div>';
     countEl.textContent = '';
     return;
   }
@@ -2722,50 +2723,69 @@ function renderBigaccount(){
 
   const productName = Store.get('productName','') || '颜小盼咖啡';
 
+  const fmtTips = (tips)=>{
+    if(!tips) return '';
+    const arr = Array.isArray(tips)? tips : [tips];
+    if(!arr.length) return '';
+    return `<div style="margin-top:8px;"><div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:4px;">💡 拍摄要点</div><ul style="font-size:12px;color:var(--text);padding-left:18px;line-height:1.7;margin:0;">${arr.map(t=>`<li>${esc(t)}</li>`).join('')}</ul></div>`;
+  };
+  const fmtLine = (label, text, color)=>{
+    if(!text || text==='无') return '';
+    return `<div style="margin-bottom:5px;"><span style="font-size:12px;font-weight:700;color:${color||'var(--text-sub)'};">${label}：</span><span style="font-size:13px;color:var(--text);line-height:1.5;">${esc(text)}</span></div>`;
+  };
+
   list.innerHTML = items.map((it,i)=>{
     const sc = normalizeScript(JSON.parse(JSON.stringify(it)), productName);
     const pillarColor = {'故事回忆':'#E74C3C','独处白描':'#3498DB','夫妻白描':'#E91E63','婆媳白描':'#9B59B6','职场妈妈':'#F39C12','自我对话':'#1ABC9C'}[sc.pillar] || '#8CA63E';
     return `
-    <div class="card">
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+    <div class="card" style="margin-bottom:14px;">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
         <div style="flex:1;min-width:200px;">
-          <span style="font-size:11px;background:${pillarColor};color:#fff;padding:3px 9px;border-radius:8px;font-weight:600;">${esc(sc.pillar||'大号')}</span>
+          <span style="font-size:11px;background:${pillarColor};color:#fff;padding:3px 10px;border-radius:8px;font-weight:600;">${esc(sc.pillar||'大号')}</span>
           ${sc.form?`<span style="font-size:11px;background:#FFF3E0;color:var(--orange);padding:2px 8px;border-radius:8px;font-weight:500;margin-left:4px;">${esc(sc.form)}</span>`:''}
           ${sc.difficulty?`<span style="font-size:11px;color:var(--text-sub);margin-left:4px;">${esc(sc.difficulty)}</span>`:''}
-          <div style="font-size:15px;font-weight:600;margin-top:8px;color:var(--text);">${i+1}. ${esc(it.title||'')}</div>
+          <div style="font-size:16px;font-weight:700;margin-top:10px;color:var(--text);line-height:1.4;">${i+1}. ${esc(it.title||'')}</div>
         </div>
-        <span style="font-size:11px;color:var(--text-mute);flex-shrink:0;">⏱${esc(sc.duration||'')}</span>
+        <span style="font-size:12px;color:var(--text-mute);flex-shrink:0;">⏱ ${esc(sc.duration||'')}</span>
       </div>
-      ${sc.location?`<div style="font-size:12px;color:var(--text-sub);margin-bottom:6px;">📍 场地：${esc(sc.location)}</div>`:''}
-      ${sc.actors?`<div style="font-size:12px;color:var(--text-sub);margin-bottom:6px;">👥 出镜：${esc(sc.actors)}</div>`:''}
-      ${sc.props && sc.props.length?`<div style="font-size:12px;color:var(--text-sub);margin-bottom:6px;">🎒 道具：${sc.props.map(p=>esc(p)).join('、')}</div>`:''}
-      ${sc.hook_logic?`<div style="background:linear-gradient(135deg,#FFF8E8,#FFFEF5);padding:10px;border-radius:8px;margin-bottom:10px;border-left:3px solid var(--gold);"><div style="font-size:11px;font-weight:700;color:var(--gold);margin-bottom:4px;">🎯 推流逻辑</div><div style="font-size:12px;color:var(--text);line-height:1.5;">${esc(sc.hook_logic)}</div></div>`:''}
-      ${sc.scenes && sc.scenes.length?`<div style="font-size:13px;font-weight:700;color:var(--olive-dark);margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid var(--olive-pale);">📋 分镜头脚本（${sc.scenes.length}个镜头）</div>
-        ${sc.scenes.map((shot,si)=>`<div style="background:var(--olive-tint);border-radius:10px;padding:12px;margin-bottom:10px;border-left:3px solid var(--olive-light);">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
-            <span style="background:var(--olive);color:#fff;font-size:11px;padding:2px 8px;border-radius:6px;font-weight:600;">镜头${si+1}</span>
-            <span style="font-size:12px;color:var(--olive);font-weight:600;">${esc(shot.time||'')}</span>
-            <span style="font-size:11px;color:var(--text-sub);background:#fff;padding:2px 8px;border-radius:6px;">${esc(shot.framing||'')}</span>
-            <span style="font-size:11px;color:var(--text-sub);background:#fff;padding:2px 8px;border-radius:6px;">${esc(shot.camera||'')}</span>
-          </div>
-          ${shot.visual?`<div style="margin-bottom:5px;"><span style="font-size:11px;color:var(--text-sub);font-weight:600;">🎬 画面：</span><span style="font-size:12px;color:var(--text);">${esc(shot.visual)}</span></div>`:''}
-          ${shot.expression?`<div style="margin-bottom:5px;"><span style="font-size:11px;color:#E91E63;font-weight:600;">😊 表情：</span><span style="font-size:12px;color:var(--text);">${esc(shot.expression)}</span></div>`:''}
-          ${shot.action?`<div style="margin-bottom:5px;"><span style="font-size:11px;color:var(--text-sub);font-weight:600;">✋ 动作：</span><span style="font-size:12px;color:var(--text);">${esc(shot.action)}</span></div>`:''}
-          ${shot.line && shot.line!=='无'?`<div style="margin-bottom:5px;background:#fff;padding:6px 10px;border-radius:6px;border-left:2px solid var(--olive);"><span style="font-size:11px;color:var(--olive-dark);font-weight:600;">🗣 台词：</span><span style="font-size:13px;color:var(--text);font-weight:500;">${esc(shot.line)}</span></div>`:''}
-          ${shot.subtitle && shot.subtitle!=='无'?`<div style="margin-bottom:5px;"><span style="font-size:11px;color:#3498DB;font-weight:600;">📝 字幕：</span><span style="font-size:12px;color:var(--text-sub);">${esc(shot.subtitle)}</span></div>`:''}
-          ${shot.bgm?`<div style="margin-bottom:5px;"><span style="font-size:11px;color:var(--text-sub);font-weight:600;">🎵 BGM：</span><span style="font-size:12px;color:var(--text-sub);">${esc(shot.bgm)}</span></div>`:''}
-          ${shot.tip?`<div style="background:#FFF8E8;padding:8px 10px;border-radius:6px;margin-top:6px;border-left:2px solid var(--gold);"><span style="font-size:11px;color:var(--gold);font-weight:600;">💡 要点：</span><span style="font-size:12px;color:var(--text);">${esc(shot.tip)}</span></div>`:''}
-        </div>`).join('')}`:''}
-      ${sc.ending_hook?`<div style="background:#F0F4E8;padding:10px;border-radius:8px;margin-bottom:8px;border-left:3px solid var(--olive);"><div style="font-size:11px;font-weight:600;color:var(--olive-dark);margin-bottom:4px;">🎬 结尾钩子</div><div style="font-size:12px;color:var(--text);line-height:1.5;">${esc(sc.ending_hook)}</div></div>`:''}
-      ${sc.publish_config?`<div style="background:#fff;padding:10px;border-radius:8px;margin-bottom:8px;border:1px solid var(--line);">
-        <div style="font-size:11px;font-weight:600;color:var(--olive-dark);margin-bottom:6px;">📤 发布配置</div>
-        ${sc.publish_config.best_time?`<div style="font-size:12px;color:var(--text-sub);margin-bottom:3px;">⏰ ${esc(sc.publish_config.best_time)}</div>`:''}
-        ${sc.publish_config.caption?`<div style="font-size:12px;color:var(--text);margin-bottom:3px;">📝 ${esc(sc.publish_config.caption)}</div>`:''}
-        ${sc.publish_config.cover_text?`<div style="font-size:12px;color:var(--orange);margin-bottom:3px;">🏷 封面：${esc(sc.publish_config.cover_text)}</div>`:''}
-        ${sc.publish_config.pinned_comment?`<div style="font-size:12px;color:var(--text-sub);">📌 置顶：${esc(sc.publish_config.pinned_comment)}</div>`:''}
+
+      ${sc.location?`<div style="font-size:13px;color:var(--text-sub);margin-bottom:4px;"><b>📍 场地</b>：${esc(sc.location)}</div>`:''}
+      ${sc.actors?`<div style="font-size:13px;color:var(--text-sub);margin-bottom:4px;"><b>👥 出镜</b>：${esc(sc.actors)}</div>`:''}
+      ${sc.props && sc.props.length?`<div style="font-size:13px;color:var(--text-sub);margin-bottom:10px;"><b>🎒 道具</b>：${sc.props.map(p=>esc(p)).join('、')}</div>`:''}
+
+      ${sc.hook_logic?`<div style="background:#FFF8E8;padding:12px;border-radius:8px;margin-bottom:14px;border-left:3px solid var(--gold);"><div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:6px;">🎯 为什么这条能爆</div><div style="font-size:13px;color:var(--text);line-height:1.7;white-space:pre-line;">${esc(sc.hook_logic)}</div></div>`:''}
+
+      ${sc.scenes && sc.scenes.length?`<div style="font-size:14px;font-weight:700;color:var(--olive-dark);margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid var(--olive-pale);">📋 完整分镜头脚本（${sc.scenes.length}个镜头，逐字逐句）</div>
+        ${sc.scenes.map((shot,si)=>{
+          const sname = shot.shot_name || '镜头';
+          return `<div style="background:#FAFBF7;border-radius:10px;padding:14px;margin-bottom:12px;border-left:4px solid var(--olive);">
+            <div style="font-size:14px;font-weight:700;color:var(--olive-dark);margin-bottom:10px;">镜头${si+1}｜${esc(sname)}（${esc(shot.time||'')}）</div>
+            ${fmtLine('景别', shot.framing, '#8CA63E')}
+            ${fmtLine('机位', shot.camera, '#8CA63E')}
+            ${fmtLine('画面', shot.visual, '#5D6D4B')}
+            ${fmtLine('表情', shot.expression, '#E91E63')}
+            ${fmtLine('动作', shot.action, '#5D6D4B')}
+            ${fmtLine('台词', shot.line, '#2C5F2D')}
+            ${fmtLine('字幕', shot.subtitle, '#3498DB')}
+            ${fmtLine('BGM', shot.bgm, '#9B59B6')}
+            ${fmtTips(shot.tips || shot.tip)}
+          </div>`;
+        }).join('')}`:''}
+
+      ${sc.ending_hook?`<div style="background:#F0F4E8;padding:12px;border-radius:8px;margin-bottom:12px;border-left:3px solid var(--olive);"><div style="font-size:12px;font-weight:700;color:var(--olive-dark);margin-bottom:4px;">🎬 结尾追更钩子</div><div style="font-size:13px;color:var(--text);line-height:1.6;">${esc(sc.ending_hook)}</div></div>`:''}
+
+      ${sc.publish_config?`<div style="background:#fff;padding:12px;border-radius:8px;margin-bottom:12px;border:1px solid var(--line);">
+        <div style="font-size:12px;font-weight:700;color:var(--olive-dark);margin-bottom:8px;">📤 发布配置</div>
+        ${sc.publish_config.best_time?`<div style="font-size:13px;color:var(--text-sub);margin-bottom:4px;"><b>发布时间</b>：${esc(sc.publish_config.best_time)}</div>`:''}
+        ${sc.publish_config.cover_text?`<div style="font-size:13px;color:var(--orange);margin-bottom:4px;"><b>封面大字</b>：${esc(sc.publish_config.cover_text)}</div>`:''}
+        ${sc.publish_config.caption?`<div style="font-size:13px;color:var(--text);margin-bottom:4px;line-height:1.5;"><b>文案</b>：${esc(sc.publish_config.caption)}</div>`:''}
+        ${sc.publish_config.pinned_comment?`<div style="font-size:13px;color:var(--text-sub);line-height:1.5;"><b>置顶评论</b>：${esc(sc.publish_config.pinned_comment)}</div>`:''}
       </div>`:''}
-      ${sc.compliance_check?`<div style="background:#E8F5E9;padding:8px 10px;border-radius:8px;margin-bottom:8px;"><span style="font-size:11px;color:#27AE60;font-weight:600;">✅ 合规：</span><span style="font-size:11px;color:var(--text-sub);">${esc(sc.compliance_check)}</span></div>`:''}
-      ${sc.shoot_checklist && sc.shoot_checklist.length?`<div style="background:#FFF3E0;padding:10px;border-radius:8px;margin-bottom:10px;"><div style="font-size:11px;font-weight:600;color:var(--orange);margin-bottom:6px;">✅ 拍摄清单</div><ul style="font-size:12px;color:var(--text);padding-left:16px;line-height:1.6;">${sc.shoot_checklist.map(c=>`<li style="margin-bottom:2px;">${esc(c)}</li>`).join('')}</ul></div>`:''}
+
+      ${sc.compliance_check?`<div style="background:#E8F5E9;padding:10px 12px;border-radius:8px;margin-bottom:12px;"><span style="font-size:12px;font-weight:700;color:#27AE60;">✅ 合规说明：</span><span style="font-size:12px;color:var(--text-sub);line-height:1.5;">${esc(sc.compliance_check)}</span></div>`:''}
+
+      ${sc.shoot_checklist && sc.shoot_checklist.length?`<div style="background:#FFF3E0;padding:12px;border-radius:8px;margin-bottom:12px;"><div style="font-size:12px;font-weight:700;color:var(--orange);margin-bottom:6px;">✅ 拍摄清单</div><ul style="font-size:13px;color:var(--text);padding-left:18px;line-height:1.7;margin:0;">${sc.shoot_checklist.map(c=>`<li>${esc(c)}</li>`).join('')}</ul></div>`:''}
+
       <div style="display:flex;gap:8px;">
         <button class="btn btn-cancel" style="flex:1;font-size:12px;padding:8px;" onclick="copyBigaccount(${i})">复制完整脚本</button>
         <button class="btn btn-primary" style="flex:1;font-size:12px;padding:8px;" onclick="saveBigaccountToScripts(${i})">存入每日脚本</button>
@@ -2788,14 +2808,17 @@ function copyBigaccount(idx){
   if(sc.scenes && sc.scenes.length){
     txt += `\n📋 分镜头脚本（${sc.scenes.length}个镜头）\n`;
     sc.scenes.forEach((s,i)=>{
-      txt += `\n[镜头${i+1}] ${s.time||''} ${s.framing||''} ${s.camera||''}\n`;
+      txt += `\n镜头${i+1}｜${s.shot_name||'镜头'}（${s.time||''}）\n`;
+      if(s.framing) txt += `景别：${s.framing}\n`;
+      if(s.camera) txt += `机位：${s.camera}\n`;
       if(s.visual) txt += `画面：${s.visual}\n`;
       if(s.expression) txt += `表情：${s.expression}\n`;
       if(s.action) txt += `动作：${s.action}\n`;
       if(s.line && s.line!=='无') txt += `台词：${s.line}\n`;
       if(s.subtitle && s.subtitle!=='无') txt += `字幕：${s.subtitle}\n`;
       if(s.bgm) txt += `BGM：${s.bgm}\n`;
-      if(s.tip) txt += `要点：${s.tip}\n`;
+      const tips = Array.isArray(s.tips)? s.tips : (s.tip? [s.tip] : []);
+      if(tips.length) txt += `拍摄要点：\n${tips.map(t=>'- '+t).join('\n')}\n`;
     });
   }
   if(sc.ending_hook) txt += `\n🎬 结尾钩子\n${sc.ending_hook}\n`;
@@ -3312,7 +3335,7 @@ document.addEventListener('touchend',e=>{
 <script>
 if('serviceWorker' in navigator){
   navigator.serviceWorker.register('data:application/javascript;base64,'+
-  btoa(unescape(encodeURIComponent(`self.addEventListener('install',e=>{self.skipWaiting();e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('cw-')).map(k=>caches.delete(k)))).then(()=>caches.open('cw-v2').then(c=>c.addAll(['./'])))));});self.addEventListener('activate',e=>{e.waitUntil(self.clients.claim());});self.addEventListener('fetch',e=>{e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).then(resp=>{let copy=resp.clone();caches.open('cw-v2').then(c=>c.put(e.request,copy));return resp;})).catch(()=>caches.match('./')));}`))).catch(()=>{});
+  btoa(unescape(encodeURIComponent(`self.addEventListener('install',e=>{self.skipWaiting();e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('cw-')).map(k=>caches.delete(k)))).then(()=>caches.open('cw-v3').then(c=>c.addAll(['./'])))));});self.addEventListener('activate',e=>{e.waitUntil(self.clients.claim());});self.addEventListener('fetch',e=>{e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).then(resp=>{let copy=resp.clone();caches.open('cw-v3').then(c=>c.put(e.request,copy));return resp;})).catch(()=>caches.match('./')));}`))).catch(()=>{});
 }
 </script>
 </body>
