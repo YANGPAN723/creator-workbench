@@ -2742,9 +2742,9 @@ function renderBigaccount(){
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
         <div style="flex:1;min-width:200px;">
           <span style="font-size:11px;background:${pillarColor};color:#fff;padding:3px 10px;border-radius:8px;font-weight:600;">${esc(sc.pillar||'大号')}</span>
-          ${sc.form?`<span style="font-size:11px;background:#FFF3E0;color:var(--orange);padding:2px 8px;border-radius:8px;font-weight:500;margin-left:4px;">${esc(sc.form)}</span>`:''}
           ${sc.difficulty?`<span style="font-size:11px;color:var(--text-sub);margin-left:4px;">${esc(sc.difficulty)}</span>`:''}
           <div style="font-size:16px;font-weight:700;margin-top:10px;color:var(--text);line-height:1.4;">${i+1}. ${esc(it.title||'')}</div>
+          ${sc.form?`<div style="margin-top:6px;font-size:12px;color:var(--orange);background:#FFF3E0;padding:4px 10px;border-radius:6px;display:inline-block;font-weight:500;">🎬 ${esc(sc.form)}</div>`:''}
         </div>
         <span style="font-size:12px;color:var(--text-mute);flex-shrink:0;">⏱ ${esc(sc.duration||'')}</span>
       </div>
@@ -3335,7 +3335,7 @@ document.addEventListener('touchend',e=>{
 <script>
 if('serviceWorker' in navigator){
   navigator.serviceWorker.register('data:application/javascript;base64,'+
-  btoa(unescape(encodeURIComponent(`self.addEventListener('install',e=>{self.skipWaiting();e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('cw-')).map(k=>caches.delete(k)))).then(()=>caches.open('cw-v3').then(c=>c.addAll(['./'])))));});self.addEventListener('activate',e=>{e.waitUntil(self.clients.claim());});self.addEventListener('fetch',e=>{e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).then(resp=>{let copy=resp.clone();caches.open('cw-v3').then(c=>c.put(e.request,copy));return resp;})).catch(()=>caches.match('./')));}`))).catch(()=>{});
+  btoa(unescape(encodeURIComponent(`self.addEventListener('install',e=>{self.skipWaiting();e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('cw-')).map(k=>caches.delete(k)))).then(()=>caches.open('cw-v4').then(c=>c.addAll(['./'])))));});self.addEventListener('activate',e=>{e.waitUntil(self.clients.claim());});self.addEventListener('fetch',e=>{e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).then(resp=>{let copy=resp.clone();caches.open('cw-v4').then(c=>c.put(e.request,copy));return resp;})).catch(()=>caches.match('./')));}`))).catch(()=>{});
 }
 </script>
 </body>
