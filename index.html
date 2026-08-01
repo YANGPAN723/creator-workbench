@@ -2736,12 +2736,12 @@ function renderBigaccount(){
 
   list.innerHTML = items.map((it,i)=>{
     const sc = normalizeScript(JSON.parse(JSON.stringify(it)), productName);
-    const pillarColor = {'故事回忆':'#E74C3C','独处白描':'#3498DB','夫妻白描':'#E91E63','婆媳白描':'#9B59B6','职场妈妈':'#F39C12','自我对话':'#1ABC9C'}[sc.pillar] || '#8CA63E';
+    const pillarColor = {'B.态度穿搭':'#E74C3C','F.装修记录':'#F39C12','D.精致生活':'#1ABC9C','E.夫妻日常':'#E91E63','A.蜕变形人':'#9B59B6','态度穿搭':'#E74C3C','装修记录':'#F39C12','精致生活':'#1ABC9C','夫妻日常':'#E91E63','蜕变形人':'#9B59B6'}[sc.direction||sc.pillar] || '#8CA63E';
     return `
     <div class="card" style="margin-bottom:14px;">
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
         <div style="flex:1;min-width:200px;">
-          <span style="font-size:11px;background:${pillarColor};color:#fff;padding:3px 10px;border-radius:8px;font-weight:600;">${esc(sc.pillar||'大号')}</span>
+          <span style="font-size:11px;background:${pillarColor};color:#fff;padding:3px 10px;border-radius:8px;font-weight:600;">${esc(sc.direction||sc.pillar||'大号')}</span>
           ${sc.difficulty?`<span style="font-size:11px;color:var(--text-sub);margin-left:4px;">${esc(sc.difficulty)}</span>`:''}
           <div style="font-size:16px;font-weight:700;margin-top:10px;color:var(--text);line-height:1.4;">${i+1}. ${esc(it.title||'')}</div>
           ${sc.form?`<div style="margin-top:6px;font-size:12px;color:var(--orange);background:#FFF3E0;padding:4px 10px;border-radius:6px;display:inline-block;font-weight:500;">🎬 ${esc(sc.form)}</div>`:''}
@@ -2800,7 +2800,7 @@ function copyBigaccount(idx){
   const productName = Store.get('productName','') || '颜小盼咖啡';
   const sc = normalizeScript(JSON.parse(JSON.stringify(data.bigaccount[idx])), productName);
   let txt = `【大号脚本】${data.bigaccount[idx].title||''}\n`;
-  txt += `支柱：${sc.pillar||''} | 形式：${sc.form||''} | 时长：${sc.duration||''}\n`;
+  txt += `方向：${sc.direction||sc.pillar||''} | 形式：${sc.form||''} | 时长：${sc.duration||''}\n`;
   if(sc.location) txt += `场地：${sc.location}\n`;
   if(sc.actors) txt += `出镜：${sc.actors}\n`;
   if(sc.props && sc.props.length) txt += `道具：${sc.props.join('、')}\n`;
@@ -3335,7 +3335,7 @@ document.addEventListener('touchend',e=>{
 <script>
 if('serviceWorker' in navigator){
   navigator.serviceWorker.register('data:application/javascript;base64,'+
-  btoa(unescape(encodeURIComponent(`self.addEventListener('install',e=>{self.skipWaiting();e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('cw-')).map(k=>caches.delete(k)))).then(()=>caches.open('cw-v4').then(c=>c.addAll(['./'])))));});self.addEventListener('activate',e=>{e.waitUntil(self.clients.claim());});self.addEventListener('fetch',e=>{e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).then(resp=>{let copy=resp.clone();caches.open('cw-v4').then(c=>c.put(e.request,copy));return resp;})).catch(()=>caches.match('./')));}`))).catch(()=>{});
+  btoa(unescape(encodeURIComponent(`self.addEventListener('install',e=>{self.skipWaiting();e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('cw-')).map(k=>caches.delete(k)))).then(()=>caches.open('cw-v5').then(c=>c.addAll(['./'])))));});self.addEventListener('activate',e=>{e.waitUntil(self.clients.claim());});self.addEventListener('fetch',e=>{e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).then(resp=>{let copy=resp.clone();caches.open('cw-v5').then(c=>c.put(e.request,copy));return resp;})).catch(()=>caches.match('./')));}`))).catch(()=>{});
 }
 </script>
 </body>
