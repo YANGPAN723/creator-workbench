@@ -31,6 +31,25 @@
   --safe-top:env(safe-area-inset-top,0px);
   --safe-bottom:env(safe-area-inset-bottom,0px);
 }
+/* ============ ins蓝白湖蓝主题 ============ */
+[data-theme="blue"]{
+  --olive:#2e75b6;
+  --olive-dark:#1a5a8a;
+  --olive-light:#5b9bd5;
+  --olive-pale:#dbeaf7;
+  --olive-tint:#e8f4f8;
+  --bg:#f0f6fb;
+  --card:#FFFFFF;
+  --text:#1a3a52;
+  --text-sub:#5a7a94;
+  --text-mute:#9ab0c4;
+  --line:#d0e0ec;
+  --red:#e74c3c;
+  --orange:#e67e22;
+  --gold:#d4a020;
+  --shadow:0 2px 12px rgba(46,117,182,.08);
+  --shadow-lg:0 8px 28px rgba(46,117,182,.16);
+}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 html,body{height:100%;}
 body{
@@ -66,6 +85,59 @@ ul{list-style:none;}
 @keyframes spin{to{transform:rotate(360deg);}}
 .topbar .refresh-btn .dot{position:absolute;top:6px;right:6px;width:8px;height:8px;border-radius:50%;background:#FFD166;display:none;}
 .topbar .refresh-btn.has-new .dot{display:block;}
+.topbar .theme-btn{width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:10px;margin-left:4px;}
+.topbar .theme-btn:active{background:rgba(255,255,255,.15);}
+.topbar .theme-btn svg{width:20px;height:20px;}
+
+/* ============ 任务打卡按钮 ============ */
+.shot-mark-btn{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:6px 12px;border-radius:20px;font-size:12px;font-weight:600;
+  background:var(--olive-pale);color:var(--olive-dark);
+  border:1.5px solid var(--olive-light);transition:.2s;
+}
+.shot-mark-btn:active{transform:scale(.95);}
+.shot-mark-btn.done{
+  background:#27AE60;color:#fff;border-color:#27AE60;
+}
+.shot-mark-btn svg{width:14px;height:14px;}
+.shot-done-stamp{
+  display:inline-block;font-size:11px;color:#27AE60;font-weight:600;
+  background:#E8F5E9;padding:2px 8px;border-radius:6px;margin-left:6px;
+}
+
+/* ============ 参考视频跳转按钮 ============ */
+.ref-link-btn{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:6px 12px;border-radius:8px;font-size:12px;font-weight:500;
+  background:#000;color:#fff;transition:.15s;
+}
+.ref-link-btn:active{transform:scale(.95);}
+.ref-link-btn svg{width:14px;height:14px;}
+
+/* ============ 复盘增强：完播率/互动率 ============ */
+.review-form .form-rate-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;}
+.review-rate-display{
+  background:linear-gradient(135deg,var(--olive-tint),#fff);
+  border-radius:10px;padding:12px;margin-bottom:10px;
+  border:1px solid var(--line);
+}
+.review-rate-display .rate-item{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:6px 0;border-bottom:1px dashed var(--line);
+}
+.review-rate-display .rate-item:last-child{border-bottom:none;}
+.review-rate-display .rate-label{font-size:12px;color:var(--text-sub);}
+.review-rate-display .rate-value{font-size:16px;font-weight:700;color:var(--olive-dark);}
+.review-rate-display .rate-value.good{color:#27AE60;}
+.review-rate-display .rate-value.warn{color:var(--orange);}
+.review-rate-display .rate-value.bad{color:var(--red);}
+.review-ai-suggest{
+  background:#FFF8E8;border-radius:10px;padding:12px;margin-bottom:10px;
+  border-left:3px solid var(--gold);
+}
+.review-ai-suggest .ai-label{font-size:12px;font-weight:700;color:var(--gold);margin-bottom:6px;}
+.review-ai-suggest .ai-content{font-size:13px;color:var(--text);line-height:1.6;}
 
 /* ============ 今日状态输入框 ============ */
 .daily-state-bar{
@@ -374,6 +446,9 @@ ul{list-style:none;}
     <svg id="refreshIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
     <span class="dot"></span>
   </button>
+  <button class="theme-btn" id="themeBtn" onclick="toggleTheme()" aria-label="切换主题">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+  </button>
 </div>
 
 <!-- 今日状态输入框 -->
@@ -470,6 +545,21 @@ ul{list-style:none;}
           <div class="input-wrap"><label>评论</label><input type="number" id="rvComment" placeholder="0"></div>
           <div class="input-wrap"><label>转发</label><input type="number" id="rvShare" placeholder="0"></div>
         </div>
+        <div class="form-rate-row">
+          <div class="input-wrap">
+            <label>完播率（%）</label>
+            <input type="number" id="rvCompletion" placeholder="如45" step="0.1" oninput="previewRate()">
+          </div>
+          <div class="input-wrap">
+            <label>互动率（%）</label>
+            <input type="number" id="rvInteraction" placeholder="如3.5" step="0.1" oninput="previewRate()">
+          </div>
+        </div>
+        <div class="review-rate-display" id="ratePreview" style="display:none;">
+          <div class="rate-item"><span class="rate-label">完播率</span><span class="rate-value" id="completionDisplay">—</span></div>
+          <div class="rate-item"><span class="rate-label">互动率</span><span class="rate-value" id="interactionDisplay">—</span></div>
+          <div class="rate-item"><span class="rate-label">综合评级</span><span class="rate-value" id="gradeDisplay">—</span></div>
+        </div>
         <div class="form-group" style="margin-bottom:8px;">
           <textarea id="rvHighlight" placeholder="✨ 亮点：哪些做得好？"></textarea>
         </div>
@@ -478,6 +568,10 @@ ul{list-style:none;}
         </div>
         <div class="form-group">
           <textarea id="rvOptimize" placeholder="🔧 优化：下次怎么改？"></textarea>
+        </div>
+        <div class="form-group">
+          <label style="font-size:13px;color:var(--text-sub);margin-bottom:6px;display:block;">📎 参考视频链接（可选）</label>
+          <input type="text" id="rvRefLink" placeholder="抖音视频链接（如https://v.douyin.com/xxx）" style="width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--olive-tint);font-size:13px;">
         </div>
         <button class="btn btn-primary" onclick="saveReview()" style="width:100%;">保存复盘</button>
       </div>
@@ -1697,18 +1791,87 @@ function saveReview(){
     like: +document.getElementById('rvLike').value||0,
     comment: +document.getElementById('rvComment').value||0,
     share: +document.getElementById('rvShare').value||0,
+    completion: +document.getElementById('rvCompletion').value||0,
+    interaction: +document.getElementById('rvInteraction').value||0,
+    refLink: document.getElementById('rvRefLink').value.trim(),
     highlight: document.getElementById('rvHighlight').value.trim(),
     problem: document.getElementById('rvProblem').value.trim(),
-    optimize: document.getElementById('rvOptimize').value.trim()
+    optimize: document.getElementById('rvOptimize').value.trim(),
+    aiSuggest: generateReviewSuggest(
+      +document.getElementById('rvCompletion').value||0,
+      +document.getElementById('rvInteraction').value||0,
+      +document.getElementById('rvPlay').value||0,
+      +document.getElementById('rvLike').value||0,
+      +document.getElementById('rvComment').value||0
+    )
   };
   const list = Store.get('reviews', []);
   list.unshift(r);
   Store.set('reviews', list);
   // 清空表单
-  ['rvTitle','rvPlay','rvLike','rvComment','rvShare','rvHighlight','rvProblem','rvOptimize'].forEach(id=>document.getElementById(id).value='');
+  ['rvTitle','rvPlay','rvLike','rvComment','rvShare','rvCompletion','rvInteraction','rvRefLink','rvHighlight','rvProblem','rvOptimize'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('rvDate').value = todayKey();
+  document.getElementById('ratePreview').style.display = 'none';
   renderReview();
   showToast('✅ 复盘已保存');
+}
+
+// 完播率/互动率实时预览
+function previewRate(){
+  const comp = +document.getElementById('rvCompletion').value||0;
+  const inter = +document.getElementById('rvInteraction').value||0;
+  const preview = document.getElementById('ratePreview');
+  if(!comp && !inter){ preview.style.display='none'; return; }
+  preview.style.display = 'block';
+  const compEl = document.getElementById('completionDisplay');
+  const interEl = document.getElementById('interactionDisplay');
+  const gradeEl = document.getElementById('gradeDisplay');
+  compEl.textContent = comp+'%';
+  interEl.textContent = inter+'%';
+  // 评级
+  let grade = '—', gradeClass = '';
+  if(comp>=45 && inter>=3){ grade='⭐ 优秀'; gradeClass='good'; }
+  else if(comp>=35 && inter>=2){ grade='✅ 合格'; gradeClass='good'; }
+  else if(comp>=25){ grade='⚠️ 待优化'; gradeClass='warn'; }
+  else { grade='❌ 不及格'; gradeClass='bad'; }
+  gradeEl.textContent = grade;
+  gradeEl.className = 'rate-value '+gradeClass;
+  compEl.className = 'rate-value '+(comp>=45?'good':comp>=35?'':'warn');
+  interEl.className = 'rate-value '+(inter>=3?'good':inter>=2?'':'warn');
+}
+
+// 根据数据自动生成复盘建议
+function generateReviewSuggest(comp, inter, play, like, comment){
+  const suggestions = [];
+  // 完播率分析
+  if(comp>0){
+    if(comp<25){
+      suggestions.push('完播率'+comp+'%偏低，前3秒钩子不够吸引人。建议：换一个更反常识/更情绪化的开场字幕，或者加快开头节奏。');
+    }else if(comp<35){
+      suggestions.push('完播率'+comp+'%中等，中段有掉人。建议：检查视频15-20秒处是否有情绪转折点，如果没有就加一个。');
+    }else if(comp<45){
+      suggestions.push('完播率'+comp+'%尚可，结尾可能没留住人。建议：结尾加一个回马枪问题或悬念，别平淡收束。');
+    }else{
+      suggestions.push('完播率'+comp+'%优秀！钩子设计和节奏控制做得好，这个模板可以复用。');
+    }
+  }
+  // 互动率分析
+  if(inter>0){
+    if(inter<1.5){
+      suggestions.push('互动率'+inter+'%偏低，观众看完没有评论冲动。建议：结尾问题太泛，换成具体可回答的问题（如"你衣柜里最该扔哪件"而不是"你们觉得呢"）。');
+    }else if(inter<3){
+      suggestions.push('互动率'+inter+'%中等，有一定评论但不够。建议：发布后立刻自己评论一条带节奏（如"我先说：运动裤，你呢？"）。');
+    }else{
+      suggestions.push('互动率'+inter+'%优秀！共鸣点戳到位了，置顶评论引导做得好。');
+    }
+  }
+  // 播放量分析
+  if(play>0 && play<1000){
+    suggestions.push('播放量'+play+'偏低，可能是账号标签还没打准或发布时间不对。建议：晚上20:00-22:00发布，精准人群活跃度高。');
+  }else if(play>=10000){
+    suggestions.push('播放量'+fmtNum(play)+'不错，有破圈潜力。建议：趁热度24小时内发一条相关续集视频。');
+  }
+  return suggestions.join('\n');
 }
 
 function renderReview(){
@@ -1727,10 +1890,14 @@ function renderReview(){
         <span>点赞 <b>${fmtNum(r.like)}</b></span>
         <span>评论 <b>${fmtNum(r.comment)}</b></span>
         <span>转发 <b>${fmtNum(r.share)}</b></span>
+        ${r.completion?`<span>完播 <b>${r.completion}%</b></span>`:''}
+        ${r.interaction?`<span>互动 <b>${r.interaction}%</b></span>`:''}
       </div>
+      ${r.aiSuggest?`<div class="review-ai-suggest"><div class="ai-label">🤖 AI复盘建议</div><div class="ai-content">${esc(r.aiSuggest).replace(/\n/g,'<br>')}</div></div>`:''}
       ${r.highlight?`<div class="rh-notes"><b>✨ 亮点：</b>${esc(r.highlight)}</div>`:''}
       ${r.problem?`<div class="rh-notes"><b>⚠️ 问题：</b>${esc(r.problem)}</div>`:''}
       ${r.optimize?`<div class="rh-notes"><b>🔧 优化：</b>${esc(r.optimize)}</div>`:''}
+      ${r.refLink?`<div style="margin-top:6px;"><a href="${esc(r.refLink)}" target="_blank" class="ref-link-btn" style="display:inline-flex;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>查看参考视频</a></div>`:''}
       <div style="margin-top:8px;text-align:right;">
         <button class="btn btn-danger" style="display:inline-block;flex:0 0 auto;padding:4px 12px;font-size:12px;" onclick="delReview(${r.id})">删除</button>
       </div>
@@ -2943,10 +3110,17 @@ function renderBigaccount(){
 
       ${sc.shoot_checklist && sc.shoot_checklist.length?`<div style="background:#FFF3E0;padding:12px;border-radius:8px;margin-bottom:12px;"><div style="font-size:12px;font-weight:700;color:var(--orange);margin-bottom:6px;">✅ 拍摄清单</div><ul style="font-size:13px;color:var(--text);padding-left:18px;line-height:1.7;margin:0;">${sc.shoot_checklist.map(c=>`<li>${esc(c)}</li>`).join('')}</ul></div>`:''}
 
-      <div style="display:flex;gap:8px;">
+      ${sc.ref_link?`<div style="margin-bottom:10px;"><a href="${esc(sc.ref_link)}" target="_blank" class="ref-link-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>查看参考视频</a></div>`:''}
+
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
         <button class="btn btn-cancel" style="flex:1;font-size:12px;padding:8px;" onclick="copyBigaccount(${i})">复制完整脚本</button>
         <button class="btn btn-primary" style="flex:1;font-size:12px;padding:8px;" onclick="saveBigaccountToScripts(${i})">存入每日脚本</button>
+        <button class="shot-mark-btn ${isShotDone('bigaccount',${i})?'done':''}" onclick="toggleShotMark('bigaccount',${i})">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          ${isShotDone('bigaccount',${i})?'已拍':'标记已拍'}
+        </button>
       </div>
+      ${isShotDone('bigaccount',${i})?`<div style="margin-top:6px;font-size:11px;color:#27AE60;">✅ 已于 ${getShotTime('bigaccount',${i})} 标记完成</div>`:''}
     </div>`;
   }).join('');
 }
@@ -3082,10 +3256,16 @@ function renderSmallaccount(){
       </div>`:''}
       ${sc.compliance_check?`<div style="background:#E8F5E9;padding:8px 10px;border-radius:8px;margin-bottom:8px;"><span style="font-size:11px;color:#27AE60;font-weight:600;">✅ 合规：</span><span style="font-size:11px;color:var(--text-sub);">${esc(sc.compliance_check)}</span></div>`:''}
       ${sc.shoot_checklist && sc.shoot_checklist.length?`<div style="background:#FFF3E0;padding:10px;border-radius:8px;margin-bottom:10px;"><div style="font-size:11px;font-weight:600;color:var(--orange);margin-bottom:6px;">✅ 拍摄清单</div><ul style="font-size:12px;color:var(--text);padding-left:16px;line-height:1.6;">${sc.shoot_checklist.map(c=>`<li style="margin-bottom:2px;">${esc(c)}</li>`).join('')}</ul></div>`:''}
-      <div style="display:flex;gap:8px;">
+      ${sc.ref_link?`<div style="margin-bottom:8px;"><a href="${esc(sc.ref_link)}" target="_blank" class="ref-link-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>查看参考视频</a></div>`:''}
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
         <button class="btn btn-cancel" style="flex:1;font-size:12px;padding:8px;" onclick="copySmallaccount(${i})">复制完整脚本</button>
         <button class="btn btn-primary" style="flex:1;font-size:12px;padding:8px;" onclick="saveSmallaccountToScripts(${i})">存入每日脚本</button>
+        <button class="shot-mark-btn ${isShotDone('smallaccount',${i})?'done':''}" onclick="toggleShotMark('smallaccount',${i})">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          ${isShotDone('smallaccount',${i})?'已拍':'标记已拍'}
+        </button>
       </div>
+      ${isShotDone('smallaccount',${i})?`<div style="margin-top:6px;font-size:11px;color:#27AE60;">✅ 已于 ${getShotTime('smallaccount',${i})} 标记完成</div>`:''}
     </div>`;
   }).join('');
 }
@@ -3258,6 +3438,49 @@ function clearAllData(){
     if(k.startsWith('cw_')) localStorage.removeItem(k);
   }
   location.reload();
+}
+
+/* ===================================================
+   主题切换
+=================================================== */
+function initTheme(){
+  const theme = Store.get('theme', 'blue'); // 默认蓝白
+  document.documentElement.setAttribute('data-theme', theme);
+}
+function toggleTheme(){
+  const current = Store.get('theme', 'blue');
+  const next = current === 'blue' ? 'olive' : 'blue';
+  Store.set('theme', next);
+  document.documentElement.setAttribute('data-theme', next);
+  showToast(next === 'blue' ? '已切换到蓝白主题' : '已切换到橄榄绿主题');
+}
+
+/* ===================================================
+   任务打卡（已拍标记）
+=================================================== */
+function getShotKey(type, idx){ return 'shot_' + todayKey() + '_' + type + '_' + idx; }
+function isShotDone(type, idx){
+  return !!Store.get(getShotKey(type, idx), false);
+}
+function getShotTime(type, idx){
+  const data = Store.get(getShotKey(type, idx), null);
+  if(!data) return '';
+  return typeof data === 'string' ? data : (data.time || '');
+}
+function toggleShotMark(type, idx){
+  const key = getShotKey(type, idx);
+  const done = Store.get(key, false);
+  if(done){
+    Store.del(key);
+    showToast('已取消标记');
+  }else{
+    const now = new Date().toLocaleString('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
+    Store.set(key, {done:true, time:now});
+    showToast('✅ 已标记为已拍');
+  }
+  // 重新渲染当前section
+  if(type === 'bigaccount') renderBigaccount();
+  if(type === 'smallaccount') renderSmallaccount();
 }
 
 /* ===================================================
@@ -3459,6 +3682,7 @@ function renderDirections(){
 }
 
 function init(){
+  initTheme();
   renderNav();
   renderPlan();
   renderReview();
@@ -3490,6 +3714,12 @@ document.addEventListener('touchend',e=>{
   if(now-lastTouch<300) e.preventDefault();
   lastTouch=now;
 },{passive:false});
+</script>
+<script>
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('data:application/javascript;base64,'+
+  btoa(unescape(encodeURIComponent(`self.addEventListener('install',e=>{self.skipWaiting();e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('cw-')).map(k=>caches.delete(k)))).then(()=>caches.open('cw-v8').then(c=>c.addAll(['./'])))));});self.addEventListener('activate',e=>{e.waitUntil(self.clients.claim());});self.addEventListener('fetch',e=>{e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).then(resp=>{let copy=resp.clone();caches.open('cw-v8').then(c=>c.put(e.request,copy));return resp;})).catch(()=>caches.match('./')));}`))).catch(()=>{});
+}
 </script>
 </body>
 </html>
