@@ -1,0 +1,3495 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#556B2F">
+<title>创作工作台</title>
+<style>
+:root{
+  --olive:#556B2F;
+  --olive-dark:#3D4F22;
+  --olive-light:#6B8E3F;
+  --olive-pale:#E8EED8;
+  --olive-tint:#F4F7EC;
+  --bg:#F5F7F2;
+  --card:#FFFFFF;
+  --text:#2C3326;
+  --text-sub:#7A8470;
+  --text-mute:#A8B09C;
+  --line:#E5E9DE;
+  --red:#C0392B;
+  --orange:#D9772E;
+  --gold:#B8860B;
+  --shadow:0 2px 12px rgba(85,107,47,.08);
+  --shadow-lg:0 8px 28px rgba(85,107,47,.16);
+  --r:14px;
+  --r-sm:10px;
+  --r-lg:18px;
+  --safe-top:env(safe-area-inset-top,0px);
+  --safe-bottom:env(safe-area-inset-bottom,0px);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  font-size:15px;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  overflow:hidden;
+}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;}
+input,textarea,select{font-family:inherit;font-size:inherit;color:inherit;}
+ul{list-style:none;}
+
+/* ============ 顶部状态栏 ============ */
+.topbar{
+  position:fixed;top:0;left:0;right:0;height:calc(52px + var(--safe-top));
+  padding-top:var(--safe-top);
+  background:linear-gradient(135deg,var(--olive) 0%,var(--olive-dark) 100%);
+  color:#fff;display:flex;align-items:center;justify-content:space-between;
+  padding-left:16px;padding-right:16px;z-index:100;
+  box-shadow:0 2px 8px rgba(60,80,30,.25);
+}
+.topbar .menu-btn{width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:10px;}
+.topbar .menu-btn:active{background:rgba(255,255,255,.15);}
+.topbar .menu-btn svg{width:22px;height:22px;}
+.topbar .title{font-size:17px;font-weight:600;letter-spacing:.5px;}
+.topbar .refresh-btn{width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:10px;position:relative;}
+.topbar .refresh-btn:active{background:rgba(255,255,255,.15);}
+.topbar .refresh-btn svg{width:20px;height:20px;}
+.topbar .refresh-btn .spin{animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.topbar .refresh-btn .dot{position:absolute;top:6px;right:6px;width:8px;height:8px;border-radius:50%;background:#FFD166;display:none;}
+.topbar .refresh-btn.has-new .dot{display:block;}
+
+/* ============ 今日状态输入框 ============ */
+.daily-state-bar{
+  position:fixed;top:calc(52px + var(--safe-top));left:0;right:0;z-index:99;
+  background:#fff;border-bottom:1px solid #eee;
+  padding:8px 12px;box-shadow:0 1px 4px rgba(0,0,0,.06);
+}
+.daily-state-bar .ds-label{font-size:11px;color:#999;margin-bottom:4px;font-weight:600;}
+.ds-input-wrap{display:flex;gap:8px;align-items:center;}
+.ds-input{
+  flex:1;height:34px;border:1.5px solid #e0e0e0;border-radius:8px;
+  padding:0 10px;font-size:13px;color:#333;background:#fafafa;
+  outline:none;transition:border-color .2s;
+}
+.ds-input:focus{border-color:var(--olive);background:#fff;}
+.ds-input::placeholder{color:#bbb;font-size:12px;}
+.ds-save-btn{
+  height:34px;padding:0 14px;border:none;border-radius:8px;
+  background:linear-gradient(135deg,var(--olive),var(--olive-dark));
+  color:#fff;font-size:13px;font-weight:600;white-space:nowrap;cursor:pointer;
+}
+.ds-save-btn:active{transform:scale(.96);}
+.ds-save-btn.saved{background:#52c41a;}
+.ds-status{font-size:11px;color:#999;margin-top:3px;min-height:14px;}
+.ds-status.ok{color:#52c41a;}
+.ds-status.err{color:#ff4d4f;}
+
+/* ============ 抽屉导航 ============ */
+.drawer-mask{
+  position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;
+  opacity:0;visibility:hidden;transition:.3s;
+}
+.drawer-mask.open{opacity:1;visibility:visible;}
+.drawer{
+  position:fixed;top:0;left:0;bottom:0;width:78%;max-width:300px;z-index:201;
+  background:linear-gradient(180deg,#FFFFFF 0%,var(--olive-tint) 100%);
+  transform:translateX(-100%);transition:transform .3s cubic-bezier(.4,0,.2,1);
+  display:flex;flex-direction:column;
+  padding-top:var(--safe-top);
+  box-shadow:4px 0 24px rgba(0,0,0,.15);
+}
+.drawer.open{transform:translateX(0);}
+.drawer-head{
+  padding:24px 20px 18px;background:linear-gradient(135deg,var(--olive) 0%,var(--olive-dark) 100%);
+  color:#fff;
+}
+.drawer-head .avatar{
+  width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,.2);
+  display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:10px;
+  border:2px solid rgba(255,255,255,.4);
+}
+.drawer-head .name{font-size:17px;font-weight:600;}
+.drawer-head .sub{font-size:12px;opacity:.85;margin-top:3px;}
+.drawer-nav{flex:1;overflow-y:auto;padding:12px 12px;}
+.drawer-nav .nav-item{
+  display:flex;align-items:center;gap:12px;padding:13px 12px;border-radius:var(--r-sm);
+  color:var(--text);font-size:15px;margin-bottom:2px;transition:.15s;
+}
+.drawer-nav .nav-item:active{background:var(--olive-pale);}
+.drawer-nav .nav-item.active{background:var(--olive-pale);color:var(--olive-dark);font-weight:600;}
+.drawer-nav .nav-item .ico{width:26px;height:26px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.drawer-nav .nav-item .ico svg{width:20px;height:20px;}
+.drawer-nav .nav-item .badge{margin-left:auto;background:var(--orange);color:#fff;font-size:11px;padding:2px 7px;border-radius:10px;font-weight:600;}
+.drawer-foot{padding:14px 20px;border-top:1px solid var(--line);font-size:12px;color:var(--text-mute);}
+.drawer-foot .row{display:flex;justify-content:space-between;margin-bottom:6px;}
+.drawer-foot .row:last-child{margin-bottom:0;}
+
+/* ============ 主区域 ============ */
+.main{
+  position:fixed;top:calc(92px + var(--safe-top));left:0;right:0;bottom:calc(58px + var(--safe-bottom));
+  overflow-y:auto;-webkit-overflow-scrolling:touch;
+  padding:14px 14px 20px;
+}
+.main::-webkit-scrollbar{width:0;}
+
+/* ============ 卡片通用 ============ */
+.card{
+  background:var(--card);border-radius:var(--r);padding:16px;margin-bottom:12px;
+  box-shadow:var(--shadow);
+}
+.card-title{display:flex;align-items:center;gap:8px;font-size:16px;font-weight:600;color:var(--olive-dark);margin-bottom:12px;}
+.card-title .bar{width:4px;height:16px;background:var(--olive);border-radius:2px;}
+.card-title .more{margin-left:auto;font-size:13px;color:var(--text-sub);font-weight:400;}
+
+/* ============ 每日计划 ============ */
+.plan-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:10px;}
+.plan-head .date{font-size:13px;color:var(--text-sub);}
+.plan-head .count{font-size:13px;color:var(--olive);font-weight:600;}
+.progress-wrap{margin-bottom:14px;}
+.progress-bar{height:8px;background:var(--olive-pale);border-radius:4px;overflow:hidden;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--olive-light),var(--olive));border-radius:4px;transition:width .4s;}
+.progress-text{display:flex;justify-content:space-between;font-size:12px;color:var(--text-sub);margin-top:6px;}
+.check-item{
+  display:flex;align-items:flex-start;gap:10px;padding:11px 10px;border-radius:var(--r-sm);
+  background:var(--olive-tint);margin-bottom:8px;transition:.15s;
+  position:relative;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;user-select:none;
+}
+.check-item:last-child{margin-bottom:0;}
+.check-item.done{opacity:.5;}
+.check-item.done .check-label{text-decoration:line-through;}
+.check-box{
+  width:30px;height:30px;border:2px solid var(--olive);border-radius:8px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;margin-top:1px;transition:.15s;
+  pointer-events:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation;user-select:none;
+}
+.check-item.done .check-box{background:var(--olive);}
+.check-box svg{width:18px;height:18px;color:#fff;opacity:0;transition:.15s;pointer-events:none;}
+.check-item.done .check-box svg{opacity:1;}
+.check-label{flex:1;font-size:14px;line-height:1.45;cursor:text;padding:4px 0;min-height:30px;}
+.check-label:focus{outline:none;background:rgba(255,255,255,.6);border-radius:6px;padding:4px 8px;margin-left:-8px;}
+.check-del{width:28px;height:28px;display:flex;align-items:center;justify-content:center;color:var(--text-mute);opacity:0;transition:.15s;cursor:pointer;z-index:2;border-radius:50%;}
+.check-item:active .check-del{opacity:1;}
+.check-item .check-del:active{background:var(--olive-pale);}
+.check-del svg{width:16px;height:16px;pointer-events:none;}
+.add-row-btn{
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  width:100%;padding:10px;border:1.5px dashed var(--olive-light);border-radius:var(--r-sm);
+  color:var(--olive);font-size:13px;margin-top:8px;background:transparent;
+}
+.add-row-btn:active{background:var(--olive-tint);}
+.add-row-btn svg{width:16px;height:16px;}
+
+/* ============ 灵感卡片 ============ */
+.inspire-card{
+  background:var(--card);border-radius:var(--r);padding:14px;margin-bottom:12px;
+  box-shadow:var(--shadow);position:relative;overflow:hidden;
+}
+.inspire-card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--olive);}
+.inspire-card .ic-head{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:8px;}
+.inspire-card .ic-title{font-size:15px;font-weight:600;color:var(--text);line-height:1.4;flex:1;}
+.inspire-card .ic-tag{font-size:11px;padding:2px 8px;background:var(--olive-pale);color:var(--olive-dark);border-radius:8px;flex-shrink:0;font-weight:500;}
+.inspire-card .ic-desc{font-size:13px;color:var(--text-sub);line-height:1.55;margin-bottom:10px;}
+.inspire-card .ic-actions{display:flex;gap:8px;}
+.ic-btn{
+  flex:1;display:flex;align-items:center;justify-content:center;gap:5px;
+  padding:8px;border-radius:8px;font-size:12px;font-weight:500;transition:.15s;
+}
+.ic-btn:active{transform:scale(.97);}
+.ic-btn.dy{background:#000;color:#fff;}
+.ic-btn.bili{background:#FB7299;color:#fff;}
+.ic-btn.save{background:var(--olive-pale);color:var(--olive-dark);flex:0 0 40px;}
+.ic-btn svg{width:14px;height:14px;}
+
+/* ============ 二创卡片 ============ */
+.recreate-card{
+  background:linear-gradient(135deg,#fff 0%,var(--olive-tint) 100%);
+  border-radius:var(--r);padding:14px;margin-bottom:12px;box-shadow:var(--shadow);
+  border:1px solid var(--olive-pale);
+}
+.recreate-card .rc-rank{
+  position:absolute;top:0;right:14px;background:var(--olive);color:#fff;
+  font-size:11px;padding:2px 8px;border-radius:0 0 6px 6px;font-weight:600;
+}
+.recreate-card .rc-hot{font-size:12px;color:var(--orange);font-weight:600;margin-bottom:6px;display:flex;align-items:center;gap:4px;}
+.recreate-card .rc-title{font-size:15px;font-weight:600;margin-bottom:8px;line-height:1.4;}
+.recreate-card .rc-angle{font-size:13px;color:var(--text);background:#fff;border-radius:8px;padding:10px;margin-bottom:8px;border-left:3px solid var(--olive-light);line-height:1.55;}
+.recreate-card .rc-angle b{color:var(--olive-dark);}
+.recreate-card .rc-source{font-size:11px;color:var(--text-mute);display:flex;align-items:center;gap:6px;}
+
+/* ============ 复盘表单 ============ */
+.review-form .form-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;}
+.review-form .form-row-3{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;margin-bottom:8px;}
+.review-form .form-row-3 .input-wrap{position:relative;}
+.review-form .input-wrap label{display:block;font-size:11px;color:var(--text-sub);margin-bottom:3px;}
+.review-form input,.review-form textarea{
+  width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;
+  background:var(--olive-tint);font-size:14px;transition:.15s;
+}
+.review-form input:focus,.review-form textarea:focus{outline:none;border-color:var(--olive);background:#fff;}
+.review-form textarea{resize:none;height:60px;line-height:1.4;}
+.review-meta{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
+.review-history-item{background:var(--olive-tint);border-radius:var(--r-sm);padding:12px;margin-bottom:8px;}
+.review-history-item .rh-date{font-size:12px;color:var(--text-sub);margin-bottom:6px;font-weight:600;}
+.review-history-item .rh-stats{display:flex;gap:10px;margin-bottom:8px;flex-wrap:wrap;}
+.review-history-item .rh-stats span{font-size:11px;background:#fff;padding:3px 8px;border-radius:6px;color:var(--text-sub);}
+.review-history-item .rh-stats span b{color:var(--olive-dark);font-size:13px;}
+.review-history-item .rh-notes{font-size:12px;color:var(--text);line-height:1.5;}
+.review-history-item .rh-notes div{margin-bottom:4px;}
+.review-history-item .rh-notes b{color:var(--olive-dark);}
+
+/* ============ 备忘录 ============ */
+.memo-item{
+  display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);
+  cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;user-select:none;position:relative;
+}
+.memo-item:last-child{border-bottom:none;}
+.memo-item .check-box{margin-top:0;pointer-events:none;}
+.memo-item .memo-text{flex:1;font-size:14px;cursor:text;padding:4px 0;user-select:text;-webkit-user-select:text;}
+.memo-item.done .memo-text{text-decoration:line-through;color:var(--text-mute);}
+
+/* ============ 灵感库 ============ */
+.lib-card{
+  background:var(--card);border-radius:var(--r);padding:14px;margin-bottom:12px;box-shadow:var(--shadow);
+  border-left:3px solid var(--gold);position:relative;
+}
+.lib-card .lc-type{font-size:11px;color:var(--gold);font-weight:600;margin-bottom:6px;display:inline-block;background:#FAF3E0;padding:2px 8px;border-radius:6px;}
+.lib-card .lc-title{font-size:15px;font-weight:600;margin-bottom:8px;line-height:1.4;}
+.lib-card .lc-section{font-size:13px;color:var(--text);line-height:1.55;margin-bottom:8px;}
+.lib-card .lc-section b{color:var(--olive-dark);}
+.lib-card .lc-section .lbl{display:inline-block;background:var(--olive-pale);color:var(--olive-dark);font-size:11px;padding:1px 7px;border-radius:5px;margin-right:6px;font-weight:600;}
+.lib-card .lc-foot{display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--text-mute);padding-top:8px;border-top:1px dashed var(--line);}
+.lib-card .lc-foot .lc-action{color:var(--olive);padding:4px 8px;background:var(--olive-pale);border-radius:6px;}
+.lib-card .lc-foot .lc-del{color:var(--red);padding:4px 8px;}
+.lib-add-btn{
+  position:fixed;right:18px;bottom:calc(78px + var(--safe-bottom));width:52px;height:52px;
+  background:linear-gradient(135deg,var(--olive-light),var(--olive));border-radius:50%;
+  box-shadow:0 4px 16px rgba(85,107,47,.4);display:flex;align-items:center;justify-content:center;
+  z-index:50;
+}
+.lib-add-btn:active{transform:scale(.92);}
+.lib-add-btn svg{width:26px;height:26px;color:#fff;}
+
+/* ============ 底部Tab ============ */
+.tabbar{
+  position:fixed;bottom:0;left:0;right:0;height:calc(58px + var(--safe-bottom));
+  padding-bottom:var(--safe-bottom);
+  background:#fff;border-top:1px solid var(--line);
+  display:none;align-items:center;justify-content:space-around;z-index:90;
+}
+.tabbar .tab{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px;flex:1;}
+.tabbar .tab svg{width:22px;height:22px;color:var(--text-mute);}
+.tabbar .tab span{font-size:10px;color:var(--text-mute);}
+.tabbar .tab.active svg{color:var(--olive);}
+.tabbar .tab.active span{color:var(--olive);font-weight:600;}
+
+/* ============ 弹窗 ============ */
+.modal-mask{
+  position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;
+  display:flex;align-items:flex-end;justify-content:center;opacity:0;visibility:hidden;transition:.25s;
+}
+.modal-mask.open{opacity:1;visibility:visible;}
+.modal{
+  background:#fff;width:100%;max-width:500px;border-radius:var(--r-lg) var(--r-lg) 0 0;
+  padding:20px 16px calc(20px + var(--safe-bottom));max-height:85vh;overflow-y:auto;
+  transform:translateY(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);
+}
+.modal-mask.open .modal{transform:translateY(0);}
+.modal-title{font-size:17px;font-weight:600;text-align:center;margin-bottom:16px;color:var(--olive-dark);}
+.modal .form-group{margin-bottom:14px;}
+.modal label{display:block;font-size:13px;color:var(--text-sub);margin-bottom:6px;font-weight:500;}
+.modal input,.modal textarea,.modal select{
+  width:100%;padding:11px 12px;border:1.5px solid var(--line);border-radius:10px;font-size:14px;background:var(--olive-tint);
+}
+.modal input:focus,.modal textarea:focus,.modal select:focus{outline:none;border-color:var(--olive);background:#fff;}
+.modal textarea{resize:none;height:80px;line-height:1.5;}
+.modal-actions{display:flex;gap:10px;margin-top:8px;}
+.btn{
+  flex:1;padding:12px;border-radius:10px;font-size:15px;font-weight:600;transition:.15s;
+}
+.btn:active{transform:scale(.97);}
+.btn-primary{background:var(--olive);color:#fff;}
+.btn-cancel{background:var(--olive-tint);color:var(--text-sub);}
+.btn-danger{background:#FDEAEA;color:var(--red);}
+
+/* ============ 空状态 ============ */
+.empty{
+  text-align:center;padding:40px 20px;color:var(--text-mute);
+}
+.empty svg{width:48px;height:48px;opacity:.4;margin-bottom:10px;}
+.empty p{font-size:13px;}
+
+/* ============ Toast ============ */
+.toast{
+  position:fixed;top:calc(70px + var(--safe-top));left:50%;transform:translateX(-50%) translateY(-20px);
+  background:rgba(40,50,30,.92);color:#fff;padding:10px 18px;border-radius:20px;font-size:13px;
+  z-index:400;opacity:0;visibility:hidden;transition:.3s;white-space:nowrap;backdrop-filter:blur(8px);
+}
+.toast.show{opacity:1;visibility:visible;transform:translateX(-50%) translateY(0);}
+
+/* ============ Section 切换 ============ */
+.section{display:none;animation:fadeIn .3s;}
+.section.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+
+.date-pill{display:inline-block;font-size:12px;color:var(--olive);background:var(--olive-pale);padding:3px 10px;border-radius:10px;margin-bottom:10px;font-weight:500;}
+
+.update-info{font-size:11px;color:var(--text-mute);text-align:center;padding:8px;}
+.update-info .ok{color:var(--olive);}
+.update-info .err{color:var(--red);}
+
+.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.section-head h2{font-size:18px;font-weight:700;color:var(--olive-dark);}
+.section-head .sub{font-size:12px;color:var(--text-sub);}
+
+.filter-tabs{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;padding-bottom:2px;}
+.filter-tabs::-webkit-scrollbar{display:none;}
+.filter-tab{flex-shrink:0;padding:6px 14px;background:var(--card);border-radius:16px;font-size:12px;color:var(--text-sub);box-shadow:var(--shadow);}
+.filter-tab.active{background:var(--olive);color:#fff;font-weight:600;}
+
+</style>
+<link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoi5Yqo5Yqb5oqA5ben5bC65Z2WIiwic2hvcnRfbmFtZSI6IuWKqOWKm+iMgOWBnuWktCIsInN0YXJ0X3VybCI6Ii4iLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsImJhY2tncm91bmRfY29sb3IiOiIjRkZGRkZGIiwidGhlbWVfY29sb3IiOiIjOENBNjNFIiwiaWNvbnMiOlt7InNyYyI6ImRhdGE6aW1hZ2Uvc3ZnK3htbDtiYXNlNjQsUEhOMlp5QjNhV1IwSUQwaWFIUjBjRG92TDJkcGJtVm1ZWEl1WTI5dEwyVjJaVzUwY3k4eE1EQXdJaUI0Yld4dWN6MGlhSFIwY0RvdkwyZHBibVZtWVhJdVkyOXRMMlYyWlc1MGN5OHhNREF3SWo0S1BITjJaeUIzYVdSMElEMGlhSFIwY0RvdkwyZHBibVZtWVhJdVkyOXRMMlYyWlc1MGN5OHhNREF3SWlCNGRXRnVibUZ0WlQwaWFIUjBjRG92TDJkcGJtVm1ZWEl1WTI5dEwyVjJaVzUwY3k4eE1EQXdJaUI0Yld4dWN6MGlhSFIwY0RvdkwyZHBibVZtWVhJdVkyOXRMMlYyWlc1MGN5OHhNREF3SWo0S1BITjJaeUIzYVdSMElEMGlhSFIwY0RvdkwyZHBibVZtWVhJdVkyOXRMMlYyWlc1MGN5OHhNREF3SWlCNGRXRnVibUZ0WlQwaWFIUjBjRG92TDJkcGJtVm1ZWEl1WTI5dEwyVjJaVzUwY3k4eE1EQXdJajQ9Iiwic2l6ZXMiOiIxOTJ4MTkyIn1dfQ==">
+<meta name="theme-color" content="#8CA63E">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="盼盼工作台">
+</head>
+<body>
+
+<!-- 顶部栏 -->
+<div class="topbar">
+  <button class="menu-btn" onclick="toggleDrawer(true)" aria-label="菜单">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+  </button>
+  <div class="title" id="pageTitle">每日计划</div>
+  <button class="refresh-btn" id="refreshBtn" onclick="fetchGist()" aria-label="刷新">
+    <svg id="refreshIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+    <span class="dot"></span>
+  </button>
+</div>
+
+<!-- 今日状态输入框 -->
+<div class="daily-state-bar" id="dailyStateBar">
+  <div class="ds-label">📝 今日状态</div>
+  <div class="ds-input-wrap">
+    <input type="text" id="dailyStateInput" class="ds-input" placeholder="今天在干嘛？一句话告诉AI，脚本更准（如：今天在装柜子，老公在旁边）" maxlength="100">
+    <button class="ds-save-btn" id="dsSaveBtn" onclick="saveDailyState()">保存</button>
+  </div>
+  <div class="ds-status" id="dsStatus"></div>
+</div>
+
+<!-- 抽屉 -->
+<div class="drawer-mask" id="drawerMask" onclick="toggleDrawer(false)"></div>
+<aside class="drawer" id="drawer">
+  <div class="drawer-head">
+    <div class="avatar">🎨</div>
+    <div class="name">盼盼两口子</div>
+    <div class="sub" id="drawerSub">减脂赛道 · 创作工作台</div>
+  </div>
+  <nav class="drawer-nav" id="drawerNav">
+    <!-- 由JS渲染 -->
+  </nav>
+  <div class="drawer-foot">
+    <div class="row"><span>数据更新</span><span id="lastUpdate">—</span></div>
+    <div class="row"><span>本地存储</span><span id="storageInfo">—</span></div>
+    <div class="row"><span>版本</span><span>v1.0</span></div>
+  </div>
+</aside>
+
+<!-- 主区域 -->
+<main class="main" id="main">
+
+  <!-- ===== 每日计划 ===== -->
+  <section class="section active" id="sec-plan">
+    <div class="section-head">
+      <h2>每日计划</h2>
+      <span class="sub" id="todayDate"></span>
+    </div>
+    <div class="card">
+      <div class="progress-wrap">
+        <div class="progress-bar"><div class="progress-fill" id="planProgress" style="width:0%"></div></div>
+        <div class="progress-text">
+          <span id="planProgressText">完成 0 / 0</span>
+          <span id="planPercent">0%</span>
+        </div>
+      </div>
+      <div id="planList"></div>
+      <button class="add-row-btn" onclick="addPlan()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        添加任务
+      </button>
+    </div>
+  </section>
+
+  <!-- ===== 选题每日灵感 ===== -->
+  <section class="section" id="sec-inspire">
+    <div class="section-head">
+      <h2>选题每日灵感</h2>
+      <span class="sub">每日15条</span>
+    </div>
+    <div class="date-pill" id="inspireDate"></div>
+    <div class="update-info" id="inspireInfo"></div>
+    <div id="inspireList"></div>
+  </section>
+
+  <!-- ===== 爆款二创 ===== -->
+  <section class="section" id="sec-recreate">
+    <div class="section-head">
+      <h2>爆款热点二创</h2>
+      <span class="sub">每日15条角度</span>
+    </div>
+    <div class="date-pill" id="recreateDate"></div>
+    <div class="update-info" id="recreateInfo"></div>
+    <div id="recreateList"></div>
+  </section>
+
+  <!-- ===== 内容复盘 ===== -->
+  <section class="section" id="sec-review">
+    <div class="section-head">
+      <h2>内容复盘</h2>
+      <span class="sub" id="reviewCount"></span>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="bar"></span>新增复盘</div>
+      <div class="review-form">
+        <div class="review-meta">
+          <input type="text" id="rvTitle" placeholder="视频标题">
+          <input type="date" id="rvDate">
+        </div>
+        <div class="form-row-3">
+          <div class="input-wrap"><label>播放</label><input type="number" id="rvPlay" placeholder="0"></div>
+          <div class="input-wrap"><label>点赞</label><input type="number" id="rvLike" placeholder="0"></div>
+          <div class="input-wrap"><label>评论</label><input type="number" id="rvComment" placeholder="0"></div>
+          <div class="input-wrap"><label>转发</label><input type="number" id="rvShare" placeholder="0"></div>
+        </div>
+        <div class="form-group" style="margin-bottom:8px;">
+          <textarea id="rvHighlight" placeholder="✨ 亮点：哪些做得好？"></textarea>
+        </div>
+        <div class="form-group" style="margin-bottom:8px;">
+          <textarea id="rvProblem" placeholder="⚠️ 问题：哪里不足？"></textarea>
+        </div>
+        <div class="form-group">
+          <textarea id="rvOptimize" placeholder="🔧 优化：下次怎么改？"></textarea>
+        </div>
+        <button class="btn btn-primary" onclick="saveReview()" style="width:100%;">保存复盘</button>
+      </div>
+    </div>
+    <div id="reviewHistory"></div>
+  </section>
+
+  <!-- ===== 备忘录 ===== -->
+  <section class="section" id="sec-memo">
+    <div class="section-head">
+      <h2>备忘录</h2>
+      <span class="sub" id="memoCount"></span>
+    </div>
+    <div class="card">
+      <div id="memoList"></div>
+      <button class="add-row-btn" onclick="addMemo()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        添加一行
+      </button>
+    </div>
+  </section>
+
+  <!-- ===== 自我灵感库 ===== -->
+  <section class="section" id="sec-library">
+    <div class="section-head">
+      <h2>自我灵感库</h2>
+      <span class="sub" id="libCount"></span>
+    </div>
+    <div class="filter-tabs" id="libFilter"></div>
+    <div id="libraryList"></div>
+  </section>
+
+  <!-- ===== 每日脚本 ===== -->
+  <section class="section" id="sec-script">
+    <div class="section-head">
+      <h2>每日脚本</h2>
+      <span class="sub" id="scriptCount"></span>
+    </div>
+    <div class="card" id="scriptGenCard">
+      <div class="card-title"><span class="bar"></span>从选题生成脚本</div>
+      <div style="font-size:13px;color:var(--text-sub);margin-bottom:10px;">从今日选题灵感里选一条，一键生成完整拍摄脚本</div>
+      <div class="form-group">
+        <select id="scriptSelect" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--olive-tint);font-size:14px;">
+          <option value="">— 选择选题 —</option>
+        </select>
+      </div>
+      <button class="btn btn-primary" onclick="generateScript()" style="width:100%;">生成拍摄脚本</button>
+    </div>
+    <div id="scriptList"></div>
+  </section>
+
+  <!-- ===== 大号脚本（盼盼两口子大号专用） ===== -->
+  <section class="section" id="sec-bigaccount">
+    <div class="section-head">
+      <h2>大号脚本</h2>
+      <span class="sub" id="bigaccountCount"></span>
+    </div>
+    <div class="info-bar" id="bigaccountInfo"></div>
+    <div class="date-bar" id="bigaccountDate"></div>
+    <div id="bigaccountList"></div>
+  </section>
+
+  <!-- ===== 小号脚本 ===== -->
+  <section class="section" id="sec-smallaccount">
+    <div class="section-head">
+      <h2>小号脚本</h2>
+      <span class="sub" id="smallaccountCount"></span>
+    </div>
+    <div class="info-bar" id="smallaccountInfo"></div>
+    <div class="date-bar" id="smallaccountDate"></div>
+    <div id="smallaccountList"></div>
+  </section>
+
+  <!-- ===== 拍摄方向库 ===== -->
+  <section class="section" id="sec-directions">
+    <div class="section-head">
+      <h2>拍摄方向库</h2>
+      <span class="sub">12大方向 · 随时查看</span>
+    </div>
+    <div class="card" style="background:linear-gradient(135deg,var(--olive) 0%,var(--olive-dark) 100%);color:#fff;margin-bottom:12px;">
+      <div style="font-size:15px;font-weight:600;margin-bottom:6px;">📌 核心IP定位</div>
+      <div style="font-size:13px;line-height:1.6;opacity:.95;">"你们看着我一步一步变好看，我也带着所有姐妹一步一步变好看"</div>
+      <div style="font-size:12px;margin-top:8px;opacity:.85;">30岁宝妈 · 两个儿子 · 162cm/98斤 · 从117到98 · 不是卖家，是带头变好看的姐妹</div>
+    </div>
+    <div class="card" style="background:#FFF8E8;border-left:3px solid var(--gold);margin-bottom:12px;">
+      <div style="font-size:14px;font-weight:600;color:var(--gold);margin-bottom:8px;">💎 两条核心金句（反复用）</div>
+      <div style="font-size:13px;color:var(--text);line-height:1.7;margin-bottom:6px;">1️⃣ "我以前也胖过，被人忽略过，你的犹豫我都懂"</div>
+      <div style="font-size:13px;color:var(--text);line-height:1.7;">2️⃣ "改变不是惩罚自己，是奖励自己。你只管变好，剩下的都会跟上来"</div>
+    </div>
+    <div id="directionsList"></div>
+    <div class="card" style="background:var(--olive-tint);">
+      <div class="card-title"><span class="bar"></span>内容占比</div>
+      <div style="font-size:13px;color:var(--text);line-height:1.8;">
+        <div>📱 <b>真实生活层 50%</b>：秀身材/夫妻日常/变化记录/瘦后新生活/蹭热点/老公宠溺/和大姐拍/向往成为我/秀实力</div>
+        <div>💡 <b>价值输出层 30%</b>：干货/心声/感悟</div>
+        <div>🎯 <b>转化攒劲层 20%</b>：初心/店里事/工厂/直播预热</div>
+      </div>
+    </div>
+    <div class="card" style="background:#FDEAEA;border-left:3px solid var(--red);margin-bottom:12px;">
+      <div style="font-size:14px;font-weight:600;color:var(--red);margin-bottom:8px;">⚠️ 抖音违规避雷（必须遵守）</div>
+      <div style="font-size:12px;color:var(--text);line-height:1.7;">
+        <div>❌ 禁用词：减肥/瘦身/溶脂/排毒/清肠/治疗/治愈/药物/包瘦/保证瘦/见效快/神效/奇迹/秘方/独家/唯一/加微信/私聊/下单/买</div>
+        <div>✅ 替换：减肥→减脂/身材管理，瘦身→变好看，产品功效→"我减脂那段时间喝的/我用过的"（强调现在不喝了，避免粉丝跟买）</div>
+        <div>❌ 不承诺效果：不说"X天瘦X斤"，只说"这段时间的变化"</div>
+        <div>❌ 不说价格：视频里绝不出现268等价格</div>
+        <div>❌ 不违规引流：不说"加微信"，只说"来找我/评论区见"</div>
+      </div>
+    </div>
+    <div class="card" style="background:var(--olive-tint);">
+      <div class="card-title"><span class="bar"></span>3条创作原则</div>
+      <div style="font-size:13px;color:var(--text);line-height:1.8;">
+        <div>1. <b>真实 > 广告</b>：宁可拍日常不带货，也不硬广</div>
+        <div>2. <b>你就是最大的广告</b>：你的变化就是产品最好的证明</div>
+        <div>3. <b>每条视频回答1个问题</b>：她为什么能变好看？我能不能？什么时候开始？</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 设置 ===== -->
+  <section class="section" id="sec-settings">
+    <div class="section-head"><h2>设置</h2></div>
+    <div class="card">
+      <div class="card-title"><span class="bar"></span>数据源</div>
+      <div class="form-group">
+        <label style="font-size:13px;color:var(--text-sub);margin-bottom:6px;display:block;">Gist ID（自动抓取数据源）</label>
+        <input type="text" id="setGistId" placeholder="留空则使用默认" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--olive-tint);">
+      </div>
+      <div class="form-group">
+        <label style="font-size:13px;color:var(--text-sub);margin-bottom:6px;display:block;">赛道关键词</label>
+        <input type="text" id="setTrack" placeholder="例如：农村生活/三农" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--olive-tint);">
+      </div>
+      <div class="form-group">
+        <label style="font-size:13px;color:var(--text-sub);margin-bottom:6px;display:block;">产品名（脚本里自动替换）</label>
+        <input type="text" id="setProductName" placeholder="默认：颜小盼咖啡" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--olive-tint);">
+      </div>
+      <div class="form-group">
+        <label style="font-size:13px;color:var(--text-sub);margin-bottom:6px;display:block;">AI 密钥（用于灵感库 AI 整理）</label>
+        <input type="password" id="setAIKey" placeholder="sk-...（留空则灵感库无法使用 AI 整理）" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--olive-tint);">
+        <div style="font-size:11px;color:var(--text-mute);margin-top:4px;">密钥仅存在手机本地，不会上传。公开仓库中请勿硬编码。</div>
+      </div>
+      <button class="btn btn-primary" onclick="saveSettings()" style="width:100%;margin-top:6px;">保存设置</button>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="bar"></span>数据管理</div>
+      <button class="btn btn-cancel" onclick="exportData()" style="width:100%;margin-bottom:8px;">导出全部数据</button>
+      <button class="btn btn-danger" onclick="clearAllData()" style="width:100%;">清空本地数据</button>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="bar"></span>使用说明</div>
+      <div style="font-size:13px;color:var(--text-sub);line-height:1.7;">
+        <p>• 每日计划、备忘录、复盘、灵感库都存在手机本地，不会丢失。</p>
+        <p>• 选题灵感和爆款二创来自云端 Gist，点右上角刷新。</p>
+        <p>• 灵感库的"AI整理"功能需要联网，把你的突发灵感发给助手后会自动同步。</p>
+        <p>• 抖音/B站按钮会尝试唤起App，失败则打开网页版。</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- 灵感库悬浮添加按钮 -->
+<button class="lib-add-btn" id="libAddBtn" onclick="openInspireModal()" style="display:none;">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+</button>
+
+<!-- 弹窗：新增灵感 -->
+<div class="modal-mask" id="inspireModal">
+  <div class="modal">
+    <div class="modal-title">记录突发灵感</div>
+    <div class="form-group">
+      <label>类型</label>
+      <select id="imType">
+        <option value="灵感">💡 突发灵感</option>
+        <option value="翻拍">🎬 可翻拍视频</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>标题 / 主题</label>
+      <input type="text" id="imTitle" placeholder="一句话说清楚">
+    </div>
+    <div class="form-group">
+      <label>原始内容（你的灵感描述或视频链接）</label>
+      <textarea id="imRaw" placeholder="想到什么写什么，或贴上视频链接"></textarea>
+    </div>
+    <div class="form-group" id="aiGroup" style="display:none;">
+      <label>AI整理结果（爆点+拍摄思路）</label>
+      <textarea id="imAiResult" placeholder="留空则保存后等待AI整理" style="height:120px;"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-cancel" onclick="closeModal('inspireModal')">取消</button>
+      <button class="btn btn-primary" onclick="saveInspire(true)">保存并AI整理</button>
+      <button class="btn btn-primary" onclick="saveInspire()" style="background:var(--olive-light);">仅保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+/* ===================================================
+   配置区
+=================================================== */
+const CONFIG = {
+  // 你的Gist ID —— 数据源
+  DEFAULT_GIST_ID: "f9e5527b830d5856636b824d2e6f7282",
+  // 你的GitHub用户名
+  GITHUB_USER: "YANGPAN723",
+  // Gist文件名
+  GIST_FILE: "creator-daily.json",
+  // 默认赛道
+  DEFAULT_TRACK: "减脂/减肥/瘦身 - 25-40岁女性"
+};
+
+/* ===================================================
+   存储
+=================================================== */
+const Store = {
+  get(key, def){
+    try{ const v = localStorage.getItem('cw_'+key); return v? JSON.parse(v): def; }
+    catch(e){ return def; }
+  },
+  set(key, val){ localStorage.setItem('cw_'+key, JSON.stringify(val)); },
+  del(key){ localStorage.removeItem('cw_'+key); }
+};
+
+/* ===================================================
+   导航
+=================================================== */
+const NAV_ITEMS = [
+  {id:'plan', name:'每日计划', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M9 16l2 2 4-4"/></svg>'},
+  {id:'inspire', name:'选题灵感', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/><circle cx="12" cy="12" r="4"/></svg>'},
+  {id:'recreate', name:'爆款二创', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 12a11 11 0 1 1-22 0 11 11 0 0 1 22 0z"/><path d="M12 8v8M8 12h8"/></svg>'},
+  {id:'review', name:'内容复盘', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-5"/></svg>'},
+  {id:'memo', name:'备忘录', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg>'},
+  {id:'library', name:'灵感库', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>'},
+  {id:'script', name:'每日脚本', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="14" y2="17"/></svg>'},
+  {id:'bigaccount', name:'大号脚本', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z"/></svg>'},
+  {id:'smallaccount', name:'小号脚本', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>'},
+  {id:'directions', name:'方向库', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/><circle cx="6" cy="6" r="1" fill="currentColor"/><circle cx="6" cy="12" r="1" fill="currentColor"/><circle cx="6" cy="18" r="1" fill="currentColor"/></svg>'},
+  {id:'settings', name:'设置', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>'}
+];
+
+let currentSection = 'plan';
+
+function renderNav(){
+  const nav = document.getElementById('drawerNav');
+  nav.innerHTML = NAV_ITEMS.map(it=>`
+    <div class="nav-item ${it.id===currentSection?'active':''}" onclick="switchSection('${it.id}')">
+      <span class="ico">${it.icon}</span>
+      <span>${it.name}</span>
+    </div>
+  `).join('');
+}
+
+function switchSection(id){
+  currentSection = id;
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.getElementById('sec-'+id).classList.add('active');
+  document.getElementById('pageTitle').textContent = NAV_ITEMS.find(n=>n.id===id).name;
+  document.getElementById('libAddBtn').style.display = id==='library'?'flex':'none';
+  renderNav();
+  toggleDrawer(false);
+  document.getElementById('main').scrollTop = 0;
+  // 按section刷新对应数据
+  if(id==='inspire') renderInspire();
+  if(id==='recreate') renderRecreate();
+  if(id==='library') renderLibrary();
+  if(id==='script') fillScriptSelect();
+  if(id==='bigaccount') renderBigaccount();
+  if(id==='smallaccount') renderSmallaccount();
+}
+
+function toggleDrawer(open){
+  document.getElementById('drawer').classList.toggle('open', open);
+  document.getElementById('drawerMask').classList.toggle('open', open);
+}
+
+/* ===================================================
+   每日计划
+=================================================== */
+function todayKey(){ return new Date().toISOString().slice(0,10); }
+function fmtDate(d){ 
+  const dt = d? new Date(d): new Date();
+  return dt.getFullYear()+'年'+(dt.getMonth()+1)+'月'+dt.getDate()+'日';
+}
+
+function getTodayPlan(){
+  const key = 'plan_'+todayKey();
+  let plan = Store.get(key, null);
+  if(!plan){
+    // 默认5条模板
+    plan = [
+      {text:'拍摄一条视频', done:false},
+      {text:'剪辑并发布', done:false},
+      {text:'回复评论区互动', done:false},
+      {text:'刷热点找选题', done:false},
+      {text:'复盘昨日数据', done:false}
+    ];
+    Store.set(key, plan);
+  }
+  return plan;
+}
+
+function renderPlan(){
+  const plan = getTodayPlan();
+  document.getElementById('todayDate').textContent = fmtDate();
+  const done = plan.filter(p=>p.done).length;
+  const total = plan.length;
+  const pct = total? Math.round(done/total*100):0;
+  document.getElementById('planProgress').style.width = pct+'%';
+  document.getElementById('planProgressText').textContent = `完成 ${done} / ${total}`;
+  document.getElementById('planPercent').textContent = pct+'%';
+  
+  const list = document.getElementById('planList');
+  if(!plan.length){
+    list.innerHTML = '<div class="empty"><p>暂无任务，点击下方添加</p></div>';
+    return;
+  }
+  list.innerHTML = plan.map((p,i)=>`
+    <div class="check-item ${p.done?'done':''}" onclick="handleItemClick(event,'plan',${i})" role="button" tabindex="0">
+      <div class="check-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <div class="check-label" contenteditable="true" onclick="event.stopPropagation();" onblur="editPlan(${i},this.innerText)">${esc(p.text)}</div>
+      <button class="check-del" onclick="event.stopPropagation(); delPlan(${i})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
+    </div>
+  `).join('');
+}
+
+function handleItemClick(e,type,i){
+  if(e && (e.target||e.srcElement)){
+    const t = e.target || e.srcElement;
+    if(t.closest && t.closest('.check-del')) return;
+    if(t.closest && (t.closest('.check-label') || t.closest('.memo-text'))) return;
+    if(t.classList && (t.classList.contains('check-label') || t.classList.contains('memo-text'))) return;
+  }
+  if(type==='plan') togglePlan(i);
+  else if(type==='memo') toggleMemo(i);
+}
+function togglePlan(i){
+  const plan = getTodayPlan();
+  plan[i].done = !plan[i].done;
+  Store.set('plan_'+todayKey(), plan);
+  renderPlan();
+}
+function editPlan(i,text){
+  const plan = getTodayPlan();
+  plan[i].text = text.trim()||plan[i].text;
+  Store.set('plan_'+todayKey(), plan);
+}
+function addPlan(){
+  const plan = getTodayPlan();
+  plan.push({text:'新任务', done:false});
+  Store.set('plan_'+todayKey(), plan);
+  renderPlan();
+}
+function delPlan(i){
+  const plan = getTodayPlan();
+  plan.splice(i,1);
+  Store.set('plan_'+todayKey(), plan);
+  renderPlan();
+}
+
+/* ===================================================
+   今日状态（盼盼每天输入一句话，pipeline读取出脚本）
+=================================================== */
+// 获取GitHub Token（第一次需要输入，之后保存在localStorage）
+function getGHToken(){
+  return Store.get('ghToken','');
+}
+function setGHToken(token){
+  Store.set('ghToken', token);
+}
+
+// 加载今日状态（页面加载时调用）
+function loadDailyState(){
+  const today = todayKey();
+  const saved = Store.get('state_'+today, '');
+  const input = document.getElementById('dailyStateInput');
+  const status = document.getElementById('dsStatus');
+  if(input){
+    input.value = saved;
+    if(saved){
+      if(status) status.innerHTML = '✅ 今日状态已保存，pipeline下次运行时会读取';
+      if(status) status.className = 'ds-status ok';
+    }
+  }
+}
+
+// 保存今日状态
+async function saveDailyState(){
+  const input = document.getElementById('dailyStateInput');
+  const status = document.getElementById('dsStatus');
+  const btn = document.getElementById('dsSaveBtn');
+  if(!input || !status || !btn) return;
+
+  const text = input.value.trim();
+  const today = todayKey();
+
+  // 1. 先保存到localStorage
+  Store.set('state_'+today, text);
+
+  if(!text){
+    status.innerHTML = '✅ 已清空今日状态';
+    status.className = 'ds-status ok';
+    btn.classList.add('saved');
+    setTimeout(()=>btn.classList.remove('saved'), 1500);
+    return;
+  }
+
+  // 2. 尝试写入Gist（需要token）
+  let token = getGHToken();
+  if(!token){
+    token = prompt('第一次保存需要输入GitHub Token（用于写入状态数据到Gist）。\nToken只保存在你手机本地，不会上传。\n\n你的GitHub Token（gist权限）：');
+    if(!token){
+      status.innerHTML = '⚠️ 未输入Token，状态只保存在本地（pipeline无法读取）';
+      status.className = 'ds-status err';
+      return;
+    }
+    setGHToken(token);
+  }
+
+  // 3. 用GitHub API写入Gist的daily_state字段
+  status.innerHTML = '⏳ 正在保存到Gist...';
+  status.className = 'ds-status';
+
+  try{
+    const gistId = getGistId();
+    // 先读取现有Gist数据
+    const readResp = await fetch(`https://api.github.com/gists/${gistId}`, {
+      headers: {'Authorization': `token ${token}`, 'Accept': 'application/vnd.github+json'}
+    });
+    if(!readResp.ok){
+      // token可能失效
+      if(readResp.status === 401 || readResp.status === 403){
+        Store.set('ghToken', ''); // 清除失效的token
+        status.innerHTML = '⚠️ Token无效或已过期，请重新保存并输入新Token';
+        status.className = 'ds-status err';
+        return;
+      }
+      throw new Error('读取Gist失败: '+readResp.status);
+    }
+    const gistData = await readResp.json();
+    const fileName = CONFIG.GIST_FILE;
+    const fileContent = gistData.files?.[fileName]?.content || '{}';
+    let data;
+    try{ data = JSON.parse(fileContent); }catch(e){ data = {}; }
+
+    // 更新daily_state字段
+    data['daily_state'] = text;
+    data['daily_state_date'] = today;
+
+    // 写回Gist
+    const writeResp = await fetch(`https://api.github.com/gists/${gistId}`, {
+      method: 'PATCH',
+      headers: {
+        'Authorization': `token ${token}`,
+        'Accept': 'application/vnd.github+json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        files: {
+          [fileName]: {
+            content: JSON.stringify(data, null, 2)
+          }
+        }
+      })
+    });
+
+    if(writeResp.ok){
+      status.innerHTML = '✅ 已保存！pipeline下次运行时会读取这句状态';
+      status.className = 'ds-status ok';
+      btn.classList.add('saved');
+      setTimeout(()=>btn.classList.remove('saved'), 1500);
+    } else {
+      throw new Error('写入Gist失败: '+writeResp.status);
+    }
+  }catch(e){
+    status.innerHTML = '⚠️ 保存到Gist失败：'+e.message+'（状态已保存在本地）';
+    status.className = 'ds-status err';
+    console.error('saveDailyState error:', e);
+  }
+}
+
+/* ===================================================
+   选题灵感（来自Gist）
+=================================================== */
+function getGistId(){
+  return Store.get('gistId','') || CONFIG.DEFAULT_GIST_ID;
+}
+
+async function fetchGist(){
+  const gid = getGistId();
+  const user = Store.get('githubUser','') || CONFIG.GITHUB_USER;
+  const icon = document.getElementById('refreshIcon');
+  icon.classList.add('spin');
+  showToast('正在刷新…');
+  
+  if(!gid){
+    loadDemoData();
+    icon.classList.remove('spin');
+    showToast('未配置Gist，已加载演示数据');
+    return;
+  }
+  
+  // 用raw URL读取，不受API速率限制
+  const rawUrl = `https://gist.githubusercontent.com/${user}/${gid}/raw/${CONFIG.GIST_FILE}`;
+  
+  try{
+    const res = await fetch(rawUrl + '?t=' + Date.now());  // 加时间戳防缓存
+    if(!res.ok) throw new Error('网络错误 '+res.status);
+    const content = await res.json();
+    Store.set('dailyData', content);
+    Store.set('lastUpdate', new Date().toLocaleString('zh-CN'));
+    document.getElementById('refreshBtn').classList.remove('has-new');
+    renderInspire();
+    renderRecreate();
+    renderBigaccount();
+    renderSmallaccount();
+    fillScriptSelect();
+    updateDrawerInfo();
+    showToast('✅ 已更新 '+ (content.date||''));
+  }catch(e){
+    console.error(e);
+    // 降级：尝试API方式
+    try{
+      const res2 = await fetch(`https://api.github.com/gists/${gid}`);
+      if(res2.ok){
+        const data = await res2.json();
+        const file = data.files[CONFIG.GIST_FILE];
+        if(file){
+          const content = JSON.parse(file.content);
+          Store.set('dailyData', content);
+          Store.set('lastUpdate', new Date().toLocaleString('zh-CN'));
+          renderInspire();
+          renderRecreate();
+          renderBigaccount();
+          renderSmallaccount();
+          updateDrawerInfo();
+          showToast('✅ 已更新 '+ (content.date||''));
+          return;
+        }
+      }
+    }catch(e2){}
+    showToast('❌ 刷新失败：'+e.message);
+    if(!Store.get('dailyData',null)) loadDemoData();
+  }finally{
+    icon.classList.remove('spin');
+  }
+}
+
+function loadDemoData(){
+  const demo = {
+    date: fmtDate(),
+    track: CONFIG.DEFAULT_TRACK,
+    inspire: [
+      {title:'选题1：菜市场里的人间烟火', tag:'生活', desc:'清晨菜市场的热闹场景，捕捉摊主和顾客的真实对话，展现平凡生活里的温度。'},
+      {title:'选题2：雨天的小确幸', tag:'情感', desc:'下雨天适合做的小事：煮一壶茶、读一本书、听雨声，治愈系内容。'},
+      {title:'选题3：一道家乡菜的故事', tag:'美食', desc:'复刻奶奶教的一道菜，讲述背后的家庭记忆，唤起观众共鸣。'},
+      {title:'选题4：独居的一天', tag:'生活', desc:'记录一个人吃饭、工作、看剧的日常，引发独居青年共鸣。'},
+      {title:'选题5：街头采访：你快乐吗', tag:'采访', desc:'随机采访路人，问最近开心的事，收集真实的笑容和故事。'},
+      {title:'选题6：老手艺的新表达', tag:'文化', desc:'找一个本地老手艺人，用年轻化视角呈现传统工艺。'},
+      {title:'选题7：深夜厨房', tag:'美食', desc:'凌晨做一顿夜宵，配上轻音乐和独白，治愈失眠的人。'},
+      {title:'选题8：从0到1种一盆菜', tag:'生活', desc:'记录阳台种菜全过程，从播种到收获，慢节奏治愈。'},
+      {title:'选题9：邻居家的猫', tag:'萌宠', desc:'拍邻居家的猫日常，配上拟人化解说，轻松搞笑。'},
+      {title:'选题10：一个人的旅行vlog', tag:'旅行', desc:'周末独自去一个没去过的小镇，记录见闻和心情。'}
+    ],
+    recreate: [
+      {hot:'热榜：某萌宠视频播放破千万', title:'萌宠互动类', angle:'<b>改编角度：</b>换成你和自家宠物的互动，加入反转剧情——宠物"嫌弃"主人的日常。'},
+      {hot:'热榜：怀旧美食复刻', title:'怀旧类', angle:'<b>改编角度：</b>复刻小时候学校门口的小吃，加入你的童年回忆解说，引发80/90后共鸣。'},
+      {hot:'热榜：职场吐槽段子', title:'职场类', angle:'<b>改编角度：</b>把段子改编成真实经历，用第一人称讲述，加入夸张的表情和动作。'},
+      {hot:'热榜：乡村生活记录', title:'乡村类', angle:'<b>改编角度：</b>记录回乡一天的所见所闻，慢节奏+方言旁白，差异化于快节奏城市内容。'},
+      {hot:'热榜：知识科普短视频', title:'科普类', angle:'<b>改编角度：</b>找一个生活中的冷知识，用30秒讲清楚，配上实物演示。'},
+      {hot:'热榜：情感独白类', title:'情感类', angle:'<b>改编角度：</b>写一段关于"长大"的独白，配上空镜画面，引发情感共鸣。'},
+      {hot:'热榜：手工制作过程', title:'手工类', angle:'<b>改编角度：</b>用废弃物做一件实用小物，全程ASMR音效，沉浸式体验。'},
+      {hot:'热榜：街头随机挑战', title:'挑战类', angle:'<b>改编角度：</b>在街头做"给陌生人送一朵花"挑战，记录对方的真实反应。'},
+      {hot:'热榜：一人食精致vlog', title:'美食类', angle:'<b>改编角度：</b>做一顿精致早餐，加入"给自己好好吃饭"的主题，治愈独居群体。'},
+      {hot:'热榜：方言搞笑配音', title:'搞笑类', angle:'<b>改编角度：</b>给经典影视片段配上方言版解说，本地化传播效果好。'}
+    ]
+  };
+  Store.set('dailyData', demo);
+  Store.set('lastUpdate', new Date().toLocaleString('zh-CN'));
+  renderInspire();
+  renderRecreate();
+  renderBigaccount();
+  renderSmallaccount();
+  updateDrawerInfo();
+}
+
+function renderInspire(){
+  const data = Store.get('dailyData', null);
+  const info = document.getElementById('inspireInfo');
+  const list = document.getElementById('inspireList');
+  const dateEl = document.getElementById('inspireDate');
+  
+  if(!data){
+    info.innerHTML = '<span class="err">未获取到数据，点击右上角刷新</span>';
+    list.innerHTML = '<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg><p>暂无灵感数据</p></div>';
+    return;
+  }
+  
+  dateEl.textContent = '📅 '+ (data.date||'') + ' · ' + (data.track||'');
+  const lu = Store.get('lastUpdate','');
+  info.innerHTML = lu? `<span class="ok">数据更新于 ${lu}</span>` : '';
+  
+  const items = data.inspire||[];
+  if(!items.length){
+    list.innerHTML = '<div class="empty"><p>今日暂无灵感</p></div>';
+    return;
+  }
+  list.innerHTML = items.map((it,i)=>`
+    <div class="inspire-card">
+      <div class="ic-head">
+        <div class="ic-title" onclick="copyText('${esc(it.title)}')">${i+1}. ${esc(it.title)}</div>
+        <span class="ic-tag">${esc(it.tag||'选题')}</span>
+      </div>
+      <div class="ic-desc" onclick="copyText('${esc(it.desc||'')}')">${esc(it.desc||'')}</div>
+      <div class="ic-actions">
+        <button class="ic-btn dy" onclick="event.stopPropagation(); openApp('dy','${esc(it.title)}')">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.6 6.3c-1.6 0-2.9-1.3-2.9-2.9V3h-2.8v13.5c0 1.4-1.2 2.6-2.6 2.6s-2.6-1.2-2.6-2.6 1.2-2.6 2.6-2.6c.3 0 .5 0 .8.1V11c-.3 0-.5-.1-.8-.1-3 0-5.4 2.4-5.4 5.4s2.4 5.4 5.4 5.4 5.4-2.4 5.4-5.4V9c1.1.8 2.4 1.2 3.8 1.2V7.4c0 .1-.7.1-.9-.1z"/></svg>
+          抖音
+        </button>
+        <button class="ic-btn bili" onclick="event.stopPropagation(); openApp('bili','${esc(it.title)}')">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.8 3c.5 0 .9.4.9.9v1.4c0 .5-.4.9-.9.9H6.2c-.5 0-.9-.4-.9-.9V3.9c0-.5.4-.9.9-.9h11.6zM4.5 7.5h15c1.4 0 2.5 1.1 2.5 2.5v8c0 2.2-1.8 4-4 4H6c-2.2 0-4-1.8-4-4v-8c0-1.4 1.1-2.5 2.5-2.5zm4.2 3.8c-.3-.3-.7-.3-1 0-.3.3-.3.7 0 1l2 2-2 2c-.3.3-.3.7 0 1 .3.3.7.3 1 0l2-2 2 2c.3.3.7.3 1 0 .3-.3.3-.7 0-1l-2-2 2-2c.3-.3.3-.7 0-1-.3-.3-.7-.3-1 0l-2 2-2-2z"/></svg>
+          B站
+        </button>
+        <button class="ic-btn save" onclick="event.stopPropagation(); copyText('${esc(it.title)}')" title="复制关键词">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        </button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderRecreate(){
+  const data = Store.get('dailyData', null);
+  const info = document.getElementById('recreateInfo');
+  const list = document.getElementById('recreateList');
+  const dateEl = document.getElementById('recreateDate');
+  
+  if(!data){
+    info.innerHTML = '<span class="err">未获取到数据，点击右上角刷新</span>';
+    list.innerHTML = '<div class="empty"><p>暂无数据</p></div>';
+    return;
+  }
+  dateEl.textContent = '📅 '+ (data.date||'');
+  const lu = Store.get('lastUpdate','');
+  info.innerHTML = lu? `<span class="ok">数据更新于 ${lu}</span>` : '';
+  
+  const items = data.recreate||[];
+  if(!items.length){
+    list.innerHTML = '<div class="empty"><p>今日暂无二创角度</p></div>';
+    return;
+  }
+  list.innerHTML = items.map((it,i)=>`
+    <div class="recreate-card">
+      <div class="rc-rank">#${i+1}</div>
+      <div class="rc-hot">🔥 ${esc(it.hot||'')}</div>
+      <div class="rc-title">${esc(it.title||'')}</div>
+      <div class="rc-angle">${it.angle||''}</div>
+      <div class="rc-source">
+        <button class="ic-btn dy" style="flex:0 0 auto;padding:5px 10px;font-size:11px;" onclick="openApp('dy','${esc(it.title)}')">抖音找参考</button>
+        <button class="ic-btn bili" style="flex:0 0 auto;padding:5px 10px;font-size:11px;" onclick="openApp('bili','${esc(it.title)}')">B站找参考</button>
+        <button class="ic-btn" style="flex:0 0 auto;padding:5px 10px;font-size:11px;background:var(--olive);color:#fff;margin-left:auto;" onclick="generateRecreateScript(${i})">🎬 生成拍摄脚本</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+/* ===================================================
+   二创脚本生成（基于热点改编，可直接落地拍摄）
+   与选题脚本的区别：二创必须先引用原热点，再过渡到盼盼的改编拍摄
+=================================================== */
+
+// 模板变量替换：把 {HOT} {PRODUCT} {TITLE} 等占位符替换成实际内容
+function replaceVars(str, vars){
+  if(typeof str !== 'string') return str;
+  return str.replace(/\{(\w+)\}/g, (m, k) => vars[k] !== undefined ? vars[k] : m);
+}
+
+// 脚本后处理：智能产品名替换 + 植入频率控制
+// 策略：台词里念生活化说法（避免广告感），动作/策略里用真实产品名（方便拍摄认道具）
+function normalizeScript(result, productName){
+  const pn = productName || '颜小盼咖啡';
+  // 台词里念的——强调"我当时喝的咖啡"，不说现在还喝
+  const casual = '我当时喝的咖啡';
+  // 动作/策略/要点里——用真实产品名，方便拍摄时认出道具
+  const replaceAction = (str) => {
+    if(typeof str !== 'string') return str;
+    return str.replace(/\{PRODUCT\}/g, pn)
+              .replace(/产品/g, pn)
+              .replace(/饮品/g, pn)
+              .replace(/我喝的这杯/g, pn);
+  };
+  // 台词里——把产品名替换为生活化说法（避免广告感）
+  const replaceLine = (str) => {
+    if(typeof str !== 'string') return str;
+    return str.replace(/\{PRODUCT\}/g, casual)
+              .replace(/产品/g, casual)
+              .replace(/饮品/g, casual)
+              .replace(new RegExp(pn, 'g'), casual);  // 把已经被replaceVars替换成的产品名再换回生活化
+  };
+  // 策略说明里——用真实产品名
+  const replaceStrategy = (str) => {
+    if(typeof str !== 'string') return str;
+    return str.replace(/\{PRODUCT\}/g, pn)
+              .replace(/产品/g, pn)
+              .replace(/饮品/g, pn)
+              .replace(/我喝的这杯/g, pn);
+  };
+
+  result.hook = replaceAction(result.hook);
+  result.logic = replaceAction(result.logic);
+  result.emotion = replaceAction(result.emotion);
+  result.interact = replaceLine(result.interact);  // 互动引导也是台词
+  result.product = replaceStrategy(result.product);
+  if(result.tips) result.tips = result.tips.map(replaceAction);
+  if(result.scenes){
+    result.scenes = result.scenes.map(s => ({
+      time: s.time,
+      shot: replaceAction(s.shot),
+      action: replaceAction(s.action),      // 动作描述：用真实产品名
+      line: replaceLine(s.line),            // 台词：生活化说法
+      bgm: s.bgm,
+      note: replaceAction(s.note)
+    }));
+  }
+  return result;
+}
+
+function generateRecreateScript(i){
+  const data = Store.get('dailyData', null);
+  if(!data || !data.recreate || !data.recreate[i]){
+    showToast('二创数据不存在');
+    return;
+  }
+  const item = data.recreate[i];
+  const script = buildRecreateScript(item);
+
+  const rec = {
+    id: Date.now(),
+    title: '二创：' + (item.title||''),
+    tag: '二创',
+    desc: item.hot||'',
+    script,
+    created: new Date().toLocaleString('zh-CN').slice(5,16)
+  };
+  const list = Store.get('scripts', []);
+  list.unshift(rec);
+  Store.set('scripts', list);
+  // 跳到脚本页查看
+  switchSection('script');
+  renderScript();
+  showToast('✅ 二创脚本已生成');
+}
+
+function buildRecreateScript(item){
+  // 二创脚本：基于热点改编，含原热点引用+改编拍摄方案
+  // 支持5种视频形式，根据二创角度类型选择
+  const title = item.title || '';
+  const hot = item.hot || '';
+  const angle = item.angle || '';
+
+  // 从title里提取角度类型（格式："大类-具体角度"）
+  // 从angle文本里提取改编角度描述
+  let angleType = '';
+  let angleDesc = '';
+  const m = angle.match(/改编角度：<\/b>([^。]+。?)/);
+  if(m){ angleDesc = m[1]; }
+  const tm = title.match(/-(.+)$/);
+  if(tm){ angleType = tm[1]; }
+
+  // 根据 angleType / angleDesc 关键词决定视频形式
+  let form = 'standard';
+  const desc2 = (angleType + angleDesc).toLowerCase();
+  if(/对比|前后|蜕变|变化/.test(desc2)){ form = 'long'; }       // 对比反差/蜕变叙事 → 长视频
+  else if(/金句|励志|配乐|卡点/.test(desc2)){ form = 'music'; }  // 励志金句 → 音乐转场
+  else if(/vlog|日常|记录|带娃/.test(desc2)){ form = 'visual'; } // 生活记录 → 画面配音乐
+  else if(/解读|避坑|干货/.test(desc2)){ form = 'short'; }       // 干货解读 → 极短
+  else if(/reaction|采访|夫妻|老公/.test(desc2)){ form = 'standard'; } // 夫妻互动 → 标准
+  else if(/独白|私信|走心/.test(desc2)){ form = 'long'; }        // 情感共鸣 → 长视频
+  else if(/改编|扮演|趣味|搞笑/.test(desc2)){ form = 'short'; }  // 趣味改编 → 极短
+  else if(/居家|厨房|场景/.test(desc2)){ form = 'standard'; }    // 居家场景 → 标准
+
+  // 8大类×形式的脚本模板库
+  // 每个模板都：1)引用原热点 2)过渡到盼盼视角 3)完整分镜头 4)标注爆款元素
+  const T = {
+    // 居家场景类
+    '居家跟拍版_standard': {
+      form:'标准视频', duration:'30秒',
+      hook:'热点画面截图开场→切到盼盼家里：「{HOT} 这事我也遇到过」',
+      emotion:'好奇→共鸣→会心一笑',
+      logic:'先用热点话题抓眼球，3秒内切到自己家里的真实场景，用夫妻日常降维解读热点，避免硬蹭。',
+      scenes:[
+        {time:'0-3秒', shot:'手机录屏/截图', action:'{HOT}视频截图或录屏画面，配大字标题「{HOT}」', line:'（字幕）{HOT}', bgm:'轻快', note:'【黄金3秒】用热点本身吸睛，不要自己说话'},
+        {time:'3-6秒', shot:'中景', action:'硬切到盼盼家客厅，盼盼正抱娃/做减脂餐，抬头看镜头', line:'盼盼：{HOT}，这事我也遇到过。', bgm:'转折', note:'【过渡钩子】硬切制造反差，3秒内进入自己的场景'},
+        {time:'6-15秒', shot:'中景/近景交替', action:'盼盼边做手头的事边聊，老公从背后路过插一句嘴', line:'盼盼：好多姐妹光看别人热闹，但我是从117斤到98斤的宝妈，我知道这里面最累的不是热点本身，是我们每天的日子。\n老公：你又开始讲道理了。', bgm:'生活感', note:'【夫妻日常】老公插嘴要自然，不要演，展现真实互动'},
+        {time:'15-22秒', shot:'近景', action:'盼盼拿起{PRODUCT}展示一下，继续说', line:'盼盼：我现在状态能稳住，不是因为我还在喝什么，是因为减脂那段时间养成的习惯没丢。当时就是靠{PRODUCT}这种辅助过来的。', bgm:'保持', note:'【产品软植入】产品作为"我当时用过的辅助"出现，不强调现在还喝'},
+        {time:'22-27秒', shot:'中景', action:'老公又补一刀/孩子跑过来抢镜', line:'老公：你现在不喝了 我才奇怪。\n孩子：妈妈！', bgm:'轻松', note:'【完播钩子】中段加意外元素留住观众，呼应"现在不喝了"的人设'},
+        {time:'27-30秒', shot:'近景', action:'盼盼对着镜头抛问题', line:'盼盼：{HOT}你们也刷到了吗？评论区聊聊。', bgm:'收', note:'【互动触发】抛开放性问题'}
+      ],
+      interact:'「{HOT}你们也刷到了吗？评论区聊聊」+ 置顶一条自己的真实经历',
+      product:'{PRODUCT}当生活道具出现（喝水/泡饮品），只展示不讲解',
+      tips:['热点截图要用当天的，超过2天就过气','硬切转场比淡入更抓人','老公插话要真实，别背台词']
+    },
+    '厨房场景版_standard': {
+      form:'标准视频', duration:'35秒',
+      hook:'锅里滋滋声+盼盼边炒边说{HOT}',
+      emotion:'好奇→专注→信任',
+      logic:'用做饭的ASMR感开场抓人，边做边聊热点，产品作为食材/饮品天然植入，生活感最强。',
+      scenes:[
+        {time:'0-3秒', shot:'特写', action:'锅里食材特写，滋滋声，盼盼手入画翻炒', line:'（字幕）边做减脂餐 边聊{HOT}', bgm:'保留环境音', note:'【黄金3秒】ASMR感开场，食物特写最抓人'},
+        {time:'3-8秒', shot:'中景', action:'盼盼围裙造型，边翻炒边对镜头聊热点', line:'盼盼：今天刷到{HOT}了，我一边做早饭一边跟你们唠两句。', bgm:'轻柔', note:'边做边说，动作要持续不停'},
+        {time:'8-18秒', shot:'近景/特写交替', action:'盼盼往锅里加调料/盛出装盘，同时发表自己的看法', line:'盼盼：我看很多人只看热闹，但作为从117到98的宝妈，我想说一句，身材管理不是跟风，是把自己每一天的小习惯过好。\n（字幕同步）', bgm:'保持', note:'【情绪转折】从复述热点→输出观点'},
+        {time:'18-25秒', shot:'中景', action:'盼盼把做好的减脂餐端上桌，顺手拿起{PRODUCT}展示', line:'盼盼：减脂那段时间，配我的减脂餐，我每天都会喝{PRODUCT}。', bgm:'温暖', note:'【产品软植入】产品作为回忆场景出现，不说现在还喝'},
+        {time:'25-30秒', shot:'近景', action:'盼盼尝一口，表情满足，老公从背后伸手偷吃', line:'盼盼：嗯~\n老公：我尝尝（偷吃）', bgm:'轻松', note:'【夫妻日常+完播钩子】老公偷吃是经典梗'},
+        {time:'30-35秒', shot:'中景', action:'盼盼笑着赶老公，对镜头', line:'盼盼：你们家做饭谁偷吃？评论区举手', bgm:'收', note:'【互动触发】'}
+      ],
+      interact:'「你们家做饭谁偷吃？评论区举手🙋」',
+      product:'{PRODUCT}作为减脂餐的饮品搭配自然出现桌面上',
+      tips:['做饭画面要真实有油烟感','产品不要特写介绍，当背景道具','老公偷吃要即兴不要彩排']
+    },
+
+    // 情感共鸣类
+    '走心独白版_long': {
+      form:'长视频', duration:'90秒',
+      hook:'{HOT}截图+盼盼安静坐着：「这个热点 我想说点不一样的」',
+      emotion:'好奇→代入→共鸣→治愈',
+      logic:'长视频走心款，用{HOT}做引子但不急着评价，先讲自己的故事，最后回到热点升华。金句要慢说配字幕。',
+      scenes:[
+        {time:'0-5秒', shot:'近景', action:'{HOT}截图飘过，盼盼安静坐在窗边/床边，光线柔和，手里拿着手机', line:'（字幕）{HOT}\n我想说点不一样的', bgm:'钢琴轻柔', note:'【黄金3秒】安静氛围+反常规表态制造悬念'},
+        {time:'5-15秒', shot:'近景', action:'盼盼放下手机，看向镜头，开始讲', line:'盼盼：{HOT}大家都在讨论，有人笑，有人骂。但我是从117斤到98斤的宝妈，我看到的不一样。', bgm:'保持', note:'【过渡】先认同再转折'},
+        {time:'15-35秒', shot:'中景/近景', action:'盼盼讲述自己从117到98的经历，穿插旧照片', line:'盼盼：3年前我117斤的时候，每天最累的不是身体，是心里。我那时候照镜子，会下意识把衣服往下拉，不想让别人看到我腰上的肉。\n（字幕同步关键词）', bgm:'渐入', note:'【故事主体】讲挣扎不讲成功，越真实越共鸣'},
+        {time:'35-55秒', shot:'近景', action:'盼盼说到动情处，眼眶微红', line:'盼盼：最难的不是少吃，是我一直觉得自己不配穿好看的衣服。后来我每天做一件小事，坚持到今天，98斤了，但我最想说的不是体重。', bgm:'情绪推高', note:'【情绪转折】这里要慢，留白，别急着说下一句'},
+        {time:'55-75秒', shot:'中景', action:'盼盼站起来/换个姿势，语气转坚定，拿起{PRODUCT}展示', line:'盼盼：我减脂那段时间，每天早上起来先喝{PRODUCT}，不是为了瘦，是告诉自己，我今天也会认真对待自己。\n（字幕）「坚持的记录 比奇迹更真实」', bgm:'高潮', note:'【截图传播点】金句字幕放大，停留3秒，配BGM高潮'},
+        {time:'75-85秒', shot:'近景', action:'盼盼放下{PRODUCT}，平静说', line:'盼盼：所以{HOT}说什么不重要，重要的是你今天有没有对自己好一点。', bgm:'收', note:'【产品软植入】产品作为回忆道具，不强调现在还喝'},
+        {time:'85-90秒', shot:'近景', action:'盼盼看着镜头，微笑', line:'盼盼：你呢？正在经历什么？评论区说说话，我都在。', bgm:'收尾', note:'【互动触发】温柔收尾'}
+      ],
+      interact:'「你正在经历什么？评论区说说话，我都在」+ 置顶自己的金句截图',
+      product:'{PRODUCT}作为"我现在的生活方式"出现，喝一口带过，不介绍',
+      tips:['长视频必须光线好看，窗边自然光最好','讲经历要具体到某一天某件事，别泛泛而谈','金句字幕一定要大，停留够久让人截图','BGM情绪曲线要和讲述节奏匹配']
+    },
+    '私信回复版_long': {
+      form:'长视频', duration:'75秒',
+      hook:'手机私信截图放大：「有个粉丝问我{HOT}」',
+      emotion:'好奇→信任→共鸣',
+      logic:'用粉丝私信做钩子，比直接聊热点更有真实感。回复私信的过程中自然讲自己的故事。',
+      scenes:[
+        {time:'0-5秒', shot:'手机屏特写', action:'粉丝私信截图，文字放大「盼盼姐 {HOT}你怎么看？」', line:'（字幕）有个粉丝问我{HOT}', bgm:'轻柔', note:'【黄金3秒】私信截图比热点本身更有代入感'},
+        {time:'5-12秒', shot:'中景', action:'盼盼拿着手机，抬头看镜头，笑一下', line:'盼盼：这个问题问得好，我跟你说说。', bgm:'保持', note:'【过渡钩子】像和朋友聊天一样开口'},
+        {time:'12-30秒', shot:'近景', action:'盼盼边看手机边讲，穿插{HOT}画面', line:'盼盼：{HOT}说的是大家都在关注的那件事。我第一反应不是站队，是想到我以前。', bgm:'保持', note:'先复述再表态，别一上来就喷'},
+        {time:'30-50秒', shot:'中景', action:'盼盼放下手机，讲自己类似经历', line:'盼盼：我117斤的时候，也特别在意别人怎么看我。那时候不是不想变好，是不知道从哪里开始。后来我就每天只做一件小事，比如早起先喝{PRODUCT}，提醒自己今天别敷衍。', bgm:'渐入', note:'【情绪转折】从评价热点→讲自己（"早起喝"是减脂期的回忆，不是现在）'},
+        {time:'50-65秒', shot:'近景', action:'盼盼拿起桌上的{PRODUCT}展示一下，继续说', line:'盼盼：所以我现在不追热点，只追自己每天的状态。这就是我那时候的答案。', bgm:'温暖', note:'【产品软植入】产品作为"我当时的答案"出现，不强调现在还喝'},
+        {time:'65-75秒', shot:'近景', action:'盼盼对着镜头，真诚', line:'盼盼：你也有类似的困惑吗？私信我，或者评论区聊，我都在。', bgm:'收', note:'【互动触发】引导私信增加粘性'}
+      ],
+      interact:'「你也有类似困惑？私信我 或评论区聊」+ 回复前3条评论',
+      product:'{PRODUCT}作为"我的生活方式答案"自然出现',
+      tips:['私信截图要打码保护粉丝隐私','语气要像闺蜜聊天，不要像说教','回复评论要快，前3条必回']
+    },
+
+    // 对比反差类
+    '前后对比版_long': {
+      form:'长视频', duration:'60秒',
+      hook:'{HOT}截图→盼盼旧照：「这个热点 我有发言权」',
+      emotion:'好奇→震撼→激励',
+      logic:'用{HOT}做引子，但核心是展示自己的117→98对比，热点只是入场券，自己的变化才是主角。',
+      scenes:[
+        {time:'0-4秒', shot:'手机截图', action:'{HOT}视频截图，配大字「这个热点 我有发言权」', line:'（字幕）{HOT}\n我有发言权', bgm:'悬疑', note:'【黄金3秒】用"发言权"制造好奇'},
+        {time:'4-8秒', shot:'近景', action:'盼盼对着镜头，拿出一张旧照片', line:'盼盼：{HOT}很多人看个热闹，但我经历过。', bgm:'转折', note:'【过渡钩子】掏旧照片的动作有仪式感'},
+        {time:'8-25秒', shot:'特写/中景', action:'盼盼举着117斤旧照，旁边是自己现在的脸，对比', line:'盼盼：这是117斤的我。那时候我每天最累的不是身体，是心。穿衣服只敢穿黑色，拍照永远站在最后。\n（字幕）117斤', bgm:'低沉', note:'【对比主体】讲旧照时的痛苦，不要美化'},
+        {time:'25-35秒', shot:'中景', action:'盼盼转身/换装，镜头转场到现在的状态', line:'（字幕）98斤 现在\n盼盼：这是现在的我。', bgm:'高潮卡点', note:'【情绪转折】音乐卡点转场，反差最大化'},
+        {time:'35-50秒', shot:'近景', action:'盼盼展示现在状态，拿起{PRODUCT}', line:'盼盼：怎么做到的？不是靠少吃，是每天把小事做好。早起一杯{PRODUCT}，按时吃饭，早点睡觉。这些听起来普通，但我做了3年。', bgm:'保持', note:'【产品软植入】产品作为方法之一出现'},
+        {time:'50-60秒', shot:'中景', action:'盼盼看着镜头，眼神坚定', line:'盼盼：{HOT}说什么不重要，重要的是你开始了吗？', bgm:'收', note:'【互动触发】把热点拉回观众自己'}
+      ],
+      interact:'「你现在的状态 几斤了？评论区打卡」+ 置顶自己的对比照',
+      product:'{PRODUCT}作为"我用的方法"自然出现，不强调功效',
+      tips:['旧照一定要真实，不要P过','转场用遮挡镜头或音乐卡点，反差才够大','说"我的记录"不说"你也能瘦"']
+    },
+    '别人vs我版_short': {
+      form:'极短视频', duration:'15秒',
+      hook:'分屏：别人怎么对{HOT} vs 盼盼怎么对',
+      emotion:'好奇→会心一笑',
+      logic:'极短款，分屏对比制造笑点，用减脂人的视角反差解读{HOT}，3秒一个反转。',
+      scenes:[
+        {time:'0-3秒', shot:'分屏', action:'左屏：{HOT}截图（别人）；右屏：盼盼（黑屏待出现）', line:'（字幕）别人 vs 减脂人', bgm:'轻快', note:'【黄金3秒】分屏本身就抓眼球'},
+        {time:'3-7秒', shot:'分屏', action:'左屏：别人怎么反应（复述{HOT}行为）；右屏：盼盼同样场景但反应完全不同', line:'（左字幕）别人：{HOT}好火，跟一下！\n（右字幕）减脂人：火不火，{PRODUCT}照喝。', bgm:'卡点', note:'【对比主体】反差要大，越荒诞越好笑'},
+        {time:'7-11秒', shot:'分屏', action:'左屏继续；右屏盼盼拿起{PRODUCT}淡定喝一口', line:'（右字幕）我：先喝口{PRODUCT}再说。', bgm:'卡点', note:'【产品软植入】产品作为"减脂人标配"出现'},
+        {time:'11-15秒', shot:'近景', action:'盼盼对镜头挑眉', line:'盼盼：减脂人懂的都懂\n（字幕）懂的都懂', bgm:'收', note:'【互动触发】圈层暗号'}
+      ],
+      interact:'「减脂人懂的都懂 评论区举手🙋」',
+      product:'{PRODUCT}作为"减脂人标配道具"出现',
+      tips:['分屏用剪映模板，3分钟搞定','反差要夸张但合理，别硬凹','15秒别说话太多，字幕为主']
+    },
+
+    // 夫妻互动类
+    '夫妻reaction版_standard': {
+      form:'标准视频', duration:'35秒',
+      hook:'盼盼和老公挤一起看手机：「快看{HOT}」',
+      emotion:'好奇→搞笑→甜蜜',
+      logic:'夫妻reaction类，真实反应是核心。不要提前剧透，让老公第一反应真实呈现，笑点在互动不在内容。',
+      scenes:[
+        {time:'0-3秒', shot:'中景', action:'盼盼和老公头挨头看手机，盼盼指着屏幕', line:'盼盼：快看这个！{HOT}火了！', bgm:'轻快', note:'【黄金3秒】夫妻同框+看手机的画面就有代入感'},
+        {time:'3-10秒', shot:'近景', action:'手机里放{HOT}视频（画中画），两人表情变化', line:'（热点原声）\n老公：卧槽……？\n盼盼：哈哈哈', bgm:'保持', note:'【真实反应】老公第一反应要真实，不要彩排'},
+        {time:'10-18秒', shot:'中景', action:'老公开始吐槽/发表看法，盼盼接话', line:'老公：这都能火？网友是真闲。\n盼盼：你不懂，这背后有东西的。', bgm:'保持', note:'【夫妻日常】观点碰撞，别都同意'},
+        {time:'18-25秒', shot:'近景', action:'盼盼借机聊到自己的减脂经历，拿起{PRODUCT}展示', line:'盼盼：说到这个，我减脂那段时间{PRODUCT}是每天喝的，饭照吃，就是不再瞎跟风了。', bgm:'温暖', note:'【产品软植入】产品作为减脂期回忆出现，不说现在还喝'},
+        {time:'25-32秒', shot:'中景', action:'老公补刀/两人拌嘴，孩子乱入', line:'老公：你跟风的时候还少？\n孩子：妈妈！', bgm:'轻松', note:'【完播钩子】孩子乱入是最强留人元素'},
+        {time:'32-35秒', shot:'近景', action:'盼盼笑着看镜头', line:'盼盼：你们家看{HOT}会吵起来吗？', bgm:'收', note:'【互动触发】'}
+      ],
+      interact:'「你们家看{HOT}会讨论吗？评论区聊聊」',
+      product:'{PRODUCT}作为"盼盼日常"自然出现',
+      tips:['reaction一定要第一次看，真实反应才好笑','老公不要背台词，想到啥说啥','孩子乱入别剪掉，那是完播神器']
+    },
+    '老公采访版_standard': {
+      form:'标准视频', duration:'30秒',
+      hook:'盼盼举手机对老公：「老公 {HOT}你怎么看」',
+      emotion:'好奇→搞笑→甜',
+      logic:'采访形式，核心是老公的真实回答。盼盼负责提问和引导，笑点在老公的直男回答和盼盼的反应。',
+      scenes:[
+        {time:'0-3秒', shot:'主观镜头', action:'盼盼举手机对准老公，老公正在忙别的', line:'盼盼：老公！{HOT}你怎么看？', bgm:'轻快', note:'【黄金3秒】突袭采访感最真实'},
+        {time:'3-10秒', shot:'主观镜头', action:'老公抬头一脸懵，开始回答', line:'老公：啊？{HOT}啊？我咋看，我看网友就是太闲了。', bgm:'保持', note:'【真实反应】老公懵的瞬间最好笑'},
+        {time:'10-18秒', shot:'主观镜头', action:'老公越说越离谱/越说越甜，盼盼画外音反应', line:'老公：要我说，能把自己日子过好的才最厉害。\n盼盼：（画外）你这脑回路今天开光了？', bgm:'保持', note:'【夫妻日常】老公的回答要出人意料'},
+        {time:'18-24秒', shot:'主观镜头', action:'盼盼把{PRODUCT}塞给老公「看这个」老公看', line:'盼盼：别说了，看这个。\n老公：嗯？这啥？\n盼盼：我减脂时候喝的，现在不喝了。', bgm:'轻松', note:'【产品软植入】产品作为"我当时用的"出现，强调现在不喝了'},
+        {time:'24-30秒', shot:'主观镜头', action:'老公喝完继续说，盼盼笑场', line:'老公：好喝，再来一口。\n盼盼：哈哈哈，你够了。', bgm:'收', note:'【完播钩子+互动】笑场收尾'}
+      ],
+      interact:'「你家老公会怎么回答？@他来试试」',
+      product:'{PRODUCT}作为"给老公的饮料"自然出现',
+      tips:['一定要突袭采访，提前说了就不真实','老公回答不要纠正，越离谱越好','笑场别剪，真实感最强']
+    },
+
+    // 干货解读类
+    '减脂视角解读版_short': {
+      form:'极短视频', duration:'18秒',
+      hook:'{HOT}截图+盼盼竖屏：「减脂人看{HOT} 角度不一样」',
+      emotion:'好奇→恍然大悟',
+      logic:'极短干货款，3秒抓人，10秒输出观点，5秒收尾。字幕要大，语速要快，信息密度高。',
+      scenes:[
+        {time:'0-3秒', shot:'近景', action:'盼盼竖屏，旁边{HOT}截图飘过', line:'盼盼：{HOT}\n减脂人看的角度不一样', bgm:'紧凑', note:'【黄金3秒】"角度不一样"制造好奇'},
+        {time:'3-10秒', shot:'近景', action:'盼盼快速输出观点，字幕大字同步', line:'盼盼：网友都在看热闹，减脂人看到的是：不要被带节奏，先把每天三件小事做好——吃对、睡好、找到自己能坚持的辅助，比如我那段时间喝的{PRODUCT}。\n（字幕大字）', bgm:'保持', note:'【干货主体】语速快，字幕大，信息密度高'},
+        {time:'10-15秒', shot:'近景', action:'盼盼拿起{PRODUCT}，边喝边收尾', line:'盼盼：所以我选择每天{PRODUCT}，不是因为火，是因为这是我生活方式的一部分。', bgm:'保持', note:'【产品软植入】产品作为"专业选择"出现'},
+        {time:'15-18秒', shot:'近景', action:'盼盼指镜头', line:'盼盼：减脂人 评论区集合', bgm:'收', note:'【互动触发】圈层召唤'}
+      ],
+      interact:'「减脂人评论区集合🙋」+ 置顶观点金句',
+      product:'{PRODUCT}作为"专业选择"自然出现',
+      tips:['18秒必须快节奏，字幕要大','观点要犀利，别和稀泥','减脂视角要专业但不说教']
+    },
+    '避坑指南版_short': {
+      form:'极短视频', duration:'20秒',
+      hook:'{HOT}截图+大字「{HOT} 别跟着学」',
+      emotion:'好奇→紧张→松口气',
+      logic:'避坑款，用{HOT}做反面教材，输出减脂避坑干货。制造紧张感→给出解决方案→软植入产品。',
+      scenes:[
+        {time:'0-3秒', shot:'近景', action:'{HOT}截图+红色大字警告', line:'（字幕）{HOT} 别跟着学！', bgm:'紧张', note:'【黄金3秒】警告式钩子最强'},
+        {time:'3-10秒', shot:'近景', action:'盼盼严肃脸，指出{HOT}里的问题', line:'盼盼：{HOT}这个方法看着有效，但对普通人有3个坑：第一太折腾，第二难坚持，第三容易反弹。', bgm:'保持紧张', note:'【干货主体】讲坑不讲卖点'},
+        {time:'10-16秒', shot:'近景', action:'盼盼语气转柔和，给正确做法', line:'盼盼：正确做法很简单，饭吃好，觉睡好，找到能坚持的辅助——我那段时间喝的{PRODUCT}配合过来的，不追求快，只追求稳。', bgm:'转温暖', note:'【情绪转折】从紧张→安心，强调"那段时间"'},
+        {time:'16-20秒', shot:'近景', action:'盼盼拿起{PRODUCT}', line:'盼盼：别走弯路，先把每天的小事做好。', bgm:'收', note:'【产品软植入】产品作为"正确做法之一"'}
+      ],
+      interact:'「你踩过这些坑吗？评论区说说我帮你避」',
+      product:'{PRODUCT}作为"正确做法"出现',
+      tips:['警告式开头要够狠，但别恐慌营销','讲坑要具体，别空泛','产品是解决方案之一，不是全部']
+    },
+
+    // 生活记录类
+    'vlog日常版_visual': {
+      form:'画面配音乐', duration:'35秒',
+      hook:'一天碎片画面+字幕：「减脂人的一天 怎么看待{HOT}」',
+      emotion:'平静→温暖→向往',
+      logic:'画面配音乐款，全程不说话，靠字幕推进。把{HOT}融入一天的碎片，展现减脂人的生活方式。',
+      scenes:[
+        {time:'0-5秒', shot:'空镜', action:'早晨光线，盼盼起床/拉开窗帘', line:'（字幕）减脂人的一天\n怎么看待{HOT}', bgm:'轻柔钢琴', note:'【黄金3秒】空镜+字幕开场，氛围感'},
+        {time:'5-12秒', shot:'中景', action:'盼盼做早餐/泡{PRODUCT}，慢动作', line:'（字幕）早上6点\n我的仪式感', bgm:'保持', note:'【产品软植入】产品作为早晨仪式出现'},
+        {time:'12-20秒', shot:'近景/中景', action:'盼���带孩子/做家务的碎片画面', line:'（字幕）{HOT}火了\n但我更在意这些小事', bgm:'渐温暖', note:'【情绪转折】从热点→日常，价值观输出'},
+        {time:'20-28秒', shot:'近景', action:'盼盼和老公吃饭/散步，自然互动', line:'（字幕）30岁 两娃 98斤\n坚持的记录 比奇迹真实', bgm:'高潮', note:'【截图传播点】金句字幕放大停留'},
+        {time:'28-35秒', shot:'空镜', action:'夜晚盼盼关灯/睡前画面', line:'（字幕）明天继续\n你也可以', bgm:'收尾', note:'【互动触发】温柔收尾留余味'}
+      ],
+      interact:'「你的一天是怎么过的？评论区聊聊」',
+      product:'{PRODUCT}作为"早晨仪式感"自然出现，不说话不介绍',
+      tips:['全程不说话，字幕推动叙事','画面要精致，慢动作+好光线','BGM情绪曲线是灵魂，要选对','金句字幕要大要慢，适合截图']
+    },
+    '带娃日常版_visual': {
+      form:'画面配音乐', duration:'30秒',
+      hook:'孩子闹腾画面+字幕：「带娃的时候 {HOT}」',
+      emotion:'共鸣→温暖→会心一笑',
+      logic:'宝妈人设强化款，画面配音乐。用带娃的真实碎片呼应{HOT}，强化"30岁宝妈好状态"人设。',
+      scenes:[
+        {time:'0-4秒', shot:'中景', action:'孩子在闹/跑，盼盼手忙脚乱', line:'（字幕）带娃的时候\n刷到{HOT}', bgm:'轻快', note:'【黄金3秒】带娃混乱画面宝妈最有共鸣'},
+        {time:'4-12秒', shot:'近景', action:'盼盼哄娃/喂娃，穿插{HOT}截图一闪而过', line:'（字幕）别人在讨论{HOT}\n我在……带娃', bgm:'保持', note:'【情绪转折】热点vs现实的反差'},
+        {time:'12-20秒', shot:'中景', action:'盼盼趁娃安静，赶紧喝口{PRODUCT}/做自己的事', line:'（字幕）娃终于睡了\n属于我的5分钟', bgm:'温暖', note:'【产品软植入】产品作为"宝妈喘息时刻"出现'},
+        {time:'20-26秒', shot:'近景', action:'盼盼看着睡着的娃，微笑', line:'（字幕）30岁 两娃 98斤\n不是奇迹 是选择', bgm:'高潮', note:'【截图传播点】金句字幕'},
+        {time:'26-30秒', shot:'空镜', action:'盼盼关灯/夜晚安静画面', line:'（字幕）你也辛苦了\n晚安', bgm:'收', note:'【互动触发】共情收尾'}
+      ],
+      interact:'「带娃的你 也辛苦了 评论区抱抱」',
+      product:'{PRODUCT}作为"宝妈喘息时刻的陪伴"出现',
+      tips:['带娃画面要真实混乱，别摆拍','产品出现要自然，像顺手拿的','金句字幕"不是奇迹 是选择"要大']
+    },
+
+    // 励志蜕变类
+    '蜕变叙事版_long': {
+      form:'长视频', duration:'90秒',
+      hook:'{HOT}截图→盼盼旧照缓缓出现：「{HOT} 让我想起3年前的自己」',
+      emotion:'好奇→代入→震撼→激励',
+      logic:'完整蜕变叙事款，{HOT}只是引子，核心是117→98的完整故事。要有挣扎、转折、方法、金句，适合置顶作品。',
+      scenes:[
+        {time:'0-5秒', shot:'近景', action:'{HOT}截图飘过，盼盼旧照缓缓淡入', line:'（字幕）{HOT}\n让我想起3年前的自己', bgm:'低沉钢琴', note:'【黄金3秒】热点+旧照双钩子'},
+        {time:'5-20秒', shot:'特写', action:'盼盼117斤旧照特写，配旁白', line:'盼盼（旁白）：3年前我117斤的时候，每天最累的不是身体，是心里。\n（字幕）117斤 3年前\n每天很累 很丧', bgm:'低沉', note:'【故事开端】讲痛苦要具体'},
+        {time:'20-40秒', shot:'中景', action:'盼盼讲转折点，眼神有光', line:'盼盼：直到有一天，我镜子里的自己让我害怕。我决定不再敷衍自己。从那天起，我每天早起先喝{PRODUCT}，不是为了瘦，是告诉自己今天要认真过。', bgm:'渐入', note:'【情绪转折】"早起先喝"是减脂那段时间的事，不是现在'},
+        {time:'40-60秒', shot:'近景/中景', action:'盼盼讲过程，穿插现在的日常画面', line:'盼盼：有人问我怎么坚持的。我说没有坚持，就是习惯了。吃饭、睡觉、陪孩子，减脂那段时间{PRODUCT}每天喝，一天一天，做了3年。', bgm:'推高', note:'【产品软植入】产品作为"那段时间的辅助"出现，不强调现在还喝'},
+        {time:'60-78秒', shot:'中景', action:'盼盼展示现在状态，对比旧照', line:'盼盼：现在98斤。\n（字幕）30岁 两娃 98斤\n不是奇迹 是3年的记录', bgm:'高潮', note:'【截图传播点】金句字幕停留5秒'},
+        {time:'78-90秒', shot:'近景', action:'盼盼看着镜头，平静坚定', line:'盼盼：{HOT}说什么不重要，你开始了吗？', bgm:'收', note:'【互动触发】把球踢给观众'}
+      ],
+      interact:'「你 准备开始了吗？评论区立flag」+ 置顶对比照',
+      product:'{PRODUCT}作为"我用的方法之一"自然出现，不强调功效',
+      tips:['旧照一定要真实，越丑越好','转折点要讲具体事件，别空泛','金句字幕"不是奇迹 是记录"要大要慢','适合做置顶作品，长尾流量']
+    },
+    '励志金句版_music': {
+      form:'音乐转场', duration:'20秒',
+      hook:'{HOT}截图→鼓点转场→盼盼状态展示',
+      emotion:'好奇→震撼→燃',
+      logic:'音乐卡点款，{HOT}做引子，核心是金句+状态展示。靠音乐卡点制造燃点，字幕精简有力。',
+      scenes:[
+        {time:'0-3秒', shot:'手机截图', action:'{HOT}截图，黑白处理', line:'（字幕）{HOT}', bgm:'前奏低沉', note:'【黄金3秒】黑白处理制造严肃感'},
+        {time:'3-6秒', shot:'中景', action:'鼓点！硬切到盼盼117旧照', line:'（字幕）以前 117斤', bgm:'鼓点！', note:'【转场卡点】鼓点硬切，反差开始'},
+        {time:'6-10秒', shot:'中景', action:'鼓点！切到现在盼盼状态', line:'（字幕）现在 98斤', bgm:'连续鼓点', note:'【情绪转折】反差最大化'},
+        {time:'10-15秒', shot:'近景/特写', action:'连续卡点展示多个状态画面', line:'（字幕）30岁 两娃\n不是奇迹 是选择', bgm:'高潮卡点', note:'【截图传播点】金句字幕卡点出现'},
+        {time:'15-18秒', shot:'近景', action:'盼盼拿起{PRODUCT}，自信状态', line:'（字幕）{PRODUCT}\n我减脂期的选择', bgm:'保持', note:'【产品软植入】产品作为"减脂期的选择"出现，不说现在还喝'},
+        {time:'18-20秒', shot:'近景', action:'盼盼对镜头', line:'（字幕）你呢？', bgm:'收', note:'【互动触发】'}
+      ],
+      interact:'「你 的选择是什么？评论区立flag」',
+      product:'{PRODUCT}作为"我减脂期的选择"出现',
+      tips:['音乐卡点一定要准，用剪映自动卡点','黑白→彩色转场反差最大','字幕要短，一个画面一句话','金句"不是奇迹 是选择"适合截图']
+    },
+
+    // 趣味改编类
+    '减脂版改编_short': {
+      form:'极短视频', duration:'15秒',
+      hook:'{HOT}原画面→盼盼翻拍版：「减脂版来了」',
+      emotion:'好奇→爆笑',
+      logic:'把{HOT}内容翻拍成减脂版本，搞笑又涨知识。核心是"反差翻拍"，原版多正经减脂版就多离谱。',
+      scenes:[
+        {time:'0-3秒', shot:'分屏', action:'上屏：{HOT}原版画面；下屏：盼盼准备翻拍', line:'（字幕）原版 vs 减脂版', bgm:'轻快', note:'【黄金3秒】分屏+翻拍预告'},
+        {time:'3-9秒', shot:'中景', action:'盼盼翻拍{HOT}内容，但全换成减脂场景/台词', line:'盼盼：别人关心{HOT}，减脂人只关心今天{PRODUCT}喝没喝。', bgm:'卡点', note:'【翻拍主体】越离谱越好笑'},
+        {time:'9-12秒', shot:'近景', action:'盼盼掏出{PRODUCT}当道具', line:'盼盼：减脂人必备，{PRODUCT}拿好。', bgm:'保持', note:'【产品软植入】产品当搞笑道具'},
+        {time:'12-15秒', shot:'近景', action:'盼盼破功笑场/老公画外吐槽', line:'盼盼/老公：哈哈哈\n（字幕）减脂人懂的都懂', bgm:'收', note:'【完播钩子】笑场收尾最真实'}
+      ],
+      interact:'「减脂版{HOT}还有什么改编？评论区出题」',
+      product:'{PRODUCT}作为"减脂人道具"搞笑出现',
+      tips:['翻拍要抓住原版精髓再魔改','越离谱越好笑，但别低俗','笑场别剪，真实感最强']
+    },
+    '角色扮演版_standard': {
+      form:'标准视频', duration:'30秒',
+      hook:'盼盼和老公换装：「{HOT} 我俩来演」',
+      emotion:'好奇→搞笑→甜',
+      logic:'和老公/姐姐角色扮演{HOT}场景，趣味性最强。核心是"演反差"，盼盼和老公互换角色或夸张演绎。',
+      scenes:[
+        {time:'0-3秒', shot:'中景', action:'盼盼和老公换装/拿道具，准备开演', line:'盼盼：{HOT}翻拍，我俩来演！', bgm:'轻快', note:'【黄金3秒】预告+换装画面就抓人'},
+        {time:'3-12秒', shot:'中景', action:'两人扮演{HOT}里的场景，夸张演绎', line:'盼盼（演角色A）：{HOT}的主角应该这样做！\n老公（演角色B）：不对，要这样！', bgm:'保持', note:'【翻拍主体】演技浮夸一点更好笑'},
+        {time:'12-20秒', shot:'中景', action:'演着演着跑偏了，两人开始即兴互动', line:'盼盼：你怎么不按剧本？\n老公：我即兴的，{HOT}本来就离谱。', bgm:'轻松', note:'【情绪转折】跑偏的即兴最好笑'},
+        {time:'20-26秒', shot:'近景', action:'盼盼笑着拿起{PRODUCT}「演累了」', line:'盼盼：演累了，喝口{PRODUCT}。\n老公：给我也来点。', bgm:'保持', note:'【产品软植入】产品作为"演累了"的道具'},
+        {time:'26-30秒', shot:'中景', action:'两人碰杯/对视，笑场', line:'（字幕）减脂人 夫妻日常\n你们也试试？', bgm:'收', note:'【互动触发】'}
+      ],
+      interact:'「@你家那位 一起来翻拍{HOT}」',
+      product:'{PRODUCT}作为"演累了喝口"的道具出现',
+      tips:['角色互换反差最大','即兴跑偏别剪，最好笑','道具越简陋越有喜感']
+    }
+  };
+
+  // 匹配脚本模板
+  let key = angleType + '_' + form;
+  let selected = T[key];
+
+  // 如果精确匹配不到，退而求其次：同angleType的任意形式，或同形式的通用
+  if(!selected){
+    // 找同angleType的
+    for(const k in T){
+      if(k.startsWith(angleType + '_')){
+        selected = T[k];
+        form = selected.form === '音乐转场' ? 'music' : (selected.form === '画面配音乐' ? 'visual' : (selected.form === '长视频' ? 'long' : (selected.form === '极短视频' ? 'short' : 'standard')));
+        break;
+      }
+    }
+  }
+  if(!selected){
+    // 还是找不到，用通用二创模板（全部使用具体台词，可直接念）
+    selected = {
+      form:'标准视频', duration:'30秒',
+      hook:'热点截图→盼盼：直接开口聊这个热点',
+      emotion:'好奇→共鸣→互动',
+      logic:'通用二创款，用热点画面做钩子，盼盼直接开口复述热点+结合自身经历+给出观点，最后自然带出产品和互动。',
+      scenes:[
+        {time:'0-3秒', shot:'手机截图', action:'热点视频截图或录屏，配大字标题「{HOT}」', line:'（字幕）{HOT}', bgm:'轻快', note:'【黄金3秒】用热点本身吸睛，不要自己说话'},
+        {time:'3-8秒', shot:'中景', action:'硬切到盼盼，盼盼正坐着或站着，面向镜头', line:'盼盼：刚刷到{HOT}，我想跟姐妹们说几句心里话。', bgm:'转折', note:'【过渡钩子】硬切反差，3秒内开口'},
+        {time:'8-18秒', shot:'近景', action:'盼盼认真看镜头讲，语速中等，配合手势', line:'盼盼：这个话题之所以火，是因为太多人只看热闹。但我是从117斤到98斤的宝妈，我看到的不一样。', bgm:'保持', note:'【主体内容】建立身份+观点'},
+        {time:'18-25秒', shot:'近景', action:'盼盼拿起{PRODUCT}展示一下，继续讲', line:'盼盼：我现在的状态，不是因为我少吃几顿，是因为减脂那段时间养成的习惯还在。比如{PRODUCT}，我那时候每天早上都会先喝。', bgm:'温暖', note:'【产品软植入】产品作为"那段时间用的"出现，不强调现在还喝'},
+        {time:'25-30秒', shot:'近景', action:'盼盼放下产品，对镜头微笑', line:'盼盼：你们看完{HOT}是什么感觉？评论区聊聊，我想听。', bgm:'收', note:'【互动触发】开放式提问'}
+      ],
+      interact:'「你们看完{HOT}是什么感觉？评论区聊聊」',
+      product:'{PRODUCT}自然出现，作为"我每天做的小事"之一，不介绍功效',
+      tips:['热点要用当天或近2天的','硬切转场比淡入更抓人','{PRODUCT}只展示，不当广告讲','语速放慢，字幕放大']
+    };
+  }
+
+  // 添加通用信息
+  const result = Object.assign({}, selected);
+  result.title = '二创：' + title;
+  result.tag = '二创';
+  result.hotRef = hot;  // 记录原热点
+  result.angleRef = angleDesc || angleType;  // 记录改编角度
+
+  // 变量填充：把模板里的占位符替换为真实内容
+  const hotText = hot.replace(/^热点[：:]/, '').trim();
+  const productName = Store.get('productName','') || '颜小盼咖啡';
+  const vars = {
+    HOT: hotText,
+    ANGLE: angleDesc || angleType,
+    TITLE: title,
+    PRODUCT: productName,
+    AGE: '30',
+    KIDS: '两娃',
+    FROM: '117',
+    TO: '98'
+  };
+  result.hook = replaceVars(result.hook, vars);
+  result.logic = replaceVars(result.logic, vars);
+  result.emotion = replaceVars(result.emotion, vars);
+  result.interact = replaceVars(result.interact, vars);
+  result.product = replaceVars(result.product, vars);
+  result.tips = (result.tips || []).map(t => replaceVars(t, vars));
+  result.scenes = (result.scenes || []).map(s => ({
+    time: s.time,
+    shot: replaceVars(s.shot, vars),
+    action: replaceVars(s.action, vars),
+    line: replaceVars(s.line, vars),
+    bgm: s.bgm,
+    note: replaceVars(s.note, vars)
+  }));
+
+  result.safeWords = [
+    '用"身材管理"代替"减肥"',
+    '用"变好看/状态好"代替"瘦了"',
+    '用"我减脂那段时间喝的/我用过的"代替产品功效（强调现在不喝了，避免粉丝跟买）',
+    '不出现具体价格',
+    '不承诺效果，只说"我的记录"',
+    '二创热点要用当天的，超过2天就过气',
+    '不要直接搬运热点画面，要有自己的改编'
+  ];
+  result.tips = (result.tips || []).concat([
+    '二创核心：先引用热点 再过渡到自己，别硬蹭',
+    '前3秒必须出现热点元素，否则观众不知道你在蹭什么',
+    '真实>演技：老公/家人反应不要演',
+    '字幕要大：手机看视频必须清晰',
+    '金句要慢说，字幕放大，适合截图'
+  ]);
+
+  return normalizeScript(result, productName);
+}
+
+/* ===================================================
+   唤起App / 打开参考
+=================================================== */
+function openApp(platform, keyword){
+  const q = encodeURIComponent(keyword);
+  let webUrl='', copyText2='';
+  if(platform==='dy'){
+    webUrl = `https://www.douyin.com/search/${q}`;
+  }else if(platform==='bili'){
+    webUrl = `https://search.bilibili.com/all?keyword=${q}`;
+  }
+  copyText2 = keyword;
+  
+  // iOS Safari 唤起 App 不稳定，直接弹出选择：打开网页版 或 复制关键词
+  const choice = confirm(
+    '【跳转抖音/B站】\n\n' +
+    '方式1：点「确定」打开网页版搜索\n' +
+    '方式2：点「取消」复制关键词，手动去App粘贴\n\n' +
+    '关键词：' + keyword
+  );
+  
+  if(choice){
+    // 打开网页版
+    const webLink = document.createElement('a');
+    webLink.href = webUrl;
+    webLink.target = '_blank';
+    webLink.rel = 'noopener';
+    document.body.appendChild(webLink);
+    webLink.click();
+    document.body.removeChild(webLink);
+  }else{
+    // 复制关键词
+    copyText(copyText2);
+  }
+}
+
+function copyText(text){
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(()=>showToast('✅ 已复制，去抖音/B站粘贴搜索'));
+  }else{
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position='fixed'; ta.style.opacity=0; ta.style.pointerEvents='none';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast('✅ 已复制，去抖音/B站粘贴搜索');
+  }
+}
+
+/* ===================================================
+   复盘
+=================================================== */
+function saveReview(){
+  const r = {
+    id: Date.now(),
+    title: document.getElementById('rvTitle').value.trim()||'未命名',
+    date: document.getElementById('rvDate').value || todayKey(),
+    play: +document.getElementById('rvPlay').value||0,
+    like: +document.getElementById('rvLike').value||0,
+    comment: +document.getElementById('rvComment').value||0,
+    share: +document.getElementById('rvShare').value||0,
+    highlight: document.getElementById('rvHighlight').value.trim(),
+    problem: document.getElementById('rvProblem').value.trim(),
+    optimize: document.getElementById('rvOptimize').value.trim()
+  };
+  const list = Store.get('reviews', []);
+  list.unshift(r);
+  Store.set('reviews', list);
+  // 清空表单
+  ['rvTitle','rvPlay','rvLike','rvComment','rvShare','rvHighlight','rvProblem','rvOptimize'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('rvDate').value = todayKey();
+  renderReview();
+  showToast('✅ 复盘已保存');
+}
+
+function renderReview(){
+  const list = Store.get('reviews', []);
+  document.getElementById('reviewCount').textContent = `共 ${list.length} 条`;
+  const his = document.getElementById('reviewHistory');
+  if(!list.length){
+    his.innerHTML = '<div class="empty"><p>还没有复盘记录</p></div>';
+    return;
+  }
+  his.innerHTML = list.map(r=>`
+    <div class="review-history-item">
+      <div class="rh-date">${esc(r.title)} · ${esc(r.date)}</div>
+      <div class="rh-stats">
+        <span>播放 <b>${fmtNum(r.play)}</b></span>
+        <span>点赞 <b>${fmtNum(r.like)}</b></span>
+        <span>评论 <b>${fmtNum(r.comment)}</b></span>
+        <span>转发 <b>${fmtNum(r.share)}</b></span>
+      </div>
+      ${r.highlight?`<div class="rh-notes"><b>✨ 亮点：</b>${esc(r.highlight)}</div>`:''}
+      ${r.problem?`<div class="rh-notes"><b>⚠️ 问题：</b>${esc(r.problem)}</div>`:''}
+      ${r.optimize?`<div class="rh-notes"><b>🔧 优化：</b>${esc(r.optimize)}</div>`:''}
+      <div style="margin-top:8px;text-align:right;">
+        <button class="btn btn-danger" style="display:inline-block;flex:0 0 auto;padding:4px 12px;font-size:12px;" onclick="delReview(${r.id})">删除</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function delReview(id){
+  if(!confirm('确定删除这条复盘？')) return;
+  const list = Store.get('reviews', []).filter(r=>r.id!==id);
+  Store.set('reviews', list);
+  renderReview();
+  showToast('已删除');
+}
+
+/* ===================================================
+   备忘录
+=================================================== */
+function getMemo(){
+  let m = Store.get('memo_'+todayKey(), null);
+  if(!m){
+    m = Array(5).fill('').map(()=>({text:'',done:false}));
+    Store.set('memo_'+todayKey(), m);
+  }
+  return m;
+}
+function renderMemo(){
+  const m = getMemo();
+  document.getElementById('memoCount').textContent = `今日 ${m.filter(x=>x.text).length} 条`;
+  document.getElementById('memoList').innerHTML = m.map((it,i)=>`
+    <div class="memo-item ${it.done?'done':''}" onclick="handleItemClick(event,'memo',${i})" role="button" tabindex="0">
+      <div class="check-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <div class="memo-text" contenteditable="true" data-i="${i}" onclick="event.stopPropagation();" onblur="editMemo(${i},this.innerText)">${esc(it.text)}</div>
+      <button class="check-del" onclick="event.stopPropagation(); delMemo(${i})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
+    </div>
+  `).join('');
+}
+function toggleMemo(i){
+  const m = getMemo(); m[i].done=!m[i].done; Store.set('memo_'+todayKey(), m); renderMemo();
+}
+function editMemo(i,text){
+  const m = getMemo(); m[i].text = text.trim(); Store.set('memo_'+todayKey(), m); renderMemo();
+}
+function addMemo(){
+  const m = getMemo(); m.push({text:'',done:false}); Store.set('memo_'+todayKey(), m); renderMemo();
+  // 聚焦新行
+  setTimeout(()=>{
+    const els = document.querySelectorAll('#memoList .memo-text');
+    if(els.length) els[els.length-1].focus();
+  },50);
+}
+function delMemo(i){
+  const m = getMemo(); m.splice(i,1); Store.set('memo_'+todayKey(), m); renderMemo();
+}
+
+/* ===================================================
+   AI 调用（灵感库整理）
+=================================================== */
+async function callAI(prompt, model){
+  const key = Store.get('aiKey','');
+  if(!key){
+    showToast('❌ 请先在设置里填写 AI 密钥');
+    switchSection('settings');
+    return null;
+  }
+  const m = model || 'deepseek-ai/DeepSeek-V3';
+  try{
+    const res = await fetch('https://api.siliconflow.cn/v1/chat/completions', {
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'Authorization':'Bearer ' + key
+      },
+      body: JSON.stringify({
+        model: m,
+        messages:[
+          {role:'system', content:'你是抖音减脂赛道短视频创作助手，熟悉30岁宝妈从117斤到98斤的人设，擅长把灵感和链接改写成可直接落地拍摄的分镜头脚本。'},
+          {role:'user', content: prompt}
+        ],
+        temperature: 0.7,
+        max_tokens: 2500
+      })
+    });
+    if(!res.ok){
+      const txt = await res.text();
+      showToast('AI请求失败: ' + res.status);
+      console.error('AI error', txt);
+      return null;
+    }
+    const data = await res.json();
+    return data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content || '';
+  }catch(e){
+    showToast('AI请求出错: ' + e.message);
+    return null;
+  }
+}
+
+function parseAIResult(text){
+  // 尝试提取 JSON
+  let json = null;
+  // 先找 ```json ... ```
+  const m1 = text.match(/```json\s*([\s\S]+?)\s*```/);
+  if(m1){
+    try{ json = JSON.parse(m1[1]); }catch(e){}
+  }
+  if(!json){
+    // 找 {...}
+    const m2 = text.match(/\{[\s\S]*"hook"[\s\S]*\}/);
+    if(m2){
+      try{ json = JSON.parse(m2[0]); }catch(e){}
+    }
+  }
+  if(!json){
+    // 兜底：把文本当拍法返回
+    return { hook: text.slice(0,80)+'...', shoot: text, script: null };
+  }
+  // 兼容只返回 hook/shoot 的旧格式，也返回完整 script
+  return {
+    hook: json.hook || json.title || '',
+    form: json.form || '',
+    duration: json.duration || '',
+    emotion: json.emotion || '',
+    logic: json.logic || '',
+    scenes: Array.isArray(json.scenes) ? json.scenes : [],
+    interact: json.interact || '',
+    product: json.product || '',
+    tips: Array.isArray(json.tips) ? json.tips : [],
+    rawText: text
+  };
+}
+
+function buildLibPrompt(item){
+  const productName = Store.get('productName','') || '颜小盼咖啡';
+  const lines = [];
+  lines.push('请为以下灵感/翻拍内容，写一条可直接落地拍摄的抖音短视频脚本。');
+  lines.push('');
+  lines.push('目标人设：30岁宝妈，两个儿子，从117斤到98斤，做减脂/身材管理赛道。');
+  lines.push('产品名：' + productName + '（软植入，台词里说"我减脂那段时间喝的/我用过的"，强调现在已不喝了，避免粉丝跟买；动作描述里可用产品名作为回忆道具出现）。');
+  lines.push('');
+  lines.push('类型：' + (item.type==='翻拍'?'翻拍别人的爆款视频':'突发灵感扩展'));
+  lines.push('标题：' + item.title);
+  lines.push('原始内容：' + (item.raw || '无'));
+  lines.push('');
+  lines.push('要求：');
+  lines.push('1. 黄金3秒钩子：具体、可直接拍，能留住人。');
+  lines.push('2. 视频形式：从极短视频/标准视频/长视频/音乐转场/画面配音乐中选一种最适合的。');
+  lines.push('3. 分镜头脚本：5-7个镜头，每个镜头包含：time（时间）、shot（景别）、action（画面/动作）、line（台词/字幕，要直接能念）、bgm（BGM）、note（拍摄要点）。');
+  lines.push('4. 情绪节奏曲线、拍摄逻辑、互动引导、产品软植入策略。');
+  lines.push('5. 违规避雷：禁用"减肥/瘦身/溶脂/排毒/治疗/保证/秘方"等词，用"减脂/身材管理/变好看/我的记录"替代。');
+  lines.push('6. 总时长控制在15-40秒（长视频可60-90秒）。');
+  lines.push('');
+  lines.push('输出必须是严格可解析的JSON格式，不要加 markdown 代码块标记，直接输出 JSON：');
+  lines.push('{"form":"...","duration":"...","hook":"...","emotion":"...","logic":"...","scenes":[{"time":"...","shot":"...","action":"...","line":"...","bgm":"...","note":"..."}],"interact":"...","product":"...","tips":["..."]}');
+  return lines.join('\n');
+}
+
+/* ===================================================
+   自我灵感库
+=================================================== */
+let libFilter = 'all';
+function getLibrary(){
+  return Store.get('library', []);
+}
+function renderLibFilter(){
+  const types = ['all','灵感','翻拍'];
+  document.getElementById('libFilter').innerHTML = types.map(t=>{
+    const label = t==='all'?'全部':t;
+    return `<div class="filter-tab ${libFilter===t?'active':''}" onclick="setLibFilter('${t}')">${label}</div>`;
+  }).join('');
+}
+function setLibFilter(t){ libFilter=t; renderLibFilter(); renderLibrary(); }
+
+function renderLibrary(){
+  const list = getLibrary();
+  document.getElementById('libCount').textContent = `共 ${list.length} 条`;
+  renderLibFilter();
+  const filtered = libFilter==='all'? list : list.filter(x=>x.type===libFilter);
+  const el = document.getElementById('libraryList');
+  if(!filtered.length){
+    el.innerHTML = '<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg><p>灵感库还是空的<br>点右下角+记录第一个灵感</p></div>';
+    return;
+  }
+  el.innerHTML = filtered.map(it=>`
+    <div class="lib-card">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <span class="lc-type">${it.type==='翻拍'?'🎬 可翻拍':'💡 突发灵感'}</span>
+        <span style="font-size:11px;color:var(--text-mute);">${esc(it.created||'')}</span>
+      </div>
+      <div class="lc-title">${esc(it.title)}</div>
+      ${it.raw?`<div class="lc-section"><span class="lbl">原始</span>${esc(it.raw)}</div>`:''}
+      ${it.ai?`<div class="lc-section"><span class="lbl">形式</span>${esc(it.ai.form||'')} · ${esc(it.ai.duration||'')}</div>
+              <div class="lc-section"><span class="lbl">钩子</span>${esc(it.ai.hook||'')}</div>
+              <div class="lc-section"><span class="lbl">拍法</span>${esc(it.ai.logic||'')}</div>
+              ${it.ai.scenes && it.ai.scenes.length?`<div class="lc-section"><span class="lbl">镜头</span>共 ${it.ai.scenes.length} 个镜头<br>${it.ai.scenes.map((s,i)=>`<div style="margin:6px 0;padding:6px 8px;background:#fff;border-radius:6px;"><b>镜头${i+1}</b> ${esc(s.time)} ${esc(s.shot)}<br>${esc(s.line)}</div>`).join('')}</div>`:''}`:''}
+      <div class="lc-foot">
+        <span style="${it.ai?'color:var(--olive);':'color:var(--text-mute);'}">${it.ai?'✅ 已整理':'⏳ 待AI整理'}</span>
+        <div style="display:flex;gap:10px;align-items:center;">
+          ${it.ai?`<span class="lc-action" onclick="generateLibScript(${it.id}, event)">🎬 生成脚本</span>`:''}
+          <span class="lc-action" onclick="aiOrganizeLib(${it.id}, event)">${it.ai?'重新整理':'AI整理'}</span>
+          <span class="lc-del" onclick="delLib(${it.id}, event)">删除</span>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function openInspireModal(){
+  document.getElementById('imType').value='灵感';
+  document.getElementById('imTitle').value='';
+  document.getElementById('imRaw').value='';
+  document.getElementById('imAiResult').value='';
+  document.getElementById('aiGroup').style.display='none';
+  document.getElementById('inspireModal').classList.add('open');
+}
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+
+async function saveInspire(autoOrganize){
+  const title = document.getElementById('imTitle').value.trim();
+  if(!title){ showToast('请填写标题'); return; }
+  const item = {
+    id: Date.now(),
+    type: document.getElementById('imType').value,
+    title,
+    raw: document.getElementById('imRaw').value.trim(),
+    ai: null,
+    created: new Date().toLocaleString('zh-CN').slice(5,16)
+  };
+  const list = getLibrary();
+  list.unshift(item);
+  Store.set('library', list);
+  closeModal('inspireModal');
+  renderLibrary();
+  if(autoOrganize){
+    showToast('✅ 灵感已保存，开始AI整理...');
+    await aiOrganizeLib(item.id);
+  }else{
+    showToast('✅ 灵感已保存'+(item.type==='翻拍'?'，可点AI整理生成脚本':''));
+  }
+}
+
+function saveToLibrary(title, desc){
+  const item = {
+    id: Date.now(),
+    type:'灵感',
+    title,
+    raw: desc,
+    ai: null,
+    created: new Date().toLocaleString('zh-CN').slice(5,16)
+  };
+  const list = getLibrary();
+  list.unshift(item);
+  Store.set('library', list);
+  showToast('✅ 已存入灵感库');
+}
+
+async function aiOrganizeLib(id, e){
+  if(e) e.stopPropagation();
+  const list = getLibrary();
+  const item = list.find(x=>x.id===id);
+  if(!item) return;
+  const key = Store.get('aiKey','');
+  if(!key){
+    showToast('❌ 请先在设置里填写 AI 密钥');
+    switchSection('settings');
+    return;
+  }
+  showToast('🤖 正在 AI 整理，请稍候...');
+  const prompt = buildLibPrompt(item);
+  const text = await callAI(prompt);
+  if(!text) return;
+  item.ai = parseAIResult(text);
+  Store.set('library', list);
+  renderLibrary();
+  showToast('✅ AI 整理完成');
+}
+
+function generateLibScript(id, e){
+  if(e) e.stopPropagation();
+  const list = getLibrary();
+  const item = list.find(x=>x.id===id);
+  if(!item || !item.ai){
+    showToast('请先 AI 整理');
+    return;
+  }
+  const ai = item.ai;
+  // 构建和 buildScript 输出一致的 script 对象
+  const script = {
+    form: ai.form || '标准视频',
+    duration: ai.duration || '30秒',
+    hook: ai.hook || '',
+    emotion: ai.emotion || '',
+    logic: ai.logic || '',
+    scenes: ai.scenes && ai.scenes.length ? ai.scenes : [{
+      time:'0-30秒', shot:'近景', action:'按AI整理结果拍摄',
+      line: ai.shoot || '参考上方整理结果',
+      bgm:'轻快', note:ai.hook || ''
+    }],
+    interact: ai.interact || '评论区聊聊',
+    product: ai.product || '自然出镜',
+    tips: Array.isArray(ai.tips) ? ai.tips : ['参考AI整理结果拍摄']
+  };
+  const rec = {
+    id: Date.now(),
+    title: '灵感：' + item.title,
+    tag: '灵感库',
+    desc: item.raw || '',
+    script,
+    created: new Date().toLocaleString('zh-CN').slice(5,16)
+  };
+  const scripts = Store.get('scripts', []);
+  scripts.unshift(rec);
+  Store.set('scripts', scripts);
+  switchSection('script');
+  renderScript();
+  showToast('✅ 已生成到每日脚本');
+}
+
+function delLib(id, e){
+  if(e) e.stopPropagation();
+  if(!confirm('删除这条灵感？')) return;
+  const list = getLibrary().filter(x=>x.id!==id);
+  Store.set('library', list);
+  renderLibrary();
+  showToast('已删除');
+}
+
+/* ===================================================
+   每日脚本
+=================================================== */
+function fillScriptSelect(){
+  const data = Store.get('dailyData', null);
+  const sel = document.getElementById('scriptSelect');
+  if(!data || !data.inspire || !data.inspire.length){
+    sel.innerHTML = '<option value="">暂无选题，请先刷新</option>';
+    return;
+  }
+  sel.innerHTML = '<option value="">— 选择选题 —</option>' + data.inspire.map((it,i)=>`<option value="${i}">${i+1}. ${esc(it.title)}</option>`).join('');
+}
+
+function generateScript(){
+  const sel = document.getElementById('scriptSelect');
+  const idx = +sel.value;
+  if(isNaN(idx)){
+    showToast('请先��择一条选题');
+    return;
+  }
+  const data = Store.get('dailyData', null);
+  if(!data || !data.inspire || !data.inspire[idx]){
+    showToast('选题数据不存在');
+    return;
+  }
+  const topic = data.inspire[idx];
+  
+  // 优先用选题里已经带有的深度脚本（从Gist来的），没有才用buildScript
+  const script = topic.script || buildScript(topic);
+  
+  const item = {
+    id: Date.now(),
+    title: topic.title,
+    tag: topic.tag || '选题',
+    desc: topic.desc || '',
+    script,
+    created: new Date().toLocaleString('zh-CN').slice(5,16)
+  };
+  const list = Store.get('scripts', []);
+  list.unshift(item);
+  Store.set('scripts', list);
+  renderScript();
+  showToast('✅ 脚本已生成');
+}
+
+function buildScript(topic){
+  // 根据选题标签和内容，生成可直接落地的分镜头脚本
+  // 支持5种视频形式：极短/标准/长视频/音乐转场/画面配音乐
+  const tag = (topic.tag || '').toLowerCase();
+  const title = topic.title || '';
+  const desc = topic.desc || '';
+  
+  // 根据tag决定最适合的视频形式
+  // 不同方向适合不同形式
+  const formMap = {
+    '秀身材': ['music', 'short', 'music'],      // 音乐转场为主
+    '夫妻日常': ['standard', 'standard', 'short'], // 标准叙事为主
+    '变化记录': ['long', 'standard', 'music'],     // 长视频对比
+    '瘦后新生活': ['visual', 'music', 'standard'], // 画面配音乐
+    '蹭热点': ['short', 'standard', 'short'],     // 极短快评
+    '干货': ['short', 'standard', 'short'],       // 极短干货
+    '心声': ['long', 'standard', 'long'],         // 长视频走心
+    '感悟': ['visual', 'long', 'standard'],       // 画面配音乐
+    '初心': ['long', 'standard', 'long'],         // 长视频叙事
+    '店里': ['standard', 'long', 'standard'],     // 标准故事
+    '工厂': ['long', 'standard', 'standard'],     // 长视频溯源
+    '直播预热': ['short', 'short', 'standard'],    // 极短预热
+    '老公宠溺': ['standard', 'short', 'standard'], // 标准互动
+    '和大姐拍': ['standard', 'music', 'short'],    // 标准互动
+    '30岁宝妈好状态': ['visual', 'long', 'music'],  // 画面配音乐
+    '向往成为我': ['visual', 'long', 'standard'],  // 画面配音乐
+    '秀实力': ['music', 'visual', 'short']         // 音乐转场
+  };
+  
+  // 找到对应方向的形式列表
+  let forms = ['standard', 'short', 'long', 'music', 'visual']; // 默认随机
+  for(const key in formMap){
+    if(tag.includes(key)){
+      forms = formMap[key];
+      break;
+    }
+  }
+  
+  // 用选题标题做hash，稳定选一种形式（同样选题每次生成同一种）
+  let hash = 0;
+  for(let i=0; i<title.length; i++){
+    hash = ((hash<<5)-hash) + title.charCodeAt(i);
+    hash |= 0;
+  }
+  const form = forms[Math.abs(hash) % forms.length];
+  
+  // 17大方向的脚本内容库（每个方向有5种形式）
+  const scriptLibrary = {
+    '秀身材': {
+      music: {
+        form:'音乐转场', duration:'20秒',
+        hook:'用音乐卡点做反差：旧衣服→新衣服，每个鼓点换一套。',
+        emotion:'惊讶→羡慕→向往。纯靠画面和音乐节奏带动情绪。',
+        logic:'音乐转场类不需要台词，靠画面反差+卡点制造冲击力。每个转场都是一个" wow moment "。',
+        scenes:[
+          {time:'0-2秒', shot:'中景', action:'盼盼穿最旧的家居服，对着镜头，音乐前奏响起。', line:'（字幕）117斤的时候', bgm:'节奏感强的卡点音乐前奏', note:'表情平淡，低头看自己。'},
+          {time:'2-4秒', shot:'中景', action:'第一个鼓点——转场，换上现在的装扮，自信站姿。', line:'（字幕）98斤', bgm:'鼓点1', note:'转场要干脆，用衣服遮挡镜头切换。'},
+          {time:'4-8秒', shot:'近景/特写', action:'连续3个卡点，展示腰线、锁骨、全身。', line:'（字幕）30岁 两个孩子', bgm:'连续鼓点', note:'每个鼓点换一个角度，动作要利落。'},
+          {time:'8-14秒', shot:'中景', action:'盼盼对着镜头自信走过来，或转身秀全身。', line:'（字幕）坚持的记录，不是奇迹', bgm:'音乐高潮', note:'这6秒是核心展示时间。'},
+          {time:'14-18秒', shot:'近景', action:'盼盼微笑，手里拿着当时减脂喝的饮品展示一下。', line:'（字幕）我的记录 评论区见', bgm:'音乐收尾', note:'产品作为"我当时的辅助"出镜，不说现在还喝。'},
+          {time:'18-20秒', shot:'字幕收尾', action:'黑屏字幕。', line:'（字幕）你也可以', bgm:'收', note:'留白1秒。'}
+        ],
+        interact:'评论区：你最想看哪件衣服对比？',
+        product:'软植入：结尾手持当时喝的饮品，字幕写"我的记录"，不强调现在还喝。',
+        tips:['卡点必须准，用剪映的"踩点"功能','每个转场用衣服遮挡镜头，最简单有效','音乐选节奏强的，不要选慢歌']
+      },
+      short: {
+        form:'极短视频', duration:'12秒',
+        hook:'直接上对比，一句话说完。',
+        emotion:'惊讶→共鸣。',
+        logic:'极短视频只讲一个点，不要贪多。',
+        scenes:[
+          {time:'0-2秒', shot:'近景', action:'盼盼拿着旧裤子比划腰。', line:'这条裤子，是我117斤时候的。', bgm:'轻快', note:'直接开场不废话。'},
+          {time:'2-5秒', shot:'特写', action:'把旧裤子套在腰上，裤子直接滑下去。', line:'现在——', bgm:'节奏点', note:'动作要慢一点给镜头时间。'},
+          {time:'5-9秒', shot:'中景', action:'盼盼转身展示现在的身材。', line:'98斤，30岁，两个娃。坚持的记录。', bgm:'保持', note:'字幕把数字放大。'},
+          {time:'9-12秒', shot:'近景', action:'盼盼微笑，字幕引导。', line:'（字幕）你也想？评论区见。', bgm:'收', note:'快速收尾。'}
+        ],
+        interact:'评论区：扣1想看完整对比',
+        product:'软植入：手里拿着饮品。',
+        tips:['12秒必须说完一个点','字幕要大，信息密度高','不要铺垫，直接上画面']
+      },
+      visual: {
+        form:'画面配音乐', duration:'30秒',
+        hook:'纯画面+BGM，用字幕讲故事。',
+        emotion:'回忆→感慨→希望。',
+        logic:'画面配音乐类不要说话，靠画面切换+字幕推进情绪。',
+        scenes:[
+          {time:'0-5秒', shot:'空镜', action:'衣柜打开的慢镜头，旧衣服特写。', line:'（字幕）三年前的衣柜', bgm:'舒缓钢琴', note:'慢动作，画面要美。'},
+          {time:'5-12秒', shot:'中景', action:'盼盼试穿旧衣服，衣服明显太大。', line:'（字幕）那时候117斤 不敢照镜子', bgm:'保持', note:'动作慢，表情平静。'},
+          {time:'12-18秒', shot:'近景', action:'盼盼换上现在的衣服，对着镜子微笑。', line:'（字幕）现在98斤', bgm:'音乐逐渐明亮', note:'转折点，情绪变温暖。'},
+          {time:'18-25秒', shot:'中景/特写', action:'盼盼日常状态混剪：运动、带娃、喝饮品、工作。', line:'（字幕）30岁 两个孩子 但我想对自己好一点', bgm:'高潮', note:'4-5个画面快速切换。'},
+          {time:'25-30秒', shot:'近景', action:'盼盼看着镜头，微笑。', line:'（字幕）坚持的记录 比奇迹更真实', bgm:'收尾', note:'留白结束。'}
+        ],
+        interact:'评论区：你有不敢打开的衣柜吗？',
+        product:'软植入：混剪画面里自然出现饮品。',
+        tips:['全程不说话，靠字幕推进','画面要精致，光线要好','BGM情绪曲线：低→高→收']
+      }
+    },
+    
+    '夫妻日常': {
+      standard: {
+        form:'标准视频', duration:'30秒',
+        hook:'用老公"偷吃"制造冲突，前3秒留住人。',
+        emotion:'搞笑→甜蜜→羡慕。让粉丝觉得"这老公真宠"。',
+        logic:'夫妻互动类的核心是真实，不要演。让老公做"陪衬"，盼盼做"主角"，最后落到"变好真好"。',
+        scenes:[
+          {time:'0-3秒', shot:'近景', action:'盼盼发现老公又在偷吃她的健康餐，或翻看她减脂时喝的咖啡，假装生气走过去。', line:'你又偷吃我的！这可是我减脂那时候喝的。', bgm:'轻快、俏皮', note:'镜头提前架好，拍真实反应。产品作为"减脂时的回忆"出现。'},
+          {time:'3-7秒', shot:'中景', action:'老公被抓包，笑着狡辩，盼盼假装要打他。', line:'老公：我就尝尝... 盼盼：尝尝？你都要喝完了！', bgm:'保持俏皮', note:'让老公自由发挥，越自然越好。'},
+          {time:'7-11秒', shot:'近景', action:'【完播钩子】盼盼突然转向镜头，表情变化。', line:'不过你们先别笑，听到他后面说什么我直接愣了。', bgm:'节奏停顿', note:'这里是完播钩子，制造悬念留人。'},
+          {time:'11-18秒', shot:'中景', action:'老公从背后抱住盼盼或帮她整理头发，说了一句暖心话。', line:'老公：你变好看了，我更紧张了。', bgm:'稍微温柔', note:'【情绪转折】从搞笑转到甜蜜。'},
+          {time:'18-24秒', shot:'近景', action:'盼盼对着镜头，【截图传播点】金句时刻。', line:'姐妹们，变好不是为了别人，是为了自己开心。但被人宠着，确实更开心。', bgm:'温暖', note:'这句是金句，字幕放大，适合截图。'},
+          {time:'24-30秒', shot:'中景', action:'两人甜蜜互动，盼盼笑着挥手。', line:'（字幕）你们老公也这样吗？评论区告诉我。', bgm:'温暖收尾', note:'引导互动。'}
+        ],
+        interact:'评论区：你们老公/男朋友也偷吃你们的吗？',
+        product:'软植入：把"减脂时喝的咖啡"作为夫妻互动道具，不强调现在还喝。',
+        tips:['不要提前排练，越自然流量越好','第7秒的完播钩子是关键','第18秒的金句要慢慢说']
+      },
+      short: {
+        form:'极短视频', duration:'10秒',
+        hook:'老公一句话开场。',
+        emotion:'搞笑→甜蜜。',
+        logic:'极短夫妻视频只抓一个笑点。',
+        scenes:[
+          {time:'0-2秒', shot:'近景', action:'老公偷喝盼盼的饮品被抓包。', line:'你又偷喝我的！', bgm:'俏皮', note:'直接上冲突。'},
+          {time:'2-5秒', shot:'特写老公', action:'老公笑着狡辩。', line:'我就尝尝...真的就好喝。', bgm:'保持', note:'真实反应。'},
+          {time:'5-8秒', shot:'近景', action:'盼盼假装生气然后笑。', line:'行，好喝你就直说，我给你倒。', bgm:'保持', note:'反转温馨。'},
+          {time:'8-10秒', shot:'中景', action:'两人碰杯。', line:'（字幕）夫妻日常 评论区见', bgm:'收', note:'快速收尾。'}
+        ],
+        interact:'评论区：你们家也这样吗？',
+        product:'软植入：饮品作为冲突道具。',
+        tips:['10秒只讲一个笑点','老公反应必须真实','字幕把笑点打出来']
+      }
+    },
+    
+    '变化记录': {
+      long: {
+        form:'长视频', duration:'2分钟',
+        hook:'用"3年前vs现在"的开场，立刻制造好奇。',
+        emotion:'回忆→心酸→坚持→自豪→希望。完整情绪弧线。',
+        logic:'长视频要讲一个完整的故事，有起承转合，不要流水账。核心是"我经历了什么"，不是"我多厉害"。',
+        scenes:[
+          {time:'0-5秒', shot:'近景', action:'盼盼拿着旧照片，对着镜头。', line:'这张照片是3年前拍的，那时候我117斤。', bgm:'舒缓、回忆感', note:'开场直接给画面，不要铺垫。'},
+          {time:'5-15秒', shot:'中景/空镜', action:'翻看旧照片，特写照片里的自己。', line:'（画外音）那时候刚生完老二，身材走样，整个人状态很差。不敢拍照，不敢出门，连镜子都不想看。', bgm:'保持舒缓', note:'画外音配空镜，情绪沉淀。'},
+          {time:'15-25秒', shot:'近景', action:'盼盼坐在沙发上，认真讲。', line:'最难受的一次，是带孩子去幼儿园，别的妈妈穿得漂漂亮亮，我穿着最大码的家居服。有个家长问我是不是保姆。', bgm:'稍微低沉', note:'【痛点共鸣】这里要慢，让粉丝代入。'},
+          {time:'25-35秒', shot:'中景', action:'盼盼站起来，语气变化。', line:'【完播钩子】但真正让我改变的，不是那件事，是后面发生的一件事。', bgm:'节奏停顿', note:'完播钩子，制造悬念。'},
+          {time:'35-60秒', shot:'近景/穿插', action:'盼盼讲述转折事件，可以穿插相关画面。', line:'有一天晚上，老大跟我说：妈妈你是不是不开心。我突然意识到，我的状态在影响孩子。那天晚上我决定，要改变。', bgm:'逐渐温暖', note:'【情绪转折】从低沉到希望。'},
+          {time:'60-90秒', shot:'中景/混剪', action:'展示改变过程：早起、运动、调整饮食、记录。', line:'（画外音）不是一下子变的。每天早起半小时，孩子没醒的时候是我的时间。开始调整饮食，减脂那段时间每天喝的、吃的都注意。坚持记录，看着自己一点一点变化。', bgm:'轻快、有节奏', note:'过程混剪，展示"坚持"。"每天喝"是减脂期的事。'},
+          {time:'90-110秒', shot:'近景', action:'盼盼看着镜头，【截图传播点】金句。', line:'减了19斤，但最大的变化不是数字。是我照镜子的时候，终于喜欢自己了。', bgm:'温暖有力', note:'金句字幕放大，适合截图。'},
+          {time:'110-120秒', shot:'中景', action:'盼盼展示现在的状态，带娃、工作、生活。', line:'（画外音）30岁，两个孩子，98斤。我的人生才刚开始。', bgm:'高潮', note:'展示成果，但不炫耀。'},
+          {time:'120秒', shot:'近景', action:'盼盼微笑，字幕引导。', line:'（字幕）你也想开始？评论区告诉我。我陪你。', bgm:'收尾', note:'引导互动，落到"陪伴"。'}
+        ],
+        interact:'评论区：你最难的时候是什么时候？我们一起聊聊。',
+        product:'软植入：混剪画面里自然出现减脂时喝的饮品，不强调现在还喝。',
+        tips:['2分钟必须有3个情绪转折','第25秒的完播钩子是关键','第90秒的金句是截图传播点','长视频不要流水账，要有故事弧线']
+      },
+      music: {
+        form:'音乐转场', duration:'25秒',
+        hook:'用同一条裤子做时间线，卡点转场。',
+        emotion:'回忆→感慨→自豪。',
+        logic:'音乐转场类用"同一件物品"贯穿，展示时间变化。',
+        scenes:[
+          {time:'0-3秒', shot:'中景', action:'盼盼穿旧裤子，能穿进去。', line:'（字幕）117斤', bgm:'舒缓前奏', note:'开始。'},
+          {time:'3-6秒', shot:'中景', action:'鼓点1——换到现在，同一条裤子，松松垮垮。', line:'（字幕）98斤', bgm:'鼓点1', note:'转场用裤子遮挡镜头。'},
+          {time:'6-12秒', shot:'近景/特写', action:'连续卡点：裤子腰头、侧面、全身。', line:'（字幕）减了19斤', bgm:'连续鼓点', note:'每个鼓点一个角度。'},
+          {time:'12-20秒', shot:'中景', action:'盼盼穿着现在的衣服自信走。', line:'（字幕）30岁 两个娃 坚持的记录', bgm:'高潮', note:'展示好状态。'},
+          {time:'20-25秒', shot:'近景', action:'微笑收尾。', line:'（字幕）你也可以', bgm:'收', note:'留白。'}
+        ],
+        interact:'评论区：你有这样的裤子吗？',
+        product:'软植入：最后手持饮品出镜。',
+        tips:['同一条裤子是视觉锚点','卡点要准','字幕信息要精简']
+      }
+    },
+    
+    '心声': {
+      long: {
+        form:'长视频', duration:'2-3分钟',
+        hook:'用一句心里话开场，制造亲密感。',
+        emotion:'安静→共鸣→心酸→温暖→希望。走心长视频。',
+        logic:'心声类长视频要像跟闺蜜聊天，不要快节奏。核心是"我懂你"，让粉丝觉得被理解。',
+        scenes:[
+          {time:'0-5秒', shot:'近景/坐着', action:'盼盼坐在沙发上，灯光柔和，安静看着镜头。', line:'今天想跟你们说点心里话，可能有点长，但希望你们听完。', bgm:'轻柔钢琴', note:'开场要慢，建立亲密感。'},
+          {time:'5-20秒', shot:'近景', action:'盼盼缓缓讲述。', line:'我以前也胖过。117斤的时候，不敢照镜子，不敢拍照，出门总觉得别人在看我。你们说的那些害怕、犹豫、不好意思，我全都懂。', bgm:'保持轻柔', note:'语速要慢，眼神要真诚。'},
+          {time:'20-35秒', shot:'中景/空镜', action:'穿插旧照片或空镜。', line:'（画外音）最难受的时候，不是穿不上衣服，是孩子问我：妈妈你怎么不笑了。', bgm:'稍微低沉', note:'【痛点共鸣】这句话要停顿，让情绪沉淀。'},
+          {time:'35-50秒', shot:'近景', action:'盼盼回到镜头前。', line:'【完播钩子】很多人问我怎么坚持下来的，其实我想说，我不是坚持，我是被逼到了那个点。', bgm:'节奏变化', note:'完播钩子，制造好奇。'},
+          {time:'50-80秒', shot:'近景', action:'盼盼讲述自己的转折。', line:'有一天我看着镜子里的自己，突然觉得，我亏待自己太久了。当了妈以后，所有时间都给了孩子、老公、家里，最后连照镜子都不敢。那一刻我决定，要对自己好一点。', bgm:'逐渐温暖', note:'【情绪转折】从低沉到希望。'},
+          {time:'80-110秒', shot:'中景/混剪', action:'展示改变过程：早起、运动、喝饮品、记录。', line:'（画外音）不是一天变的。每天给自己留半小时，孩子没醒的时候是我的。开始认真吃饭，认真运动，认真记录每一天的变化。', bgm:'轻快', note:'过程展示。'},
+          {time:'110-140秒', shot:'近景', action:'盼盼认真看着镜头，【截图传播点】金句。', line:'减了19斤以后，最大的变化不是身材。是我终于敢说：我值得对自己好一点。', bgm:'温暖有力', note:'金句字幕放大。'},
+          {time:'140-160秒', shot:'近景', action:'盼盼伸出手，像拉姐妹。', line:'如果你也在那个不敢照镜子的阶段，我想告诉你：你不是一个人。我走过来了，我带着你一起走。', bgm:'温暖', note:'建立陪伴感。'},
+          {time:'160-180秒', shot:'近景', action:'盼盼微笑。', line:'（字幕）你不是一个人 评论区见', bgm:'收尾', note:'引导互动。'}
+        ],
+        interact:'评论区：如果你也在路上，留下一句"我值得"。',
+        product:'软植入：混剪画面里自然出现饮品。',
+        tips:['心声类要慢，不要快节奏','第20秒的痛点要停顿','第110秒的金句是核心','全程语速放慢，像跟闺蜜聊天']
+      },
+      standard: {
+        form:'标准视频', duration:'25秒',
+        hook:'一句心里话开场。',
+        emotion:'安静→共鸣→温暖。',
+        logic:'标准心声视频，浓缩成一个点。',
+        scenes:[
+          {time:'0-3秒', shot:'近景', action:'盼盼安静看着镜头。', line:'今天想跟你们说点心里话。', bgm:'轻柔钢琴', note:'慢开场。'},
+          {time:'3-10秒', shot:'近景', action:'缓缓讲述。', line:'我以前也胖过，也被人忽略过，也看着镜子里的自己哭过。你说的那些害怕，我全都懂。', bgm:'保持', note:'语速放慢。'},
+          {time:'10-15秒', shot:'中景/空镜', action:'穿插旧照片。', line:'（画外音）那时候我总觉得，来不及了。', bgm:'稍微低沉', note:'情绪沉淀。'},
+          {time:'15-20秒', shot:'近景', action:'回到现在，【截图传播点】金句。', line:'但我走过来了。改变不是惩罚自己，是奖励自己。', bgm:'逐渐明亮', note:'金句放大。'},
+          {time:'20-25秒', shot:'近景', action:'盼盼伸出手。', line:'你也能。我在，我带着你一步一步来。', bgm:'温暖收尾', note:'引导互动。'}
+        ],
+        interact:'评论区：留下一句"我值得"',
+        product:'软植入：桌上有饮品，作为陪伴道具。',
+        tips:['25秒只讲一个情绪点','第15秒的金句是核心','光线要柔和']
+      }
+    },
+    
+    '感悟': {
+      visual: {
+        form:'画面配音乐', duration:'40秒',
+        hook:'纯画面+字幕+BGM，用金句推进。',
+        emotion:'共鸣→思考→认同。',
+        logic:'画面配音乐类不要说话，靠画面+字幕+音乐讲一个完整的价值观。',
+        scenes:[
+          {time:'0-6秒', shot:'空镜', action:'清晨阳光照进房间，盼盼起床的背影。', line:'（字幕）30岁才明白', bgm:'轻柔钢琴', note:'慢动作空镜开场。'},
+          {time:'6-14秒', shot:'中景', action:'盼盼做早餐、收拾家里、带孩子。', line:'（字幕）当了妈以后 所有时间都给了别人', bgm:'保持', note:'日常画面混剪。'},
+          {time:'14-22秒', shot:'近景', action:'盼盼照镜子，停顿。', line:'（字幕）最后连照镜子都不认识自己了', bgm:'稍微低沉', note:'【痛点共鸣】停顿画面。'},
+          {time:'22-30秒', shot:'中景', action:'盼盼开始运动、看书、喝饮品。', line:'（字幕）后来我决定 每天给自己留半小时', bgm:'逐渐明亮', note:'【情绪转折】画面变亮。'},
+          {time:'30-36秒', shot:'近景', action:'盼盼自信微笑。', line:'（字幕）变好不是为了别人 是为了更喜欢自己', bgm:'高潮', note:'【截图传播点】金句字幕。'},
+          {time:'36-40秒', shot:'空镜', action:'窗边阳光，盼盼背影。', line:'（字幕）你也可以', bgm:'收尾', note:'留白结束。'}
+        ],
+        interact:'评论区：你最近一次为自己花时间是什么时候？',
+        product:'软植入：画面里自然出现饮品。',
+        tips:['全程不说话，靠字幕','画面要精致，光线要好','BGM情绪曲线：低→高→收','金句字幕要大要慢']
+      },
+      long: {
+        form:'长视频', duration:'1.5分钟',
+        hook:'一句价值观金句开场。',
+        emotion:'共鸣→思考→认同→行动。',
+        logic:'感悟类长视频要输出一个完整的价值观，不要碎片化。',
+        scenes:[
+          {time:'0-5秒', shot:'近景', action:'盼盼对着镜头。', line:'30岁才明白，变好看不是为了别人，是为了自己。', bgm:'轻柔', note:'金句开场。'},
+          {time:'5-20秒', shot:'中景', action:'盼盼边走边说。', line:'生了两个孩子，当过宝妈，才知道女人最容易丢掉的，是自己。我们把所有时间都给了孩子、老公、家里，最后照镜子都不认识自己。', bgm:'保持', note:'【痛点共鸣】语速放慢。'},
+          {time:'20-30秒', shot:'近景', action:'盼盼认真说。', line:'【完播钩子】但我想告诉你们，这不是矫情，这是真的会出问题。', bgm:'节奏停顿', note:'完播钩子。'},
+          {time:'30-50秒', shot:'中景/穿插', action:'穿插自己以前状态差时的画面。', line:'我有一段时间，整个人状态很差，脾气暴躁，孩子怕我，老公躲我。后来才明白，不是他们的问题，是我把自己丢了。', bgm:'稍微低沉', note:'真实故事。'},
+          {time:'50-70秒', shot:'近景', action:'盼盼语气变化。', line:'【情绪转折】后来我开始每天给自己留半小时。运动、看书、或者就是安静坐一会。就这半小时，整个人都不一样了。', bgm:'逐渐温暖', note:'转折点。'},
+          {time:'70-85秒', shot:'中景', action:'展示现在的状态。', line:'现在我98斤，状态比20岁还好。不是因为瘦了，是因为我开始爱自己了。', bgm:'温暖有力', note:'【截图传播点】金句。'},
+          {time:'85-90秒', shot:'近景', action:'盼盼微笑。', line:'（字幕）你什么时候决定重新爱自己？', bgm:'收尾', note:'引导互动。'}
+        ],
+        interact:'评论区：你最近一次为自己花时间是什么时候？',
+        product:'软植入：画面里自然出现。',
+        tips:['长视频要有完整的价值观','第20秒完播钩子留人','第70秒金句是核心','不要强行煽情']
+      }
+    },
+    
+    '瘦后新生活': {
+      visual: {
+        form:'画面配音乐', duration:'35秒',
+        hook:'用"以前不敢做的事"做画面主题。',
+        emotion:'向往→羡慕→动力。',
+        logic:'画面配音乐类用场景切换展示"新生活"，不需要台词。',
+        scenes:[
+          {time:'0-5秒', shot:'空镜', action:'海边的浪花、阳光。', line:'（字幕）以前我哪敢这样穿', bgm:'夏日轻快', note:'空镜开场。'},
+          {time:'5-12秒', shot:'中景', action:'盼盼穿吊带裙在海边走，风吹头发。', line:'（字幕）98斤 30岁 两个孩子', bgm:'保持', note:'画面要美。'},
+          {time:'12-20秒', shot:'近景/混剪', action:'混剪：试穿新衣服、跑步、陪孩子玩。', line:'（字幕）变好以后 最大的变化是 敢做以前不敢做的事', bgm:'高潮', note:'4-5个画面切换。'},
+          {time:'20-28秒', shot:'中景', action:'盼盼对镜头笑，阳光打在脸上。', line:'（字幕）不是炫耀 是想告诉你 你也可以', bgm:'温暖', note:'【截图传播点】金句字幕。'},
+          {time:'28-35秒', shot:'远景', action:'盼盼走向远方或和孩子奔跑。', line:'（字幕）评论区告诉我 你最想做什么', bgm:'收尾', note:'留白结束。'}
+        ],
+        interact:'评论区：瘦了以后你最想做的一件事？',
+        product:'软植入：混剪画面里自然出现饮品。',
+        tips:['画面要明亮，给人希望','场景要好看，不要随便','BGM要轻快正能量','字幕要少而精']
+      },
+      music: {
+        form:'音乐转场', duration:'20秒',
+        hook:'用"敢穿"做卡点主题。',
+        emotion:'羡慕→向往。',
+        logic:'音乐转场类用衣服卡点，展示"敢穿的变化"。',
+        scenes:[
+          {time:'0-3秒', shot:'中景', action:'盼盼穿旧家居服。', line:'（字幕）以前', bgm:'前奏', note:'开始。'},
+          {time:'3-6秒', shot:'中景', action:'鼓点1——换吊带裙。', line:'（字幕）现在', bgm:'鼓点1', note:'转场。'},
+          {time:'6-12秒', shot:'近景/特写', action:'连续卡点：全身、侧身、背影。', line:'（字幕）98斤', bgm:'连续鼓点', note:'展示好状态。'},
+          {time:'12-18秒', shot:'中景', action:'盼盼自信走。', line:'（字幕）30岁 两娃 我的人生刚开始', bgm:'高潮', note:'核心展示。'},
+          {time:'18-20秒', shot:'近景', action:'微笑。', line:'（字幕）你也可以', bgm:'收', note:'留白。'}
+        ],
+        interact:'评论区：你最想穿什么？',
+        product:'软植入：手持饮品。',
+        tips:['卡点要准','衣服反差要大','画面要阳光']
+      }
+    },
+    
+    '蹭热点': {
+      short: {
+        form:'极短视频', duration:'15秒',
+        hook:'用热点直接开场，关联自己。',
+        emotion:'好奇→共鸣。',
+        logic:'蹭热点极短视频只讲一个观点，不要长篇大论。',
+        scenes:[
+          {time:'0-3秒', shot:'近景', action:'盼盼假装刷到热点，抬头看镜头。', line:'这个最近火了，我作为30岁宝妈，看完特别有感触。', bgm:'节奏感', note:'直接开场。'},
+          {time:'3-7秒', shot:'中景', action:'盼盼表达观点。', line:'很多人看到的是热闹，我看到的是普通人想改变有多难。', bgm:'保持', note:'观点输出。'},
+          {time:'7-11秒', shot:'近景', action:'结合自己。', line:'就像我从117到98，没人关心中间多少次想放弃。', bgm:'稍微放慢', note:'带入自己故事。'},
+          {time:'11-15秒', shot:'近景', action:'盼盼微笑。', line:'（字幕）你怎么看？评论区聊。', bgm:'收', note:'快速互动。'}
+        ],
+        interact:'评论区：你对这个热点怎么看？',
+        product:'软植入：根据场景自然出镜。',
+        tips:['15秒只讲一个观点','热点要当天最新','用宝妈视角差异化']
+      },
+      standard: {
+        form:'标准视频', duration:'30秒',
+        hook:'热点+自己观点。',
+        emotion:'好奇→共鸣→思考。',
+        logic:'标准蹭热点视频，有观点有态度有自己故事。',
+        scenes:[
+          {time:'0-3秒', shot:'近景', action:'盼盼对着镜头。', line:'这个最近火了，但我看完想的不是热闹。', bgm:'节奏感', note:'开场。'},
+          {time:'3-10秒', shot:'中景', action:'解释热点+观点。', line:'很多人在笑，但我看到一个普通人想改变有多难。这让我想到自己。', bgm:'保持', note:'观点输出。'},
+          {time:'10-18秒', shot:'近景', action:'结合自己经历。', line:'我从117到98，这一路多少次想放弃，只有自己知道。别人看到的是结果，没看到的是过程。', bgm:'稍微放慢', note:'【情绪转折】带入故事。'},
+          {time:'18-25秒', shot:'近景', action:'【截图传播点】金句。', line:'所以如果你也在改变的路上，别太在意别人怎么看。你比他们勇敢。', bgm:'温暖', note:'金句放大。'},
+          {time:'25-30秒', shot:'近景', action:'微笑。', line:'（字幕）你怎么看？评论区聊。', bgm:'收', note:'引导互动。'}
+        ],
+        interact:'评论区：你对这个热点怎么看？',
+        product:'软植入：根据场景自然出镜。',
+        tips:['观点要温和不要站队','用自己故事增加真实感','金句要有共鸣']
+      }
+    },
+    
+    '干货': {
+      short: {
+        form:'极短视频', duration:'15秒',
+        hook:'直接给干货，不废话。',
+        emotion:'好奇→恍然大悟。',
+        logic:'干货极短视频只讲3点，每点一句话。',
+        scenes:[
+          {time:'0-2秒', shot:'近景', action:'盼盼直接开口。', line:'30岁后代谢变慢的3个信号，中1个就该注意了。', bgm:'简洁节奏', note:'直接开场。'},
+          {time:'2-5秒', shot:'近景', action:'伸一根手指。', line:'第一，肚子先胖。以前吃一碗饭没事，现在半碗就鼓。', bgm:'保持', note:'具体场景。'},
+          {time:'5-8秒', shot:'近景', action:'伸两根手指。', line:'第二，累得快。带娃逛一天变成追两步就喘。', bgm:'保持', note:'场景感。'},
+          {time:'8-11秒', shot:'近景', action:'伸三根手指。', line:'第三，皮肤差。不是护肤品问题，是代谢慢了。', bgm:'保持', note:'不要说医疗词。'},
+          {time:'11-15秒', shot:'中景', action:'盼盼总结。', line:'我不是专家，但我是这样过来的。中几条？评论区扣数字。', bgm:'温暖收尾', note:'引导互动。'}
+        ],
+        interact:'评论区扣数字：1/2/3你中了哪条？',
+        product:'软植入：讲完拿起饮品说"这是我每天的饮食习惯"。',
+        tips:['15秒只讲3点','不要出现医疗词','用"我发现"不是"你应该"']
+      },
+      standard: {
+        form:'标准视频', duration:'40秒',
+        hook:'干货+完播钩子。',
+        emotion:'好奇→学习→信任。',
+        logic:'标准干货视频，3点+完播钩子+金句。',
+        scenes:[
+          {time:'0-3秒', shot:'近景', action:'盼盼直接开口。', line:'30岁后代谢变慢的3个信号，中1个就该注意了。', bgm:'简洁', note:'开场。'},
+          {time:'3-8秒', shot:'近景', action:'第一点。', line:'第一，肚子先胖。以前吃一碗饭没事，现在半碗就鼓。', bgm:'保持', note:'具体场景。'},
+          {time:'8-13秒', shot:'近景', action:'第二点。', line:'第二，累得快。带娃逛一天变成追两步就喘。', bgm:'保持', note:'场景感。'},
+          {time:'13-18秒', shot:'近景', action:'第三点。', line:'第三，皮肤差。不是护肤品问题，是代谢慢了。', bgm:'保持', note:'安全表达。'},
+          {time:'18-25秒', shot:'近景', action:'【完播钩子】', line:'但这3个信号里，最危险的是第2个，很多人忽略了。', bgm:'节奏停顿', note:'留人。'},
+          {time:'25-35秒', shot:'中景', action:'解释+结合自己。', line:'累得快说明身体在报警。我以前也是这样，后来调整了生活习惯，每天给自己留时间，慢慢就好起来了。', bgm:'温暖', note:'结合经历。'},
+          {time:'35-40秒', shot:'近景', action:'引导互动。', line:'（字幕）你中了几条？评论区扣数字。', bgm:'收', note:'互动。'}
+        ],
+        interact:'评论区扣数字：1/2/3你中了哪条？',
+        product:'软植入：讲完拿起饮品。',
+        tips:['干货控制在3点','第18秒完播钩子留人','不要出现医疗词']
+      }
+    },
+    
+    '初心': {
+      long: {
+        form:'长视频', duration:'2分钟',
+        hook:'用"为什么做这件事"开头。',
+        emotion:'好奇→信任→认同。',
+        logic:'初心类长视频要讲完整故事，从"为什么"到"怎么做"到"理念"。',
+        scenes:[
+          {time:'0-5秒', shot:'近景', action:'盼盼在店里或家里。', line:'很多人问我，为什么开始做身材管理这件事。', bgm:'叙事感', note:'像聊天开场。'},
+          {time:'5-20秒', shot:'中景/穿插', action:'穿插旧照片。', line:'因为我自己经历过。从117到98，我知道那种想改变又不敢开始的感觉。踩过很多坑，也试过很多方法。', bgm:'保持', note:'真实故事。'},
+          {time:'20-35秒', shot:'近景', action:'盼盼认真说。', line:'最难受的时候，不是没效果，是不知道该信谁。市面太多乱七八糟的东西，我踩过坑，不想让你们再踩。', bgm:'稍微低沉', note:'建立信任。'},
+          {time:'35-50秒', shot:'近景', action:'【完播钩子】', line:'后来我想明白了一件事，这也是我做这件事的核心理念。', bgm:'节奏停顿', note:'留人。'},
+          {time:'50-80秒', shot:'中景', action:'盼盼在店里整理产品。', line:'简单、能坚持，比什么都重要。不是追求快，是追求能长期做下去。我自己减脂那段时间喝的，才敢给你们。', bgm:'温暖', note:'理念输出。"每天喝"改成"那段时间喝"。'},
+          {time:'80-100秒', shot:'近景', action:'【截图传播点】金句。', line:'我不想做一锤子买卖。我想做的是，你跟着我，一步一步变好，我们成为长期的朋友。', bgm:'温暖有力', note:'金句放大。'},
+          {time:'100-120秒', shot:'中景', action:'盼盼打包发货或服务顾客。', line:'（画外音）每天做一点，剩下的交给时间。我负责选好的，你负责相信我。', bgm:'收尾', note:'展示工作。'}
+        ],
+        interact:'评论区：你最想改变的一件事是什么？',
+        product:'自然植入：店里场景，产品作为背景。',
+        tips:['不要夸大经历','不要贬低竞品','结尾落到"陪伴"不是"卖货"','第35秒完播钩子是关键']
+      }
+    },
+    
+    '店里': {
+      standard: {
+        form:'标准视频', duration:'35秒',
+        hook:'用顾客故事开头。',
+        emotion:'心疼→温暖→信任。',
+        logic:'店里故事类要用真实案例打动人，但保护顾客隐私。',
+        scenes:[
+          {time:'0-3秒', shot:'中景/店里', action:'盼盼在店里整理。', line:'今天店里来了个姐妹，她的故事我想讲给你们听。', bgm:'轻柔叙事', note:'不露顾客正脸。'},
+          {time:'3-12秒', shot:'近景', action:'盼盼讲述。', line:'她产后一直状态不好，老公不爱回家，自己不愿意出门。来的时候，眼神小心翼翼的。', bgm:'保持', note:'语速慢。'},
+          {time:'12-18秒', shot:'近景', action:'【情绪转折】', line:'我看着她，就像看到以前的自己。', bgm:'稍微温暖', note:'建立共鸣。'},
+          {time:'18-25秒', shot:'中景', action:'盼盼给顾客递饮品或打包产品。', line:'我跟她说，不用急，我懂你，我陪你一起。', bgm:'温暖', note:'产品自然出镜。'},
+          {time:'25-30秒', shot:'近景', action:'【截图传播点】金句。', line:'每个想变好的姐妹，都值得被认真对待。', bgm:'温暖有力', note:'金句放大。'},
+          {time:'30-35秒', shot:'近景', action:'微笑。', line:'（字幕）如果你也想改变 评论区见', bgm:'收尾', note:'引导互动。'}
+        ],
+        interact:'评论区：如果你也想改变，给自己一个开始。',
+        product:'自然植入：店里环境、产品作为服务场景。',
+        tips:['顾客不露脸','故事要真实','产品不是主角，服务才是']
+      }
+    },
+    
+    '工厂': {
+      long: {
+        form:'长视频', duration:'1.5分钟',
+        hook:'用"带你们看看"开头。',
+        emotion:'好奇→放心→信任。',
+        logic:'工厂溯源类要展示严谨，但不要硬广。',
+        scenes:[
+          {time:'0-5秒', shot:'中景/工厂', action:'盼盼在工厂门口。', line:'今天带你们看看，我减脂那段时间喝的，是怎么做出来的。', bgm:'轻快', note:'开场。"每天喝"改成"那段时间喝"。'},
+          {time:'5-25秒', shot:'近景/特写', action:'展示原料、生产线。', line:'（画外音）从源头开始，每一关我都要自己看过。原料从哪来，每一步怎么把关，我都要问清楚。', bgm:'保持', note:'展示专业。'},
+          {time:'25-40秒', shot:'中景', action:'盼盼和工作人员交流。', line:'不只是看，我要确认。这个环节我特别在意，因为我自己减脂那段时间也喝。', bgm:'保持', note:'增加真实感。"每天喝"改成"那段时间喝"。'},
+          {time:'40-55秒', shot:'近景', action:'【完播钩子】', line:'很多人问我为什么选这家工厂，其实有个原因。', bgm:'节奏停顿', note:'留人。'},
+          {time:'55-75秒', shot:'中景/穿插', action:'展示工厂资质或检测报告。', line:'因为他们是xx认证的，每批都有检测报告。我自己看过，才放心。', bgm:'温暖', note:'展示严谨。'},
+          {time:'75-90秒', shot:'近景', action:'盼盼拿起产品。', line:'所以我才敢推荐给你们，因为我自己也喝过。', bgm:'温暖', note:'不说功效，说"我喝过"（不说"我每天喝"）。'},
+          {time:'90秒', shot:'近景', action:'盼盼微笑。', line:'（字幕）我负责选 你负责相信我', bgm:'收尾', note:'引导信任。'}
+        ],
+        interact:'评论区：你们还想看哪个环节？',
+        product:'自然植入：产品作为溯源对象。',
+        tips:['工厂要干净明亮','不要过度夸专业','结尾回到"陪伴"人设']
+      }
+    },
+    
+    '直播预热': {
+      short: {
+        form:'极短视频', duration:'12秒',
+        hook:'直接说时间和主题。',
+        emotion:'期待→好奇。',
+        logic:'预热视频要短、直接、有具体时间。',
+        scenes:[
+          {time:'0-3秒', shot:'近景', action:'盼盼兴奋对镜头。', line:'今晚8点，我有一场直播，专门给姐妹们的。', bgm:'节奏感', note:'时间要具体。'},
+          {time:'3-7秒', shot:'中景', action:'展示直播主题。', line:'会聊我怎么从117到98的，也回答你们的问题。', bgm:'保持', note:'给来的理由。'},
+          {time:'7-10秒', shot:'近景', action:'认真说。', line:'不整虚的，实实在在跟你们聊。', bgm:'保持', note:'真实承诺。'},
+          {time:'10-12秒', shot:'近景', action:'挥手。', line:'（字幕）今晚8点 评论区先提问', bgm:'收', note:'引导预约。'}
+        ],
+        interact:'评论区：你想听我聊什么？',
+        product:'直播主题关联，不硬推。',
+        tips:['时间要固定','预热在直播前1-2小时发','提前收集问题']
+      }
+    },
+    
+    '老公宠溺': {
+      standard: {
+        form:'标准视频', duration:'25秒',
+        hook:'老公宠溺行为开场。',
+        emotion:'羡慕→甜蜜→向往。',
+        logic:'让粉丝向往你的状态，核心是"关系好"不是"有钱"。',
+        scenes:[
+          {time:'0-3秒', shot:'中景', action:'老公给盼盼递东西或帮忙。', line:'姐妹们，你们看他在干嘛。', bgm:'轻快', note:'自然不演。'},
+          {time:'3-8秒', shot:'近景', action:'老公解释，盼盼假装嫌弃。', line:'老公：怕你累嘛。 盼盼：我信你个鬼。', bgm:'俏皮', note:'真实互动。'},
+          {time:'8-14秒', shot:'中景', action:'盼盼对镜头说。', line:'以前我没好状态的时候，他可不是这样的。男人啊，真的现实。', bgm:'保持俏皮', note:'开玩笑语气。'},
+          {time:'14-20秒', shot:'近景', action:'【截图传播点】金句。', line:'不过说真的，自己状态好了，身边的人都温柔了。', bgm:'温暖', note:'落到自己。'},
+          {time:'20-25秒', shot:'近景', action:'甜蜜笑。', line:'（字幕）你们老公也这样吗？', bgm:'收尾', note:'互动。'}
+        ],
+        interact:'评论区：你们老公也这样吗？',
+        product:'软植入：产品作为老公"关心"的一部分。',
+        tips:['不要炫富','老公反应要真实','结尾回到"自己变好"']
+      }
+    },
+    
+    '和大姐拍': {
+      standard: {
+        form:'标准视频', duration:'25秒',
+        hook:'姐妹互动制造反差。',
+        emotion:'欢乐→亲切→羡慕。',
+        logic:'姐妹类要轻松搞笑，突出两人不同性格。',
+        scenes:[
+          {time:'0-3秒', shot:'中景', action:'盼盼和大姐同框。', line:'今天硬拉我姐来拍，她说比上班还难。', bgm:'轻快欢乐', note:'开场笑点。'},
+          {time:'3-8秒', shot:'近景', action:'大姐吐槽，盼盼笑。', line:'大姐：你天天拍这个，真有人看？', bgm:'保持', note:'让大姐自由发挥。'},
+          {time:'8-14秒', shot:'中景', action:'两人一起对比身材或试穿同款。', line:'（字幕）同款衣服 不同身材', bgm:'保持', note:'动作简单。'},
+          {time:'14-20秒', shot:'近景', action:'盼盼对镜头说，大姐捣乱。', line:'不管什么样，自信最重要。你看我姐，她就不care。', bgm:'温暖', note:'价值观。'},
+          {time:'20-25秒', shot:'中景', action:'两人笑或比心。', line:'（字幕）姐俩一起变好 有没有一起的', bgm:'收尾', note:'互动。'}
+        ],
+        interact:'评论区：你有这样的姐妹吗？@她来看。',
+        product:'软植入：两人手里各拿饮品。',
+        tips:['大姐性格要真实','互动多于独白','同款对比注意尺度']
+      }
+    },
+    
+    '30岁宝妈好状态': {
+      visual: {
+        form:'画面配音乐', duration:'35秒',
+        hook:'用"30岁两个娃"做反差。',
+        emotion:'惊讶→羡慕→动力。',
+        logic:'画面配音乐类展示"宝妈好状态"，不需要台词。',
+        scenes:[
+          {time:'0-5秒', shot:'空镜', action:'清晨阳光，闹钟显示5:30。', line:'（字幕）30岁 两个孩子', bgm:'轻柔', note:'空镜开场。'},
+          {time:'5-12秒', shot:'中景', action:'盼盼起床、运动、做早餐。', line:'（字幕）很多人问我怎么还有这个状态', bgm:'保持', note:'日常混剪。'},
+          {time:'12-20秒', shot:'近景/特写', action:'盼盼运动、喝饮品、看书。', line:'（字幕）其实没什么秘诀 就是每天给自己留半小时', bgm:'逐渐温暖', note:'【情绪转折】画面变亮。'},
+          {time:'20-28秒', shot:'中景', action:'盼盼带孩子、和老公互动。', line:'（字幕）当妈了也可以爱自己', bgm:'高潮', note:'【截图传播点】金句。'},
+          {time:'28-35秒', shot:'近景', action:'盼盼微笑。', line:'（字幕）30岁才是女人最好的开始', bgm:'收尾', note:'正能量。'}
+        ],
+        interact:'评论区：当妈后，你为自己留过时间吗？',
+        product:'软植入：饮品作为"每天给自己的时间"。',
+        tips:['孩子可入镜但不要过度晒娃','画面要明亮给人希望','字幕要少而精']
+      },
+      long: {
+        form:'长视频', duration:'1.5分钟',
+        hook:'直接说年龄身份制造反差。',
+        emotion:'惊讶→好奇→认同→动力。',
+        logic:'长视频展示完整的"宝妈好状态"日常，有理念有方法。',
+        scenes:[
+          {time:'0-5秒', shot:'近景', action:'盼盼带孩子出镜。', line:'30岁，两个娃，很多人问我怎么还能有这个状态。', bgm:'轻快自信', note:'开场冲击。'},
+          {time:'5-20秒', shot:'中景/混剪', action:'展示一天：早起、运动、做早餐、叫孩子起床。', line:'（画外音）早上5点半，孩子没醒，这段时间是我自己的。运动、看书、或者就安静坐一会。', bgm:'轻快', note:'展示日常。'},
+          {time:'20-35秒', shot:'近景', action:'盼盼认真说。', line:'【痛点共鸣】当妈以后，最容易丢的是自己。我把所有时间给了孩子、老公、家里，最后连照镜子都不敢。', bgm:'稍微低沉', note:'痛点。'},
+          {time:'35-50秒', shot:'近景', action:'【完播钩子】', line:'后来我明白了，妈妈状态好，孩子才开心。', bgm:'节奏变化', note:'转折。'},
+          {time:'50-70秒', shot:'中景/混剪', action:'展示运动、喝饮品、打扮自己。', line:'（画外音）每天半小时，运动、认真吃饭、认真打扮。就这点时间，整个人都不一样了。', bgm:'温暖', note:'方法。'},
+          {time:'70-80秒', shot:'近景', action:'【截图传播点】金句。', line:'不是说我多厉害，我只是想证明，当妈了也可以爱自己。30岁才是女人最好的开始。', bgm:'温暖有力', note:'金句。'},
+          {time:'80-90秒', shot:'中景', action:'盼盼带孩子开心互动。', line:'（字幕）你为自己留过时间吗？', bgm:'收尾', note:'引导互动。'}
+        ],
+        interact:'评论区：当妈后，你为自己留过时间吗？',
+        product:'软植入：饮品作为"每天给自己的时间"。',
+        tips:['孩子可入镜但不要过度晒娃','突出"妈妈"身份但不强调辛苦','第35秒完播钩子是关键']
+      }
+    },
+    
+    '向往成为我': {
+      visual: {
+        form:'画面配音乐', duration:'40秒',
+        hook:'用粉丝私信做开场。',
+        emotion:'感动→羡慕→动力。',
+        logic:'画面配音乐类展示"真实的美好"，不说话靠字幕。',
+        scenes:[
+          {time:'0-6秒', shot:'近景', action:'盼盼看手机，屏幕模糊显示粉丝私信。', line:'（字幕）昨天有个粉丝说 想活成我的样子', bgm:'温暖叙事', note:'开场。'},
+          {time:'6-14秒', shot:'中景/混剪', action:'展示盼盼真实一天：带娃、工作、运动。', line:'（字幕）但你们不知道 我也是从117斤过来的', bgm:'保持', note:'真实展示。'},
+          {time:'14-22秒', shot:'近景/空镜', action:'穿插旧照片。', line:'（字幕）满脸疲惫 不敢照镜子', bgm:'稍微低沉', note:'【痛点共鸣】。'},
+          {time:'22-30秒', shot:'中景', action:'盼盼现在状态的混剪。', line:'（字幕）不是想让你们羡慕 是想让你们知道 你也可以', bgm:'逐渐温暖', note:'【情绪转折】。'},
+          {time:'30-36秒', shot:'近景', action:'盼盼微笑。', line:'（字幕）变好不是为了别人 是为了更喜欢自己', bgm:'高潮', note:'【截图传播点】金句。'},
+          {time:'36-40秒', shot:'空镜', action:'盼盼背影。', line:'（字幕）你想成为的自己 现在就可以开始', bgm:'收尾', note:'留白。'}
+        ],
+        interact:'评论区：你理想中的自己是什么样？',
+        product:'软植入：自然出现。',
+        tips:['不要炫富','展示"真实的美好"','结尾有行动号召']
+      }
+    },
+    
+    '秀实力': {
+      music: {
+        form:'音乐转场', duration:'20秒',
+        hook:'用"以前不敢想"做卡点主题。',
+        emotion:'羡慕→动力→认同。',
+        logic:'秀实力类用音乐卡点低调展示，强调"坚持的结果"。',
+        scenes:[
+          {time:'0-3秒', shot:'中景', action:'盼盼穿普通家居服。', line:'（字幕）以前不敢想', bgm:'前奏', note:'开始。'},
+          {time:'3-6秒', shot:'中景', action:'鼓点1——换上现在的穿搭。', line:'（字幕）现在', bgm:'鼓点1', note:'转场。'},
+          {time:'6-12秒', shot:'近景/特写', action:'连续卡点：腰线、锁骨、全身。', line:'（字幕）坚持的记录', bgm:'连续鼓点', note:'展示但不炫耀。'},
+          {time:'12-18秒', shot:'中景', action:'盼盼自信走。', line:'（字幕）30岁 两娃 98斤', bgm:'高潮', note:'数字展示。'},
+          {time:'18-20秒', shot:'近景', action:'微笑。', line:'（字幕）你也可以', bgm:'收', note:'留白。'}
+        ],
+        interact:'评论区：你坚持最久的一件事？',
+        product:'软植入：手持饮品。',
+        tips:['不要炫富','用"以前不敢想"固定句式','画面要阳光健康']
+      },
+      visual: {
+        form:'画面配音乐', duration:'30秒',
+        hook:'纯画面展示状态。',
+        emotion:'羡慕→动力。',
+        logic:'画面配音乐类低调展示，不说话靠画面和字幕。',
+        scenes:[
+          {time:'0-5秒', shot:'空镜', action:'阳光照进房间。', line:'（字幕）以前不敢想 自己还能穿这种衣服', bgm:'轻柔', note:'空镜开场。'},
+          {time:'5-12秒', shot:'中景', action:'盼盼自然展示穿搭，走路、转身。', line:'（字幕）不是突然变的 是一天一天过来的', bgm:'保持', note:'自然不做作。'},
+          {time:'12-20秒', shot:'近景/特写', action:'细节展示：腰线、手臂、锁骨。', line:'（字幕）每一步 都是坚持的记录', bgm:'逐渐温暖', note:'特写不过度性感。'},
+          {time:'20-26秒', shot:'近景', action:'盼盼真诚看镜头。', line:'（字幕）我没有炫耀 只是想告诉你 坚持有用', bgm:'高潮', note:'【截图传播点】金句。'},
+          {time:'26-30秒', shot:'近景', action:'微笑。', line:'（字幕）你也可以 从今天开始', bgm:'收尾', note:'正能量。'}
+        ],
+        interact:'评论区：你坚持最久的一件事？',
+        product:'软植入：饮品作为"坚持"的一部分。',
+        tips:['不要炫富','画面阳光健康','用"以前不敢想"固定句式']
+      }
+    }
+  };
+  
+  // 根据tag找最合适的脚本
+  let selected = null;
+  for(const key in scriptLibrary){
+    if(tag.includes(key)){
+      const lib = scriptLibrary[key];
+      // 看这个方向有没有当前形式的脚本
+      if(lib[form]){
+        selected = lib[form];
+      }else{
+        // 没有当前形式，取第一个可用的
+        selected = lib[Object.keys(lib)[0]];
+      }
+      break;
+    }
+  }
+  
+  // 标题关键词匹配
+  if(!selected){
+    const titleMap = {
+      '老公':'老公宠溺','大姐':'和大姐拍','直播':'直播预热',
+      '店':'店里','工厂':'工厂','初心':'初心',
+      '干货':'干货','代谢':'干货','30岁':'30岁宝妈好状态',
+      '宝妈':'30岁宝妈好状态','衣柜':'变化记录','对比':'变化记录',
+      '海边':'瘦后新生活','吊带':'瘦后新生活',
+      '心里话':'心声','感悟':'感悟','自己':'感悟',
+      '羡慕':'向往成为我','向往':'向往成为我',
+      '实力':'秀实力','热点':'蹭热点','台风':'蹭热点',
+      '夫妻':'夫妻日常'
+    };
+    for(const k in titleMap){
+      if(title.includes(k)){
+        const lib = scriptLibrary[titleMap[k]];
+        if(lib){
+          selected = lib[form] || lib[Object.keys(lib)[0]];
+        }
+        break;
+      }
+    }
+  }
+  
+  // 通用模板（每种形式都有）
+  if(!selected){
+    const generic = {
+      short: {
+        form:'极短视频', duration:'12秒',
+        hook:'直接上画面，一句话开场：关于{TITLE}，我只说一句。',
+        emotion:'好奇→共鸣。',
+        logic:'极短视频只讲一个点，用{TITLE}做引子，直接给结论。',
+        scenes:[
+          {time:'0-2秒', shot:'近景', action:'盼盼对着镜头，表情认真', line:'盼盼：关于{TITLE}，我只说一句。', bgm:'轻快', note:'不铺垫。'},
+          {time:'2-6秒', shot:'中景', action:'盼盼侧身展示状态或相关画面', line:'盼盼：我是从117到98的宝妈，这条路我走过。', bgm:'保持', note:'真实感。'},
+          {time:'6-10秒', shot:'近景', action:'盼盼拿起{PRODUCT}，自然喝一口', line:'盼盼：不是少吃几顿，是每天把小事做好。', bgm:'温暖', note:'金句+产品自然出镜。'},
+          {time:'10-12秒', shot:'近景', action:'盼盼对镜头', line:'盼盼：你认同吗？', bgm:'收', note:'互动。'}
+        ],
+        interact:'评论区：你认同吗？',
+        product:'{PRODUCT}自然出镜，作为"我每天做的小事"之一',
+        tips:['12秒只讲一个点','字幕要大','不铺垫']
+      },
+      standard: {
+        form:'标准视频', duration:'30秒',
+        hook:'用具体画面开场：关于{TITLE}，这条告诉你答案。',
+        emotion:'好奇→共鸣→温暖。',
+        logic:'标准视频有起承转合，围绕{TITLE}展开，讲自己的经历和观点。',
+        scenes:[
+          {time:'0-3秒', shot:'近景', action:'盼盼对着镜头，背景干净', line:'盼盼：{TITLE}，这条告诉你答案。', bgm:'轻快前奏', note:'直接开场。'},
+          {time:'3-10秒', shot:'中景', action:'盼盼展示相关场景或旧照', line:'盼盼：我自己经历过，所以才知道这中间的难。117斤的时候，我也以为只要少吃就行。', bgm:'保持', note:'真实故事。'},
+          {time:'10-18秒', shot:'近景', action:'【完播钩子】盼盼语气放慢，制造悬念', line:'盼盼：但很多人不知道的是，关键不在快慢。', bgm:'节奏停顿', note:'留人。'},
+          {time:'18-25秒', shot:'近景', action:'【截图传播点】金句，盼盼拿起{PRODUCT}展示', line:'盼盼：关键是你有没有认真对待自己。我减脂那段时间{PRODUCT}每天喝，饭照吃，现在不喝了，但习惯养成了。', bgm:'温暖', note:'金句放大。强调"那段时间喝，现在不喝了"。'},
+          {time:'25-30秒', shot:'近景', action:'盼盼微笑', line:'盼盼：你也在路上吗？评论区见。', bgm:'收尾', note:'互动。'}
+        ],
+        interact:'评论区：你也在路上吗？',
+        product:'{PRODUCT}作为"我认真对待自己的方式"自然出镜',
+        tips:['第10秒完播钩子留人','第18秒金句是核心','字幕要大']
+      },
+      long: {
+        form:'长视频', duration:'1.5分钟',
+        hook:'用故事开场：{TITLE}，我想好好跟你们聊聊。',
+        emotion:'好奇→共鸣→思考→希望。',
+        logic:'长视频要有完整故事弧线，围绕{TITLE}讲自己的经历。',
+        scenes:[
+          {time:'0-5秒', shot:'近景', action:'盼盼对着镜头，光线柔和', line:'盼盼：{TITLE}，我想好好跟你们聊聊。', bgm:'舒缓', note:'慢开场。'},
+          {time:'5-20秒', shot:'中景', action:'盼盼讲述背景，穿插旧照', line:'盼盼：很多人看到的是现在的我，但你们不知道我经历过什么。117斤的时候，我连拍照都不敢站前面。', bgm:'保持', note:'铺垫。'},
+          {time:'20-35秒', shot:'近景', action:'【痛点共鸣】', line:'盼盼：最难受的时候，不是身体累，是心累。是觉得自己来不及了。', bgm:'稍微低沉', note:'痛点。'},
+          {time:'35-50秒', shot:'近景', action:'【完播钩子】', line:'盼盼：但后来发生了一件事，让我彻底改变。', bgm:'节奏停顿', note:'留人。'},
+          {time:'50-70秒', shot:'中景/混剪', action:'展示改变过程，盼盼减脂期喝{PRODUCT}、运动、记录', line:'盼盼（画外音）：我开始每天给自己留时间，运动、调整饮食、记录变化，{PRODUCT}那段时间也坚持每天喝。', bgm:'逐渐温暖', note:'过程。强调"那段时间喝"。'},
+          {time:'70-80秒', shot:'近景', action:'【截图传播点】金句。', line:'盼盼：变好不是为了别人，是为了照镜子的时候，更喜欢自己。', bgm:'温暖有力', note:'金句。'},
+          {time:'80-90秒', shot:'近景', action:'微笑。', line:'盼盼：你也想开始？评论区告诉我。', bgm:'收尾', note:'互动。'}
+        ],
+        interact:'评论区：你也想开始吗？',
+        product:'{PRODUCT}在混剪中自然出现，作为日常记录的一部分',
+        tips:['长视频要有3个情绪转折','第35秒完播钩子','第70秒金句']
+      },
+      music: {
+        form:'音乐转场', duration:'20秒',
+        hook:'用卡点做反差：{TITLE}的答案，就在我的变化里。',
+        emotion:'惊讶→羡慕。',
+        logic:'音乐转场类靠画面+卡点，用{TITLE}做标题，展示变化。',
+        scenes:[
+          {time:'0-3秒', shot:'中景', action:'盼盼穿旧衣服，{TITLE}字幕出现', line:'（字幕）{TITLE}', bgm:'前奏', note:'开始。'},
+          {time:'3-6秒', shot:'中景', action:'鼓点转场', line:'（字幕）以前 117斤', bgm:'鼓点', note:'转场。'},
+          {time:'6-14秒', shot:'近景/特写', action:'连续卡点展示现在状态', line:'（字幕）现在 98斤', bgm:'连续鼓点', note:'展示。'},
+          {time:'14-18秒', shot:'中景', action:'自信展示，拿起{PRODUCT}', line:'（字幕）{PRODUCT} 减脂期的选择', bgm:'高潮', note:'核心。不说"每天的选择"，改成"减脂期的选择"。'},
+          {time:'18-20秒', shot:'近景', action:'微笑。', line:'（字幕）你也可以', bgm:'收', note:'留白。'}
+        ],
+        interact:'评论区：你也在改变吗？',
+        product:'{PRODUCT}作为"减脂期的选择"自然出镜',
+        tips:['卡点要准','转场用遮挡镜头','字幕精简']
+      },
+      visual: {
+        form:'画面配音乐', duration:'30秒',
+        hook:'纯画面+字幕：关于{TITLE}，我用画面回答。',
+        emotion:'共鸣→思考→希望。',
+        logic:'画面配音乐类不说话，靠字幕推进，围绕{TITLE}展现生活。',
+        scenes:[
+          {time:'0-5秒', shot:'空镜', action:'相关场景空镜，{TITLE}字幕', line:'（字幕）{TITLE}', bgm:'轻柔', note:'空镜开场。'},
+          {time:'5-12秒', shot:'中景', action:'盼盼日常画面。', line:'（字幕）很多人不知道的是', bgm:'保持', note:'铺垫。'},
+          {time:'12-20秒', shot:'近景', action:'盼盼展示状态，喝{PRODUCT}。', line:'（字幕）我也是一步一步过来的', bgm:'逐渐温暖', note:'转折。'},
+          {time:'20-26秒', shot:'近景', action:'金句字幕。', line:'（字幕）坚持的记录 比奇迹更真实', bgm:'高潮', note:'【截图传播点】。'},
+          {time:'26-30秒', shot:'空镜', action:'留白。', line:'（字幕）你也可以', bgm:'收尾', note:'结束。'}
+        ],
+        interact:'评论区：你怎么看？',
+        product:'{PRODUCT}自然出现，不说话不介绍',
+        tips:['全程不说话','画面要精致','BGM情绪曲线']
+      }
+    };
+    selected = generic[form] || generic.standard;
+  }
+  
+  // 添加通用信息
+  const result = Object.assign({}, selected);
+  result.title = title;
+  result.tag = topic.tag || '选题';
+
+  // 变量填充：把选题标题、产品名等占位符替换为真实内容
+  const productName = Store.get('productName','') || '颜小盼咖啡';
+  const vars = {
+    TITLE: title,
+    DESC: desc,
+    DESC1: desc.split(/[。！？\n]/)[0] || '',
+    PRODUCT: productName,
+    AGE: '30',
+    KIDS: '两娃',
+    FROM: '117',
+    TO: '98'
+  };
+  result.hook = replaceVars(result.hook, vars);
+  result.logic = replaceVars(result.logic, vars);
+  result.emotion = replaceVars(result.emotion, vars);
+  result.interact = replaceVars(result.interact, vars);
+  result.product = replaceVars(result.product, vars);
+  result.tips = (result.tips || []).map(t => replaceVars(t, vars));
+  result.scenes = (result.scenes || []).map(s => ({
+    time: s.time,
+    shot: replaceVars(s.shot, vars),
+    action: replaceVars(s.action, vars),
+    line: replaceVars(s.line, vars),
+    bgm: s.bgm,
+    note: replaceVars(s.note, vars)
+  }));
+
+  result.safeWords = [
+    '用"身材管理"代替"减肥"',
+    '用"变好看/状态好"代替"瘦了"',
+    '用"我减脂那段时间喝的/我用过的"代替产品功效（强调现在不喝了，避免粉丝跟买）',
+    '不出现具体价格',
+    '不承诺效果，只说"我的记录"'
+  ];
+  result.tips = (result.tips || []).concat([
+    '真实>演技：老公/家人反应不要演',
+    '前3秒定生死：必须有反差/悬念/痛点',
+    '字幕要大：手机看视频必须清晰',
+    'BGM不要盖过人声',
+    '完播钩子要在视频中段设置',
+    '金句要慢说，字幕放大，适合截图'
+  ]);
+
+  return normalizeScript(result, productName);
+}
+/* ===================================================
+   大号脚本（盼盼两口子大号专用）
+   样式对齐示例脚本：逐字段详细展示
+=================================================== */
+function renderBigaccount(){
+  const data = Store.get('dailyData', null);
+  const info = document.getElementById('bigaccountInfo');
+  const list = document.getElementById('bigaccountList');
+  const dateEl = document.getElementById('bigaccountDate');
+  const countEl = document.getElementById('bigaccountCount');
+
+  if(!data){
+    info.innerHTML = '<span class="err">未获取到数据，点击右上角刷新</span>';
+    list.innerHTML = '<div class="empty"><p>暂无大号脚本</p></div>';
+    countEl.textContent = '';
+    return;
+  }
+
+  const items = data.bigaccount || [];
+  countEl.textContent = `共 ${items.length} 条`;
+  dateEl.textContent = '📅 '+ (data.date||'') + ' · 6支柱轮换';
+  const lu = Store.get('lastUpdate','');
+  info.innerHTML = lu? `<span class="ok">数据更新于 ${lu}</span>` : '';
+
+  if(!items.length){
+    list.innerHTML = '<div class="empty"><p>今日暂无大号脚本，点击右上角刷新</p></div>';
+    return;
+  }
+
+  const productName = Store.get('productName','') || '颜小盼咖啡';
+
+  const fmtTips = (tips)=>{
+    if(!tips) return '';
+    const arr = Array.isArray(tips)? tips : [tips];
+    if(!arr.length) return '';
+    return `<div style="margin-top:8px;"><div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:4px;">💡 拍摄要点</div><ul style="font-size:12px;color:var(--text);padding-left:18px;line-height:1.7;margin:0;">${arr.map(t=>`<li>${esc(t)}</li>`).join('')}</ul></div>`;
+  };
+  const fmtLine = (label, text, color)=>{
+    if(!text || text==='无') return '';
+    return `<div style="margin-bottom:5px;"><span style="font-size:12px;font-weight:700;color:${color||'var(--text-sub)'};">${label}：</span><span style="font-size:13px;color:var(--text);line-height:1.5;">${esc(text)}</span></div>`;
+  };
+
+  list.innerHTML = items.map((it,i)=>{
+    const sc = normalizeScript(JSON.parse(JSON.stringify(it)), productName);
+    const pillarColor = {'B.态度穿搭':'#E74C3C','F.装修记录':'#F39C12','D.精致生活':'#1ABC9C','E.夫妻日常':'#E91E63','A.蜕变形人':'#9B59B6','态度穿搭':'#E74C3C','装修记录':'#F39C12','精致生活':'#1ABC9C','夫妻日常':'#E91E63','蜕变形人':'#9B59B6'}[sc.direction||sc.pillar] || '#8CA63E';
+    return `
+    <div class="card" style="margin-bottom:14px;">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+        <div style="flex:1;min-width:200px;">
+          <span style="font-size:11px;background:${pillarColor};color:#fff;padding:3px 10px;border-radius:8px;font-weight:600;">${esc(sc.direction||sc.pillar||'大号')}</span>
+          ${sc.difficulty?`<span style="font-size:11px;color:var(--text-sub);margin-left:4px;">${esc(sc.difficulty)}</span>`:''}
+          <div style="font-size:16px;font-weight:700;margin-top:10px;color:var(--text);line-height:1.4;">${i+1}. ${esc(it.title||'')}</div>
+          ${sc.form?`<div style="margin-top:6px;font-size:12px;color:var(--orange);background:#FFF3E0;padding:4px 10px;border-radius:6px;display:inline-block;font-weight:500;">🎬 ${esc(sc.form)}</div>`:''}
+        </div>
+        <span style="font-size:12px;color:var(--text-mute);flex-shrink:0;">⏱ ${esc(sc.duration||'')}</span>
+      </div>
+
+      ${sc.location?`<div style="font-size:13px;color:var(--text-sub);margin-bottom:4px;"><b>📍 场地</b>：${esc(sc.location)}</div>`:''}
+      ${sc.actors?`<div style="font-size:13px;color:var(--text-sub);margin-bottom:4px;"><b>👥 出镜</b>：${esc(sc.actors)}</div>`:''}
+      ${sc.props && sc.props.length?`<div style="font-size:13px;color:var(--text-sub);margin-bottom:10px;"><b>🎒 道具</b>：${sc.props.map(p=>esc(p)).join('、')}</div>`:''}
+
+      ${sc.hook_logic?`<div style="background:#FFF8E8;padding:12px;border-radius:8px;margin-bottom:14px;border-left:3px solid var(--gold);"><div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:6px;">🎯 为什么这条能爆</div><div style="font-size:13px;color:var(--text);line-height:1.7;white-space:pre-line;">${esc(sc.hook_logic)}</div></div>`:''}
+
+      ${sc.scenes && sc.scenes.length?`<div style="font-size:14px;font-weight:700;color:var(--olive-dark);margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid var(--olive-pale);">📋 完整分镜头脚本（${sc.scenes.length}个镜头，逐字逐句）</div>
+        ${sc.scenes.map((shot,si)=>{
+          const sname = shot.shot_name || '镜头';
+          return `<div style="background:#FAFBF7;border-radius:10px;padding:14px;margin-bottom:12px;border-left:4px solid var(--olive);">
+            <div style="font-size:14px;font-weight:700;color:var(--olive-dark);margin-bottom:10px;">镜头${si+1}｜${esc(sname)}（${esc(shot.time||'')}）</div>
+            ${fmtLine('景别', shot.framing, '#8CA63E')}
+            ${fmtLine('机位', shot.camera, '#8CA63E')}
+            ${fmtLine('画面', shot.visual, '#5D6D4B')}
+            ${fmtLine('表情', shot.expression, '#E91E63')}
+            ${fmtLine('动作', shot.action, '#5D6D4B')}
+            ${fmtLine('台词', shot.line, '#2C5F2D')}
+            ${fmtLine('字幕', shot.subtitle, '#3498DB')}
+            ${fmtLine('BGM', shot.bgm, '#9B59B6')}
+            ${fmtTips(shot.tips || shot.tip)}
+          </div>`;
+        }).join('')}`:''}
+
+      ${sc.ending_hook?`<div style="background:#F0F4E8;padding:12px;border-radius:8px;margin-bottom:12px;border-left:3px solid var(--olive);"><div style="font-size:12px;font-weight:700;color:var(--olive-dark);margin-bottom:4px;">🎬 结尾追更钩子</div><div style="font-size:13px;color:var(--text);line-height:1.6;">${esc(sc.ending_hook)}</div></div>`:''}
+
+      ${sc.publish_config?`<div style="background:#fff;padding:12px;border-radius:8px;margin-bottom:12px;border:1px solid var(--line);">
+        <div style="font-size:12px;font-weight:700;color:var(--olive-dark);margin-bottom:8px;">📤 发布配置</div>
+        ${sc.publish_config.best_time?`<div style="font-size:13px;color:var(--text-sub);margin-bottom:4px;"><b>发布时间</b>：${esc(sc.publish_config.best_time)}</div>`:''}
+        ${sc.publish_config.cover_text?`<div style="font-size:13px;color:var(--orange);margin-bottom:4px;"><b>封面大字</b>：${esc(sc.publish_config.cover_text)}</div>`:''}
+        ${sc.publish_config.caption?`<div style="font-size:13px;color:var(--text);margin-bottom:4px;line-height:1.5;"><b>文案</b>：${esc(sc.publish_config.caption)}</div>`:''}
+        ${sc.publish_config.pinned_comment?`<div style="font-size:13px;color:var(--text-sub);line-height:1.5;"><b>置顶评论</b>：${esc(sc.publish_config.pinned_comment)}</div>`:''}
+      </div>`:''}
+
+      ${sc.compliance_check?`<div style="background:#E8F5E9;padding:10px 12px;border-radius:8px;margin-bottom:12px;"><span style="font-size:12px;font-weight:700;color:#27AE60;">✅ 合规说明：</span><span style="font-size:12px;color:var(--text-sub);line-height:1.5;">${esc(sc.compliance_check)}</span></div>`:''}
+
+      ${sc.shoot_checklist && sc.shoot_checklist.length?`<div style="background:#FFF3E0;padding:12px;border-radius:8px;margin-bottom:12px;"><div style="font-size:12px;font-weight:700;color:var(--orange);margin-bottom:6px;">✅ 拍摄清单</div><ul style="font-size:13px;color:var(--text);padding-left:18px;line-height:1.7;margin:0;">${sc.shoot_checklist.map(c=>`<li>${esc(c)}</li>`).join('')}</ul></div>`:''}
+
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-cancel" style="flex:1;font-size:12px;padding:8px;" onclick="copyBigaccount(${i})">复制完整脚本</button>
+        <button class="btn btn-primary" style="flex:1;font-size:12px;padding:8px;" onclick="saveBigaccountToScripts(${i})">存入每日脚本</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function copyBigaccount(idx){
+  const data = Store.get('dailyData', null);
+  if(!data || !data.bigaccount || !data.bigaccount[idx]) return;
+  const productName = Store.get('productName','') || '颜小盼咖啡';
+  const sc = normalizeScript(JSON.parse(JSON.stringify(data.bigaccount[idx])), productName);
+  let txt = `【大号脚本】${data.bigaccount[idx].title||''}\n`;
+  txt += `方向：${sc.direction||sc.pillar||''} | 形式：${sc.form||''} | 时长：${sc.duration||''}\n`;
+  if(sc.location) txt += `场地：${sc.location}\n`;
+  if(sc.actors) txt += `出镜：${sc.actors}\n`;
+  if(sc.props && sc.props.length) txt += `道具：${sc.props.join('、')}\n`;
+  if(sc.hook_logic) txt += `\n🎯 推流逻辑\n${sc.hook_logic}\n`;
+  if(sc.scenes && sc.scenes.length){
+    txt += `\n📋 分镜头脚本（${sc.scenes.length}个镜头）\n`;
+    sc.scenes.forEach((s,i)=>{
+      txt += `\n镜头${i+1}｜${s.shot_name||'镜头'}（${s.time||''}）\n`;
+      if(s.framing) txt += `景别：${s.framing}\n`;
+      if(s.camera) txt += `机位：${s.camera}\n`;
+      if(s.visual) txt += `画面：${s.visual}\n`;
+      if(s.expression) txt += `表情：${s.expression}\n`;
+      if(s.action) txt += `动作：${s.action}\n`;
+      if(s.line && s.line!=='无') txt += `台词：${s.line}\n`;
+      if(s.subtitle && s.subtitle!=='无') txt += `字幕：${s.subtitle}\n`;
+      if(s.bgm) txt += `BGM：${s.bgm}\n`;
+      const tips = Array.isArray(s.tips)? s.tips : (s.tip? [s.tip] : []);
+      if(tips.length) txt += `拍摄要点：\n${tips.map(t=>'- '+t).join('\n')}\n`;
+    });
+  }
+  if(sc.ending_hook) txt += `\n🎬 结尾钩子\n${sc.ending_hook}\n`;
+  if(sc.publish_config){
+    txt += `\n📤 发布配置\n`;
+    if(sc.publish_config.best_time) txt += `时间：${sc.publish_config.best_time}\n`;
+    if(sc.publish_config.caption) txt += `文案：${sc.publish_config.caption}\n`;
+    if(sc.publish_config.cover_text) txt += `封面：${sc.publish_config.cover_text}\n`;
+    if(sc.publish_config.pinned_comment) txt += `置顶：${sc.publish_config.pinned_comment}\n`;
+  }
+  if(sc.shoot_checklist && sc.shoot_checklist.length) txt += `\n✅ 拍摄清单\n${sc.shoot_checklist.map(c=>'· '+c).join('\n')}\n`;
+  copyText(txt);
+}
+
+function saveBigaccountToScripts(idx){
+  const data = Store.get('dailyData', null);
+  if(!data || !data.bigaccount || !data.bigaccount[idx]) return;
+  const productName = Store.get('productName','') || '颜小盼咖啡';
+  const raw = data.bigaccount[idx];
+  const sc = normalizeScript(JSON.parse(JSON.stringify(raw)), productName);
+  const list = Store.get('scripts', []);
+  const newId = list.length? Math.max(...list.map(x=>x.id||0))+1 : 1;
+  list.unshift({
+    id: newId,
+    tag: (raw.tag||'大号') + '·大号',
+    title: raw.title || '大号脚本',
+    created: new Date().toLocaleString('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}),
+    script: sc
+  });
+  Store.set('scripts', list);
+  showToast('✅ 已存入每日脚本');
+  setTimeout(()=>switchSection('script'), 800);
+}
+
+// ===== 小号脚本渲染 =====
+function renderSmallaccount(){
+  const data = Store.get('dailyData', null);
+  const info = document.getElementById('smallaccountInfo');
+  const list = document.getElementById('smallaccountList');
+  const dateEl = document.getElementById('smallaccountDate');
+  const countEl = document.getElementById('smallaccountCount');
+
+  if(!data){
+    info.innerHTML = '<span class="err">未获取到数据，点击右上角刷新</span>';
+    list.innerHTML = '<div class="empty"><p>暂无小号脚本</p></div>';
+    countEl.textContent = '';
+    return;
+  }
+
+  const items = data.smallaccount || [];
+  countEl.textContent = `共 ${items.length} 条`;
+  dateEl.textContent = '📅 '+ (data.date||'') + ' · 3类型轮换';
+  const lu = Store.get('lastUpdate','');
+  info.innerHTML = lu? `<span class="ok">数据更新于 ${lu}</span>` : '';
+
+  if(!items.length){
+    list.innerHTML = '<div class="empty"><p>今日暂无小号脚本，点击右上角刷新</p></div>';
+    return;
+  }
+
+  const productName = Store.get('productName','') || '颜小盼咖啡';
+
+  list.innerHTML = items.map((it,i)=>{
+    const sc = normalizeScript(JSON.parse(JSON.stringify(it)), productName);
+    const typeColor = {'减脂生活方式':'#27AE60','好物分享':'#E67E22','直播预热':'#E74C3C'}[sc.type] || '#8CA63E';
+    return `
+    <div class="card">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+        <div style="flex:1;min-width:200px;">
+          <span style="font-size:11px;background:${typeColor};color:#fff;padding:3px 9px;border-radius:8px;font-weight:600;">${esc(sc.type||'小号')}</span>
+          ${sc.form?`<span style="font-size:11px;background:#FFF3E0;color:var(--orange);padding:2px 8px;border-radius:8px;font-weight:500;margin-left:4px;">${esc(sc.form)}</span>`:''}
+          ${sc.difficulty?`<span style="font-size:11px;color:var(--text-sub);margin-left:4px;">${esc(sc.difficulty)}</span>`:''}
+          <div style="font-size:15px;font-weight:600;margin-top:8px;color:var(--text);">${i+1}. ${esc(it.title||'')}</div>
+        </div>
+        <span style="font-size:11px;color:var(--text-mute);flex-shrink:0;">⏱${esc(sc.duration||'')}</span>
+      </div>
+      ${sc.location?`<div style="font-size:12px;color:var(--text-sub);margin-bottom:6px;">📍 场地：${esc(sc.location)}</div>`:''}
+      ${sc.actors?`<div style="font-size:12px;color:var(--text-sub);margin-bottom:6px;">👥 出镜：${esc(sc.actors)}</div>`:''}
+      ${sc.props && sc.props.length?`<div style="font-size:12px;color:var(--text-sub);margin-bottom:6px;">🎒 道具：${sc.props.map(p=>esc(p)).join('、')}</div>`:''}
+      ${sc.hook_logic?`<div style="background:linear-gradient(135deg,#FFF8E8,#FFFEF5);padding:10px;border-radius:8px;margin-bottom:10px;border-left:3px solid var(--gold);"><div style="font-size:11px;font-weight:700;color:var(--gold);margin-bottom:4px;">🎯 推流逻辑</div><div style="font-size:12px;color:var(--text);line-height:1.5;">${esc(sc.hook_logic)}</div></div>`:''}
+      ${sc.scenes && sc.scenes.length?`<div style="font-size:13px;font-weight:700;color:var(--olive-dark);margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid var(--olive-pale);">📋 分镜头脚本（${sc.scenes.length}个镜头）</div>
+        ${sc.scenes.map((shot,si)=>`<div style="background:var(--olive-tint);border-radius:10px;padding:12px;margin-bottom:10px;border-left:3px solid var(--olive-light);">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
+            <span style="background:var(--olive);color:#fff;font-size:11px;padding:2px 8px;border-radius:6px;font-weight:600;">镜头${si+1}</span>
+            <span style="font-size:12px;color:var(--olive);font-weight:600;">${esc(shot.time||'')}</span>
+            <span style="font-size:11px;color:var(--text-sub);background:#fff;padding:2px 8px;border-radius:6px;">${esc(shot.framing||'')}</span>
+            <span style="font-size:11px;color:var(--text-sub);background:#fff;padding:2px 8px;border-radius:6px;">${esc(shot.camera||'')}</span>
+          </div>
+          ${shot.visual?`<div style="margin-bottom:5px;"><span style="font-size:11px;color:var(--text-sub);font-weight:600;">🎬 画面：</span><span style="font-size:12px;color:var(--text);">${esc(shot.visual)}</span></div>`:''}
+          ${shot.expression?`<div style="margin-bottom:5px;"><span style="font-size:11px;color:#E91E63;font-weight:600;">😊 表情：</span><span style="font-size:12px;color:var(--text);">${esc(shot.expression)}</span></div>`:''}
+          ${shot.action?`<div style="margin-bottom:5px;"><span style="font-size:11px;color:var(--text-sub);font-weight:600;">✋ 动作：</span><span style="font-size:12px;color:var(--text);">${esc(shot.action)}</span></div>`:''}
+          ${shot.line && shot.line!=='无'?`<div style="margin-bottom:5px;background:#fff;padding:6px 10px;border-radius:6px;border-left:2px solid var(--olive);"><span style="font-size:11px;color:var(--olive-dark);font-weight:600;">🗣 台词：</span><span style="font-size:13px;color:var(--text);font-weight:500;">${esc(shot.line)}</span></div>`:''}
+          ${shot.subtitle && shot.subtitle!=='无'?`<div style="margin-bottom:5px;"><span style="font-size:11px;color:#3498DB;font-weight:600;">📝 字幕：</span><span style="font-size:12px;color:var(--text-sub);">${esc(shot.subtitle)}</span></div>`:''}
+          ${shot.bgm?`<div style="margin-bottom:5px;"><span style="font-size:11px;color:var(--text-sub);font-weight:600;">🎵 BGM：</span><span style="font-size:12px;color:var(--text-sub);">${esc(shot.bgm)}</span></div>`:''}
+          ${shot.tip?`<div style="background:#FFF8E8;padding:8px 10px;border-radius:6px;margin-top:6px;border-left:2px solid var(--gold);"><span style="font-size:11px;color:var(--gold);font-weight:600;">💡 要点：</span><span style="font-size:12px;color:var(--text);">${esc(shot.tip)}</span></div>`:''}
+        </div>`).join('')}`:''}
+      ${sc.ending_hook?`<div style="background:#F0F4E8;padding:10px;border-radius:8px;margin-bottom:8px;border-left:3px solid var(--olive);"><div style="font-size:11px;font-weight:600;color:var(--olive-dark);margin-bottom:4px;">🎬 结尾钩子</div><div style="font-size:12px;color:var(--text);line-height:1.5;">${esc(sc.ending_hook)}</div></div>`:''}
+      ${sc.publish_config?`<div style="background:#fff;padding:10px;border-radius:8px;margin-bottom:8px;border:1px solid var(--line);">
+        <div style="font-size:11px;font-weight:600;color:var(--olive-dark);margin-bottom:6px;">📤 发布配置</div>
+        ${sc.publish_config.best_time?`<div style="font-size:12px;color:var(--text-sub);margin-bottom:3px;">⏰ ${esc(sc.publish_config.best_time)}</div>`:''}
+        ${sc.publish_config.caption?`<div style="font-size:12px;color:var(--text);margin-bottom:3px;">📝 ${esc(sc.publish_config.caption)}</div>`:''}
+        ${sc.publish_config.cover_text?`<div style="font-size:12px;color:var(--orange);margin-bottom:3px;">🏷 封面：${esc(sc.publish_config.cover_text)}</div>`:''}
+        ${sc.publish_config.pinned_comment?`<div style="font-size:12px;color:var(--text-sub);">📌 置顶：${esc(sc.publish_config.pinned_comment)}</div>`:''}
+      </div>`:''}
+      ${sc.compliance_check?`<div style="background:#E8F5E9;padding:8px 10px;border-radius:8px;margin-bottom:8px;"><span style="font-size:11px;color:#27AE60;font-weight:600;">✅ 合规：</span><span style="font-size:11px;color:var(--text-sub);">${esc(sc.compliance_check)}</span></div>`:''}
+      ${sc.shoot_checklist && sc.shoot_checklist.length?`<div style="background:#FFF3E0;padding:10px;border-radius:8px;margin-bottom:10px;"><div style="font-size:11px;font-weight:600;color:var(--orange);margin-bottom:6px;">✅ 拍摄清单</div><ul style="font-size:12px;color:var(--text);padding-left:16px;line-height:1.6;">${sc.shoot_checklist.map(c=>`<li style="margin-bottom:2px;">${esc(c)}</li>`).join('')}</ul></div>`:''}
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-cancel" style="flex:1;font-size:12px;padding:8px;" onclick="copySmallaccount(${i})">复制完整脚本</button>
+        <button class="btn btn-primary" style="flex:1;font-size:12px;padding:8px;" onclick="saveSmallaccountToScripts(${i})">存入每日脚本</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function copySmallaccount(idx){
+  const data = Store.get('dailyData', null);
+  if(!data || !data.smallaccount || !data.smallaccount[idx]) return;
+  const productName = Store.get('productName','') || '颜小盼咖啡';
+  const sc = normalizeScript(JSON.parse(JSON.stringify(data.smallaccount[idx])), productName);
+  let txt = `【小号脚本】${data.smallaccount[idx].title||''}\n`;
+  txt += `类型：${sc.type||''} | 形式：${sc.form||''} | 时长：${sc.duration||''}\n`;
+  if(sc.location) txt += `场地：${sc.location}\n`;
+  if(sc.actors) txt += `出镜：${sc.actors}\n`;
+  if(sc.props && sc.props.length) txt += `道具：${sc.props.join('、')}\n`;
+  if(sc.hook_logic) txt += `\n🎯 推流逻辑\n${sc.hook_logic}\n`;
+  if(sc.scenes && sc.scenes.length){
+    txt += `\n📋 分镜头脚本（${sc.scenes.length}个镜头）\n`;
+    sc.scenes.forEach((s,i)=>{
+      txt += `\n[镜头${i+1}] ${s.time||''} ${s.framing||''} ${s.camera||''}\n`;
+      if(s.visual) txt += `画面：${s.visual}\n`;
+      if(s.expression) txt += `表情：${s.expression}\n`;
+      if(s.action) txt += `动作：${s.action}\n`;
+      if(s.line && s.line!=='无') txt += `台词：${s.line}\n`;
+      if(s.subtitle && s.subtitle!=='无') txt += `字幕：${s.subtitle}\n`;
+      if(s.bgm) txt += `BGM：${s.bgm}\n`;
+      if(s.tip) txt += `要点：${s.tip}\n`;
+    });
+  }
+  if(sc.ending_hook) txt += `\n🎬 结尾钩子\n${sc.ending_hook}\n`;
+  if(sc.publish_config){
+    txt += `\n📤 发布配置\n`;
+    if(sc.publish_config.best_time) txt += `时间：${sc.publish_config.best_time}\n`;
+    if(sc.publish_config.caption) txt += `文案：${sc.publish_config.caption}\n`;
+    if(sc.publish_config.cover_text) txt += `封面：${sc.publish_config.cover_text}\n`;
+    if(sc.publish_config.pinned_comment) txt += `置顶：${sc.publish_config.pinned_comment}\n`;
+  }
+  if(sc.shoot_checklist && sc.shoot_checklist.length) txt += `\n✅ 拍摄清单\n${sc.shoot_checklist.map(c=>'· '+c).join('\n')}\n`;
+  copyText(txt);
+}
+
+function saveSmallaccountToScripts(idx){
+  const data = Store.get('dailyData', null);
+  if(!data || !data.smallaccount || !data.smallaccount[idx]) return;
+  const productName = Store.get('productName','') || '颜小盼咖啡';
+  const raw = data.smallaccount[idx];
+  const sc = normalizeScript(JSON.parse(JSON.stringify(raw)), productName);
+  const list = Store.get('scripts', []);
+  const newId = list.length? Math.max(...list.map(x=>x.id||0))+1 : 1;
+  list.unshift({
+    id: newId,
+    tag: (raw.type||'小号') + '·小号',
+    title: raw.title || '小号脚本',
+    created: new Date().toLocaleString('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}),
+    script: sc
+  });
+  Store.set('scripts', list);
+  showToast('✅ 已存入每日脚本');
+  setTimeout(()=>switchSection('script'), 800);
+}
+
+function renderScript(){
+  const list = Store.get('scripts', []);
+  document.getElementById('scriptCount').textContent = `共 ${list.length} 条`;
+  const el = document.getElementById('scriptList');
+  if(!list.length){
+    el.innerHTML = '<div class="empty"><p>还没有脚本<br>从上方选一条选题生成</p></div>';
+    return;
+  }
+  el.innerHTML = list.map(s=>{
+    const sc = s.script;
+    return `
+    <div class="card">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:8px;">
+        <div>
+          <span style="font-size:11px;background:var(--olive-pale);color:var(--olive-dark);padding:2px 8px;border-radius:8px;font-weight:500;">${esc(s.tag)}</span>
+          ${sc.form?`<span style="font-size:11px;background:#FFF3E0;color:var(--orange);padding:2px 8px;border-radius:8px;font-weight:500;margin-left:4px;">${esc(sc.form)}</span>`:''}
+          <div style="font-size:15px;font-weight:600;margin-top:6px;color:var(--text);">${esc(s.title)}</div>
+        </div>
+        <span style="font-size:11px;color:var(--text-mute);flex-shrink:0;">${esc(s.created)}</span>
+      </div>
+      <div style="font-size:12px;color:var(--olive);margin-bottom:12px;">⏱ 总时长：${esc(sc.duration)}</div>
+      ${sc.hotRef?`<div style="background:#FFF3E0;padding:10px;border-radius:8px;margin-bottom:10px;border-left:3px solid var(--orange);"><div style="font-size:12px;font-weight:600;color:var(--orange);margin-bottom:4px;">🔥 二创原热点</div><div style="font-size:12px;color:var(--text);line-height:1.5;">${esc(sc.hotRef)}</div></div>`:''}
+      ${sc.angleRef?`<div style="background:var(--olive-pale);padding:10px;border-radius:8px;margin-bottom:10px;border-left:3px solid var(--olive);"><div style="font-size:12px;font-weight:600;color:var(--olive-dark);margin-bottom:4px;">✏️ 改编角度</div><div style="font-size:12px;color:var(--text);line-height:1.5;">${esc(sc.angleRef)}</div></div>`:''}
+      ${sc.hook?`<div style="background:linear-gradient(135deg,#FFF8E8,#FFFEF5);padding:12px;border-radius:10px;margin-bottom:10px;border-left:3px solid var(--gold);"><div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:6px;">🎯 黄金3秒钩子设计</div><div style="font-size:13px;color:var(--text);line-height:1.6;">${esc(sc.hook)}</div></div>`:''}
+      ${sc.emotion?`<div style="background:var(--olive-tint);padding:10px;border-radius:8px;margin-bottom:10px;"><div style="font-size:12px;font-weight:600;color:var(--olive-dark);margin-bottom:4px;">📈 情绪节奏曲线</div><div style="font-size:12px;color:var(--text);">${esc(sc.emotion)}</div></div>`:''}
+      ${sc.logic?`<div style="background:#F0F4E8;padding:12px;border-radius:10px;margin-bottom:12px;border-left:3px solid var(--olive);"><div style="font-size:12px;font-weight:700;color:var(--olive-dark);margin-bottom:6px;">🎬 拍摄逻辑（为什么这么拍）</div><div style="font-size:13px;color:var(--text);line-height:1.6;">${esc(sc.logic)}</div></div>`:''}
+      <div style="font-size:13px;font-weight:700;color:var(--olive-dark);margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid var(--olive-pale);">📋 分镜头脚本（每个镜头含拍摄要点）</div>
+      ${sc.scenes.map((shot,i)=>`<div style="background:var(--olive-tint);border-radius:10px;padding:12px;margin-bottom:10px;border-left:3px solid var(--olive-light);"><div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><span style="background:var(--olive);color:#fff;font-size:11px;padding:2px 8px;border-radius:6px;font-weight:600;">镜头${i+1}</span><span style="font-size:12px;color:var(--olive);font-weight:600;">${esc(shot.time)}</span><span style="font-size:11px;color:var(--text-sub);background:#fff;padding:2px 8px;border-radius:6px;">${esc(shot.shot)}</span></div><div style="margin-bottom:6px;"><span style="font-size:11px;color:var(--text-sub);font-weight:600;">🎬 画面/动作：</span><span style="font-size:13px;color:var(--text);">${esc(shot.action)}</span></div><div style="margin-bottom:6px;"><span style="font-size:11px;color:var(--text-sub);font-weight:600;">🗣 台词/字幕：</span><span style="font-size:13px;color:var(--text);">${esc(shot.line)}</span></div><div style="margin-bottom:6px;"><span style="font-size:11px;color:var(--text-sub);font-weight:600;">🎵 BGM：</span><span style="font-size:12px;color:var(--text-sub);">${esc(shot.bgm)}</span></div>${shot.note?`<div style="background:#fff;padding:8px 10px;border-radius:6px;margin-top:6px;border-left:2px solid var(--gold);"><span style="font-size:11px;color:var(--gold);font-weight:600;">💡 拍摄要点：</span><span style="font-size:12px;color:var(--text);">${esc(shot.note)}</span></div>`:''}</div>`).join('')}
+      <div style="background:var(--olive-tint);padding:10px;border-radius:8px;margin-bottom:8px;"><div style="font-size:12px;font-weight:600;color:var(--olive-dark);margin-bottom:4px;">💬 互动引导</div><div style="font-size:12px;color:var(--text);line-height:1.5;">${esc(sc.interact)}</div></div>
+      <div style="background:#FFF8E8;padding:10px;border-radius:8px;margin-bottom:8px;"><div style="font-size:12px;font-weight:600;color:var(--gold);margin-bottom:4px;">🎯 产品植入策略</div><div style="font-size:12px;color:var(--text);line-height:1.5;">${esc(sc.product)}</div></div>
+      ${sc.safeWords?`<div style="background:#FDEAEA;padding:10px;border-radius:8px;margin-bottom:8px;"><div style="font-size:12px;font-weight:600;color:var(--red);margin-bottom:4px;">⚠️ 违规避雷</div><ul style="font-size:12px;color:var(--text);padding-left:16px;line-height:1.6;">${sc.safeWords.map(w=>`<li>${esc(w)}</li>`).join("")}</ul></div>`:''}
+      <div style="font-size:12px;font-weight:600;color:var(--olive-dark);margin-bottom:6px;">💡 拍摄 tips</div>
+      <ul style="font-size:12px;color:var(--text-sub);padding-left:16px;margin-bottom:10px;line-height:1.6;">${sc.tips.map(t=>`<li style="margin-bottom:4px;">${esc(t)}</li>`).join('')}</ul>
+      <div style="display:flex;gap:8px;"><button class="btn btn-cancel" style="flex:1;font-size:12px;padding:8px;" onclick="copyScript(${s.id})">复制完整脚本</button><button class="btn btn-danger" style="flex:0 0 auto;font-size:12px;padding:8px 14px;" onclick="delScript(${s.id})">删除</button></div>
+    </div>`;
+  }).join('');
+}
+function copyScript(id){
+  const list = Store.get('scripts', []);
+  const s = list.find(x=>x.id===id);
+  if(!s) return;
+  const sc = s.script;
+  let text = `【${s.title}】\n`;
+  text += `形式：${sc.form||'标准视频'} | 时长：${sc.duration}\n\n`;
+  if(sc.hotRef) text += `🔥 二创原热点：${sc.hotRef}\n\n`;
+  if(sc.angleRef) text += `✏️ 改编角度：${sc.angleRef}\n\n`;
+  if(sc.hook) text += `🎯 黄金3秒钩子：\n${sc.hook}\n\n`;
+  if(sc.emotion) text += `📈 情绪节奏：${sc.emotion}\n\n`;
+  if(sc.logic) text += `🎬 拍摄逻辑：\n${sc.logic}\n\n`;
+  text += `📋 分镜头脚本：\n`;
+  sc.scenes.forEach((shot,i)=>{
+    text += `\n镜头${i+1} [${shot.time}] ${shot.shot}\n`;
+    text += `  画面/动作：${shot.action}\n`;
+    text += `  台词/字幕：${shot.line}\n`;
+    text += `  BGM：${shot.bgm}\n`;
+    if(shot.note) text += `  💡 拍摄要点：${shot.note}\n`;
+  });
+  text += `\n💬 互动引导：${sc.interact}\n\n`;
+  text += `🎯 产品植入：${sc.product}\n\n`;
+  if(sc.safeWords) text += `⚠️ 违规避雷：\n${sc.safeWords.map(w=>'· '+w).join('\n')}\n\n`;
+  text += `💡 拍摄Tips：\n${sc.tips.map(t=>'· '+t).join('\n')}`;
+  
+  copyText(text);
+  showToast('✅ 完整脚本已复制');
+}
+
+function delScript(id){
+  if(!confirm('删除这条脚本？')) return;
+  const list = Store.get('scripts', []).filter(x=>x.id!==id);
+  Store.set('scripts', list);
+  renderScript();
+  showToast('已删除');
+}
+
+/* ===================================================
+   设置
+=================================================== */
+function loadSettings(){
+  document.getElementById('setGistId').value = Store.get('gistId','');
+  document.getElementById('setTrack').value = Store.get('track', CONFIG.DEFAULT_TRACK);
+  document.getElementById('setProductName').value = Store.get('productName','');
+  document.getElementById('setAIKey').value = Store.get('aiKey','');
+}
+function saveSettings(){
+  Store.set('gistId', document.getElementById('setGistId').value.trim());
+  Store.set('track', document.getElementById('setTrack').value.trim());
+  Store.set('productName', document.getElementById('setProductName').value.trim() || '颜小盼咖啡');
+  Store.set('aiKey', document.getElementById('setAIKey').value.trim());
+  showToast('✅ 设置已保存');
+}
+
+function exportData(){
+  const data = {};
+  for(let i=0;i<localStorage.length;i++){
+    const k = localStorage.key(i);
+    if(k.startsWith('cw_')) data[k] = localStorage.getItem(k);
+  }
+  const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `创作工作台备份_${todayKey()}.json`;
+  a.click();
+  showToast('已导出');
+}
+function clearAllData(){
+  if(!confirm('确定清空所有本地数据？此操作不可恢复！')) return;
+  if(!confirm('再次确认：将清空所有计划、复盘、备忘录、灵感库！')) return;
+  for(let i=localStorage.length-1;i>=0;i--){
+    const k = localStorage.key(i);
+    if(k.startsWith('cw_')) localStorage.removeItem(k);
+  }
+  location.reload();
+}
+
+/* ===================================================
+   工具
+=================================================== */
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+function fmtNum(n){
+  if(n>=10000) return (n/10000).toFixed(1)+'w';
+  if(n>=1000) return (n/1000).toFixed(1)+'k';
+  return n;
+}
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._t);
+  t._t = setTimeout(()=>t.classList.remove('show'), 2500);
+}
+function updateDrawerInfo(){
+  document.getElementById('lastUpdate').textContent = Store.get('lastUpdate','—');
+  let size=0;
+  for(let i=0;i<localStorage.length;i++){
+    const k=localStorage.key(i);
+    if(k.startsWith('cw_')) size += localStorage.getItem(k).length;
+  }
+  document.getElementById('storageInfo').textContent = (size/1024).toFixed(1)+'KB';
+  document.getElementById('drawerSub').textContent = fmtDate();
+}
+
+/* ===================================================
+   初始化
+=================================================== */
+/* ===================================================
+   拍摄方向库
+=================================================== */
+const DIRECTIONS = [
+  {
+    layer: '真实生活层', layerColor: 'var(--olive)', layerIcon: '📱',
+    items: [
+      {
+        name: '在老公面前秀身材', icon: '⭐', priority: '流量密码，必做',
+        goal: '制造反差+老公真实反应，引发共鸣',
+        form: '15秒，对比+夫妻互动',
+        examples: ['穿上3年前的裤子，老公反应绝了','减脂后穿吊带，老公紧张了','穿比基尼在老公面前，他沉默了'],
+        key: '老公反应必须偷拍，不能演。前1秒旧照片，第2秒切现在。'
+      },
+      {
+        name: '夫妻日常', icon: '💑', priority: '接地气人设',
+        goal: '让粉丝觉得"这就是我想要的生活"',
+        form: '15秒，日常片段+搞笑+走心收尾',
+        examples: ['老公偷吃我减脂餐被抓包','我俩的一天：他外卖我减脂餐','老公陪我减肥的崩溃瞬间'],
+        key: '搞笑是外壳，温暖是内核。最后3秒必须走心。'
+      },
+      {
+        name: '我的变化记录', icon: '📸', priority: '人设核心',
+        goal: '强化"从胖变好看"的IP，让粉丝见证你的成长',
+        form: '15-20秒，对比+回忆+成长',
+        examples: ['翻出3年前的照片我哭了','从140到100穿过的衣服变化','你们看着我一步一步变好看'],
+        key: '你本身的变化就是最大的广告，持续强化。'
+      },
+      {
+        name: '瘦后的新生活', icon: '🌅', priority: '向往感',
+        goal: '制造向往，让粉丝"想成为你"',
+        form: '20秒，vlog+风景+独白',
+        examples: ['瘦下来第一次敢去海边','以前不敢穿的衣服现在全敢了','瘦下来后第一次自信出行'],
+        key: '每个"敢去"接一个"以前不敢"的对比。画面>语言。'
+      },
+      {
+        name: '蹭热点二创', icon: '🔥', priority: '突发插入，借流量',
+        goal: '用减脂视角解读热门事件，拉新粉',
+        form: '15秒，热点关联+你的观点',
+        examples: ['台风天居家燃脂操','我的体重跌幅榜（蹭A股）','减脂就是普通人的修仙'],
+        key: '热点出来6小时内发。关联要自然，落脚点在减脂。'
+      },
+      {
+        name: '老公对我的宠溺', icon: '😘', priority: '向往感+夫妻互动',
+        goal: '让粉丝向往"瘦下来老公也会更宠我"',
+        form: '15-20秒，日常宠溺场景+走心收尾',
+        examples: ['减脂后老公每天早上给我准备减脂餐','老公开始给我买小一号的衣服了','我说想吃什么老公半夜出去买','老公偷偷给我拍了100张照片'],
+        key: '宠溺是"变好的结果"不是"秀恩爱"。每条都要传递：变好了，被爱的人会更宠你。'
+      },
+      {
+        name: '和大姐一起拍', icon: '👯', priority: '真实案例+活广告',
+        goal: '大姐的变化就是你的方法有效的证明',
+        form: '15-20秒，大姐近况+你的陪伴',
+        examples: ['大姐瘦下来后第一次来店里找我','大姐穿上S码我们俩一起逛街','大姐说的一句话让我破防了','大姐现在的生活方式变化'],
+        key: '不拍挑战过程，拍"挑战后的生活"。大姐是活广告，她的变化=你的方法有效。'
+      },
+      {
+        name: '30岁宝妈的好状态', icon: '👩‍👧‍👦', priority: '差异化人设，最强向往',
+        goal: '让粉丝觉得"生了孩子也能这么好，孩子还会更喜欢漂亮的妈妈"',
+        form: '15-20秒，宝妈日常+好状态展示',
+        examples: ['30岁两个儿子的妈，现在的状态','孩子说"妈妈你越来越漂亮了"','生了两个孩子的身材（162/98）','接送孩子时其他妈妈的反应'],
+        key: '这是你独有的差异化人设。不是单纯秀身材，是"宝妈+好状态"的组合。核心金句："孩子更喜欢漂亮的妈妈"。让25-40岁宝妈觉得"我也能像她一样"。',
+      },
+      {
+        name: '让粉丝向往成为我', icon: '✨', priority: '人设向往',
+        goal: '展示"变好后的人生可能性"，让粉丝想成为你',
+        form: '15-20秒，生活状态展示+金句',
+        examples: ['我的一天：从运动到工作到陪家人','变好后我最喜欢的一个变化','有人问我你怎么越来越自信了','你想成为现在的我吗？我来教你'],
+        key: '每条都要回答"我也能像她一样吗"→答案永远是"能"。不是炫优越是展示可能性。'
+      },
+      {
+        name: '秀实力（自然版）', icon: '💎', priority: '信任建立，不炫富',
+        goal: '让粉丝觉得"她有实力，犯不着为268骗我"',
+        form: '实力在背景自然出现，不是主角',
+        examples: ['拍视频时背景是店里货架/仓库打包','出门开车门把手入镜','收到快递是品牌包装','好餐厅打卡配"以前想都不敢想"'],
+        key: '循序渐进！从小到大3个月慢慢加。每次秀实力必须接"以前不敢想"或"努力换来的"。实力是"变好的副产品"不是"炫耀的资本"。永远不直接说"我有钱"。'
+      }
+    ]
+  },
+  {
+    layer: '价值输出层', layerColor: 'var(--olive-light)', layerIcon: '💡',
+    items: [
+      {
+        name: '减脂干货/冷知识', icon: '📚', priority: '拉新粉主力',
+        goal: '让陌生女性主动搜到你，变成粉丝',
+        form: '15秒，口播，直击痛点',
+        examples: ['30岁后代谢变慢的3个信号','经期前后怎么吃不胖','为什么肚子最难瘦'],
+        key: '25-40岁女性会主动搜索的内容。给希望不给焦虑。'
+      },
+      {
+        name: '聊心声经历', icon: '💝', priority: '打动人心',
+        goal: '让粉丝觉得"她懂我"，建立深度信任',
+        form: '20秒，独白/夫妻对话',
+        examples: ['我以前也胖过，你的犹豫我都懂','最胖的时候有多自卑','最想对犹豫的姐妹说的心里话'],
+        key: '语速慢一倍，留白是力量。不要哭，平静说更有力。'
+      },
+      {
+        name: '人生感悟', icon: '✨', priority: '价值观认同',
+        goal: '从"减肥"升华到"人生"，让粉丝向往',
+        form: '15-20秒，金句+画面',
+        examples: ['改变不是惩罚自己，是奖励自己','自律不是狠，是爱自己','你只管变好，剩下的都会跟上来'],
+        key: '扣回减脂，不要飘。金句直接做标题。'
+      }
+    ]
+  },
+  {
+    layer: '转化攒劲层', layerColor: 'var(--gold)', layerIcon: '🎯',
+    items: [
+      {
+        name: '做产品的初心', icon: '🙏', priority: '信任基石',
+        goal: '让粉丝相信你是真心帮她，不是为卖货',
+        form: '20秒，真心话讲述',
+        examples: ['我为什么做减脂：不是为卖货','我自己就是产品的受益者','我陪跑过的最难忘的姐妹'],
+        key: '核心是"我为什么想帮你"，不是"产品多好"。'
+      },
+      {
+        name: '店里的事', icon: '🏪', priority: '最容易促单',
+        goal: '用真实顾客案例引发"我也想要"',
+        form: '20秒，讲述+场景',
+        examples: ['今天店里来了个产后妈妈','一个姐妹喝了3个月的变化','老顾客复购时说的话让我破防'],
+        key: '故事必须真实。细节比形容词有力。'
+      },
+      {
+        name: '工厂/实力展示', icon: '🏭', priority: '背书',
+        goal: '让粉丝放心，不是三无产品',
+        form: '15-20秒，实地拍摄',
+        examples: ['带你们看咖啡生产线','为什么我们的成本高','一杯咖啡从原料到成品'],
+        key: '展示实力但不炫耀。重点是"为品质负责"。'
+      },
+      {
+        name: '直播预热+切片', icon: '🎬', priority: '榨干每场直播',
+        goal: '一个月3场直播，每场价值最大化',
+        form: '预热15秒+切片15秒',
+        examples: ['这次直播准备了什么大招','昨晚直播间最催泪的瞬间','3分钟抢空的场面你们没见到'],
+        key: '直播前3天开始预热，直播后2天发切片。'
+      }
+    ]
+  }
+];
+
+function renderDirections(){
+  const el = document.getElementById('directionsList');
+  el.innerHTML = DIRECTIONS.map(layer=>`
+    <div style="margin-bottom:16px;">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;">
+        <span style="background:${layer.layerColor};color:#fff;font-size:12px;padding:3px 10px;border-radius:8px;font-weight:600;">${layer.layerIcon} ${layer.layer}</span>
+      </div>
+      ${layer.items.map(it=>`
+        <div class="card" style="margin-bottom:10px;border-left:3px solid ${layer.layerColor};">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:6px;">
+            <div style="font-size:15px;font-weight:600;color:var(--text);">${it.icon} ${esc(it.name)}</div>
+            <span style="font-size:10px;color:${layer.layerColor};background:var(--olive-tint);padding:2px 8px;border-radius:6px;flex-shrink:0;font-weight:500;">${esc(it.priority)}</span>
+          </div>
+          <div style="font-size:12px;color:var(--text-sub);margin-bottom:6px;">🎯 <b>目标：</b>${esc(it.goal)}</div>
+          <div style="font-size:12px;color:var(--text-sub);margin-bottom:6px;">🎬 <b>形式：</b>${esc(it.form)}</div>
+          <div style="font-size:12px;color:var(--text-sub);margin-bottom:8px;">📝 <b>选题示例：</b></div>
+          <ul style="font-size:12px;color:var(--text);padding-left:18px;margin-bottom:8px;line-height:1.6;">
+            ${it.examples.map(e=>`<li style="margin-bottom:2px;">${esc(e)}</li>`).join('')}
+          </ul>
+          <div style="background:var(--olive-tint);padding:8px 10px;border-radius:6px;font-size:12px;color:var(--olive-dark);line-height:1.5;">
+            💡 <b>关键：</b>${esc(it.key)}
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  `).join('');
+}
+
+function init(){
+  renderNav();
+  renderPlan();
+  renderReview();
+  renderMemo();
+  renderLibrary();
+  renderScript();
+  renderDirections();
+  fillScriptSelect();
+  loadSettings();
+  updateDrawerInfo();
+  document.getElementById('rvDate').value = todayKey();
+  
+  // 首次加载，如果有Gist则自动获取，否则加载演示
+  const gid = getGistId();
+  if(gid){
+    fetchGist();
+  }else{
+    loadDemoData();
+  }
+  // 加载今日状态
+  loadDailyState();
+}
+
+document.addEventListener('DOMContentLoaded', init);
+// 防止iOS双击缩放
+let lastTouch=0;
+document.addEventListener('touchend',e=>{
+  const now=Date.now();
+  if(now-lastTouch<300) e.preventDefault();
+  lastTouch=now;
+},{passive:false});
+</script>
+</body>
+</html>
